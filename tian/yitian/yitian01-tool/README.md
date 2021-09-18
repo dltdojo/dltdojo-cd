@@ -10,6 +10,7 @@ tool tree
   - kustomize
   - heml
   - k3d/k3s/microk8s
+- git
 - VisualStudio Code
   - terminal: [Bash (Unix shell)](https://en.wikipedia.org/wiki/Bash_(Unix_shell))
     - [How do I use Bash on Windows from the Visual Studio Code integrated terminal? - Stack Overflow](https://stackoverflow.com/questions/42606837/how-do-i-use-bash-on-windows-from-the-visual-studio-code-integrated-terminal)
@@ -24,6 +25,14 @@ tool tree
 - ethereum
   - [ethereum/go-ethereum: Official Go implementation of the Ethereum protocol](https://github.com/ethereum/go-ethereum)
   - geth's built-in interactive JavaScript console
+- Cybersecurity Framework (CSF)
+  - [Cybersecurity Framework | NIST](https://www.nist.gov/cyberframework)
+  - [The Cybersecurity Framework - YouTube](https://www.youtube.com/watch?v=J9ToNuwmyF0&t)
+  - ID Identify
+  - PR Protect
+  - DE Detect
+  - RS Respond
+  - RC Recover
 
 
 任務報酬(TODO)
@@ -38,6 +47,7 @@ tool tree
     - 合約開發者 +5
     - 前端開發者 +1
     - 後端開發者 +1
+    - 守護者 +1
 - Non Fungible Token
   - 2021 新參紀念章
   - 2021 王牌建造者
