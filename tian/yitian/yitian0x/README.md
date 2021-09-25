@@ -1,0 +1,53 @@
+# WIP
+
+- HTTP server
+  - apache
+  - nginx
+  - [How do you set up a local testing server? - Learn web development | MDN](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/set_up_a_local_testing_server)
+    - ```python3 -m http.server```
+    - ```php -S localhost:8000```
+- bitcoin
+  - [Release Bitcoin Core 22.0 · bitcoin/bitcoin](https://github.com/bitcoin/bitcoin/releases/tag/v22.0)
+  - [BlockchainCommons/Learning-Bitcoin-from-the-Command-Line: A complete course for learning Bitcoin programming and usage from the command](https://github.com/BlockchainCommons/Learning-Bitcoin-from-the-Command-Line)
+- ethereum
+  - [ethereum/go-ethereum: Official Go implementation of the Ethereum protocol](https://github.com/ethereum/go-ethereum)
+  - geth's built-in interactive JavaScript console
+  - solidity
+- rust
+- nodejs
+- Storage
+  - ipfs
+- Games
+  - [Veloren](https://veloren.net/)
+    - [聊天測試 BIP39 - DLTDOJO3 第三新熵熱踢道場](https://dltdojo.github.io/taichu-crypto/mad-red/veloren/chat-dltdojo-bip39/index.html)
+  - Minecraft
+    - [bitquest/bitquest: A Minecraft server with Blockchain economy](https://github.com/bitquest/bitquest)
+    - [EnjinCraft - Minecraft Blockchain Plugin | Enjin](https://enjin.io/software/enjincraft)
+- Cybersecurity Framework (CSF)
+  - [Cybersecurity Framework | NIST](https://www.nist.gov/cyberframework)
+  - [The Cybersecurity Framework - YouTube](https://www.youtube.com/watch?v=J9ToNuwmyF0&t)
+  - ID Identify
+  - PR Protect
+  - DE Detect
+  - RS Respond
+  - RC Recover
+- blockchain
+  - MIT 15.S12 Blockchain and Money, Fall 2018 - YouTube https://www.youtube.com/playlist?list=PLUl4u3cNGP63UUkfL0onkxF6MYgVa04Fn
+
+任務報酬(TODO)
+
+- Fungible Token
+  - 200 DDJCD (DLTDOJO CYBERDREAM POINT)
+  - 123 Level Exp. 
+  - Job Exp.
+    - k8s 操作員 +10
+    - 道場建造員 +10
+    - 測試員 +10
+    - 合約開發者 +5
+    - 前端開發者 +1
+    - 後端開發者 +1
+    - 守護者 +1
+- Non Fungible Token
+  - 2021 新參紀念章
+  - 2021 王牌建造者
+  - 2021 超級建造者
