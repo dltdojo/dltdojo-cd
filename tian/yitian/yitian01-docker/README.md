@@ -5,7 +5,19 @@
 - [Docker - 維基百科，自由的百科全書](https://zh.wikipedia.org/zh-tw/Docker)
 - [Install Docker Engine | Docker Documentation](https://docs.docker.com/engine/install/)
 - [Docker Tutorial for Beginners [FULL COURSE in 3 Hours] - YouTube](https://www.youtube.com/watch?v=3c-iBn73dDE)
-- [Evolution of HTTP - HTTP | MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Evolution_of_HTTP#invention_of_the_world_wide_web)
+- [docker - YouTube](https://www.youtube.com/results?search_query=docker&sp=EgIYAg%253D%253D)
+- HTTP
+  - [Evolution of HTTP - HTTP | MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Evolution_of_HTTP#invention_of_the_world_wide_web)
+  - [curlimages/curl Tags | Docker Hub](https://hub.docker.com/r/curlimages/curl/tags?page=1&ordering=last_updated)
+  - [Httpd - Official Image | Docker Hub](https://hub.docker.com/_/httpd)
+  - [The Apache HTTP Server Project](https://httpd.apache.org/)
+  - [Php - Official Image | Docker Hub](https://hub.docker.com/_/php)
+  - [buildkite/puppeteer - Docker Image | Docker Hub](https://hub.docker.com/r/buildkite/puppeteer)
+  - [puppeteer/puppeteer: Headless Chrome Node.js API](https://github.com/puppeteer/puppeteer)
+- PostgreSQL
+  - [SQL - Wikipedia](https://en.wikipedia.org/wiki/SQL)
+  - [Postgres - Official Image | Docker Hub](https://hub.docker.com/_/postgres?tab=description&page=1&ordering=last_updated)
+  - The CREATE USER statement is a PostgreSQL extension. The SQL standard leaves the definition of users to the implementation. [PostgreSQL: Documentation: 12: CREATE USER](https://www.postgresql.org/docs/12/sql-createuser.html)
 - bitcoin
   - [bitcoin/bitcoin: Bitcoin Core integration/staging tree](https://github.com/bitcoin/bitcoin)
   - [ruimarinho/docker-bitcoin-core: A bitcoin-core docker image](https://github.com/ruimarinho/docker-bitcoin-core)
@@ -17,15 +29,103 @@
 
 - hello-world
 - 網路 HTTP 資源讀取
-- 產生一個比特幣地址
-- 產生一個以太坊地址
+- 製作一個關聯性資料庫使用者帳戶
+- 製作一個靜態 HTTP 服務
+- 製作一個動態 HTTP 服務
+- 製作一個比特幣帳戶地址
+- 製作一個以太坊帳戶地址
 
 ```
 $ docker run hello-world
-$ docker run --entrypoint curl docker.io/bitnami/kubectl:1.22 -sv http://info.cern.ch/hypertext/WWW/TheProject.html
-$ docker run --entrypoint sh docker.io/ruimarinho/bitcoin-core:0.16-alpine -c "bitcoind -printtoconsole -regtest=1 & sleep 7 ; bitcoin-cli -regtest getnewaddress"
+$ docker run docker.io/curlimages/curl:7.79.1 -sv http://info.cern.ch/hypertext/WWW/TheProject.html
+```
+
+資料庫 PostgreSQL 新增使用者
+
+```
+$ docker run -d --name my-db -e POSTGRES_PASSWORD=password docker.io/postgres:13-alpine && \
+    sleep 10 && \
+    docker exec -it my-db psql -U postgres -c "CREATE DATABASE db101 ;" && \
+    docker exec -it my-db psql -U postgres -c "CREATE USER alice WITH ENCRYPTED PASSWORD 'alicepass'; GRANT ALL PRIVILEGES ON DATABASE db101 TO alice;" && \
+    docker exec -it my-db psql -U postgres -l && \
+    docker stop my-db && \
+    docker rm my-db
+```
+
+製作靜態 HTTP 服務
+
+```
+$ docker network create --driver bridge foonet && \
+    docker run -d --name my-http -p 8081:80 --network foonet docker.io/httpd:2-alpine && \
+    sleep 6 && \
+    docker exec -it my-http cat /usr/local/apache2/htdocs/index.html && \
+    docker exec -it my-http sed -i "s/It/DLTDOJO-CD/g" /usr/local/apache2/htdocs/index.html && \
+    docker run --network foonet docker.io/curlimages/curl:7.79.1 -sv http://my-http:80 && \
+    docker stop my-http && \
+    docker rm my-http && \
+    docker network rm foonet
+```
+
+製作動態 HTTP 服務
+
+```
+$ docker network create --driver bridge foonet && \
+  docker run -d --name my-php -p 8081:80 --network foonet docker.io/php:7.2-apache && \
+  sleep 6 && \
+  docker exec -i my-php /bin/sh <<\EOF &&
+cat <<\HERE > /var/www/html/index.php
+<HTML>
+<HEAD>
+<TITLE>DLTDOJO-CD</TITLE>
+</HEAD>
+<BODY>
+<H2>Frontend Time : <span id="frontend-time"></span></H2>
+<H2>Backend Time : 
+<?php 
+$today = date('Y-m-d H:i:s'); 
+echo $today; 
+?>
+</H2>
+<script>
+const d = new Date();
+document.getElementById("frontend-time").innerHTML = d.toISOString();
+</script>
+</BODY>
+</HTML>
+HERE
+EOF
+  docker run --network foonet docker.io/curlimages/curl:7.79.1 -sv http://my-php:80 && \
+  docker run -i --network foonet docker.io/buildkite/puppeteer:10.0.0 /bin/sh <<\EOF2 &&
+cat <<\HERE2 > test.js
+const puppeteer = require('puppeteer');
+
+(async () => {
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
+  const page = await browser.newPage();
+  await page.goto("http://my-php:80/", {waitUntil: 'networkidle0'});
+  const html = await page.content(); // serialized HTML of page DOM.
+  console.log(html);
+  await browser.close();
+})();
+HERE2
+node test.js
+EOF2
+  docker stop my-php && \
+  docker rm my-php && \
+  docker network rm foonet
+```
+
+比特幣與以太坊新增地址
+
+```
+$ docker run --entrypoint sh docker.io/ruimarinho/bitcoin-core:0.16-alpine \
+  -c "bitcoind -printtoconsole -regtest=1 & sleep 7 ; bitcoin-cli -regtest getnewaddress"
+$ docker run --entrypoint sh docker.io/ethereum/client-go:v1.10.4 \
+  -c "echo "TESTONLY" > pwd.txt ; geth account new --password pwd.txt"
 $ docker run -it docker.io/ethereum/client-go:v1.10.4 account new
-$ docker run --entrypoint sh docker.io/ethereum/client-go:v1.10.4 -c "echo "TESTONLY" > pwd.txt ; geth account new --password pwd.txt"
 ```
 
 # 其他討論
