@@ -14,14 +14,19 @@
   - [Php - Official Image | Docker Hub](https://hub.docker.com/_/php)
   - [buildkite/puppeteer - Docker Image | Docker Hub](https://hub.docker.com/r/buildkite/puppeteer)
   - [puppeteer/puppeteer: Headless Chrome Node.js API](https://github.com/puppeteer/puppeteer)
+- Nmap Network Scanning
+  - [instrumentisto/nmap - Docker Image | Docker Hub](https://hub.docker.com/r/instrumentisto/nmap)
+  - [Common Platform Enumeration (CPE) | Nmap Network Scanning](https://nmap.org/book/output-formats-cpe.html)
+  - [Common Platform Enumeration - Wikipedia](https://en.wikipedia.org/wiki/Common_Platform_Enumeration)
+  - [cpe:/a:apache:http_server:2.4.41 - NVD - Search Common Platform Enumerations (CPE)](https://nvd.nist.gov/products/cpe/search/results?namingFormat=2.2&keyword=cpe%3A%2Fa%3Aapache%3Ahttp_server%3A2.4.41)
 - PostgreSQL
   - [SQL - Wikipedia](https://en.wikipedia.org/wiki/SQL)
   - [Postgres - Official Image | Docker Hub](https://hub.docker.com/_/postgres?tab=description&page=1&ordering=last_updated)
   - The CREATE USER statement is a PostgreSQL extension. The SQL standard leaves the definition of users to the implementation. [PostgreSQL: Documentation: 12: CREATE USER](https://www.postgresql.org/docs/12/sql-createuser.html)
-- bitcoin
+- Bitcoin
   - [bitcoin/bitcoin: Bitcoin Core integration/staging tree](https://github.com/bitcoin/bitcoin)
   - [ruimarinho/docker-bitcoin-core: A bitcoin-core docker image](https://github.com/ruimarinho/docker-bitcoin-core)
-- ethereum
+- Ethereum
   - [ethereum/go-ethereum: Official Go implementation of the Ethereum protocol](https://github.com/ethereum/go-ethereum)
   - [ethereum/client-go - Docker Image | Docker Hub](https://hub.docker.com/r/ethereum/client-go)
 
@@ -31,6 +36,7 @@
 - 網路 HTTP 資源讀取
 - 製作一個關聯性資料庫使用者帳戶
 - 製作一個靜態 HTTP 服務
+- 顯示一組 NVD 有漏洞紀錄的 Common Platform Enumeration
 - 製作一個動態 HTTP 服務
 - 製作一個比特幣帳戶地址
 - 製作一個以太坊帳戶地址
@@ -52,21 +58,22 @@ $ docker run -d --name my-db -e POSTGRES_PASSWORD=password docker.io/postgres:13
     docker rm my-db
 ```
 
-製作靜態 HTTP 服務
+製作靜態 HTTP 服務與展示 CPE
 
 ```
 $ docker network create --driver bridge foonet && \
-    docker run -d --name my-http -p 8081:80 --network foonet docker.io/httpd:2-alpine && \
+    docker run -d --name my-http -p 8081:80 --network foonet docker.io/httpd:2.4.41-alpine && \
     sleep 6 && \
     docker exec -it my-http cat /usr/local/apache2/htdocs/index.html && \
     docker exec -it my-http sed -i "s/It/DLTDOJO-CD/g" /usr/local/apache2/htdocs/index.html && \
-    docker run --network foonet docker.io/curlimages/curl:7.79.1 -sv http://my-http:80 && \
+    docker run --rm -it --network foonet docker.io/curlimages/curl:7.79.1 -sv http://my-http:80 && \
+    docker run --rm -it --network foonet docker.io/instrumentisto/nmap:7.92 -A -T4 -oX - my-http && \
     docker stop my-http && \
     docker rm my-http && \
     docker network rm foonet
 ```
 
-製作動態 HTTP 服務
+製作動態 HTTP 服務，測試前端的 ```docker.io/buildkite/puppeteer:10.0.0``` 約 420 MB 需注意預留空間與下載時間。
 
 ```
 $ docker network create --driver bridge foonet && \
