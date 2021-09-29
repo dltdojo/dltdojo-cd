@@ -1,6 +1,8 @@
 # YiTian01 壹天壹時 Docker
 
-展開旅程前需要先收集工具，提供操控各式工具的容器化應用 Docker 為第一個需要安裝完成的工具。Docker 在各平台也不同的安裝方式請自行搜尋安裝完成。
+展開旅程前需先安裝好 2 個必備工具，提供操控各式工具的容器化應用 Docker 為第一個需要安裝完成的工具，另一個工具是 Bash (Unix shell),Docker 與 Bash 在各種 OS 的安裝方式請自行搜尋安裝來完成任務。
+
+除了各式容器應用之外，各種工具組建配置黏合上 Shell 是必備工具，尤其是需要自動化的地方很常用到，在 [‘X’ as code](https://github.blog/2020-10-29-getting-started-with-devops-automation/) 的時代，除了寫成 script 的 sh 檔之外，Dockerfile 與 YAML 內嵌片段 script 來用的場景可說是 Chain+Git+Dev+SecOps 必學的技能。
 
 - docker
   - [Docker - 維基百科，自由的百科全書](https://zh.wikipedia.org/zh-tw/Docker)
@@ -11,6 +13,11 @@
   - [Bash (Unix shell) - Wikipedia](https://en.wikipedia.org/wiki/Bash_(Unix_shell))
   - [鳥哥的 Linux 私房菜 -- 第十章、認識與學習BASH](http://linux.vbird.org/linux_basic/0320bash.php)
   - [How do I use Bash on Windows from the Visual Studio Code integrated terminal? - Stack Overflow](https://stackoverflow.com/questions/42606837/how-do-i-use-bash-on-windows-from-the-visual-studio-code-integrated-terminal)
+  - [Search YAML · apiVersion cat EOF curl](https://github.com/search?l=YAML&q=apiVersion+cat+EOF+curl&type=Code)
+  - [Search Shell · fabric EOF](https://github.com/search?l=Shell&o=desc&q=fabric+EOF&s=indexed&type=Code)
+  - [Search Dockerfile · bitcoin](https://github.com/search?l=Dockerfile&o=desc&q=bitcoin&s=indexed&type=Code)
+  - [Search Shell · ethereum](https://github.com/search?l=Shell&o=desc&q=ethereum&s=indexed&type=Code)
+  - [Search YAML · apiVersion cat EOF replicas](https://github.com/search?l=YAML&o=desc&q=apiVersion+cat+EOF+replicas&s=&type=Code)
 - HTTP
   - [Evolution of HTTP - HTTP | MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Evolution_of_HTTP#invention_of_the_world_wide_web)
   - [curlimages/curl Tags | Docker Hub](https://hub.docker.com/r/curlimages/curl/tags?page=1&ordering=last_updated)
@@ -28,12 +35,18 @@
   - [SQL - Wikipedia](https://en.wikipedia.org/wiki/SQL)
   - [Postgres - Official Image | Docker Hub](https://hub.docker.com/_/postgres?tab=description&page=1&ordering=last_updated)
   - The CREATE USER statement is a PostgreSQL extension. The SQL standard leaves the definition of users to the implementation. [PostgreSQL: Documentation: 12: CREATE USER](https://www.postgresql.org/docs/12/sql-createuser.html)
+  - [PostgreSQL login with x509 certificate - Stack Overflow](https://stackoverflow.com/questions/52309111/postgresql-login-with-x509-certificate)
+- Hyperledger Fabric
+  - [Fabric CA User’s Guide — hyperledger-fabric-cadocs master documentation](https://hyperledger-fabric-ca.readthedocs.io/en/v1.5.0/users-guide.html#getting-started)
+  - [openssl/openssl: TLS/SSL and crypto library](https://github.com/openssl/openssl)
 - Bitcoin
   - [bitcoin/bitcoin: Bitcoin Core integration/staging tree](https://github.com/bitcoin/bitcoin)
   - [ruimarinho/docker-bitcoin-core: A bitcoin-core docker image](https://github.com/ruimarinho/docker-bitcoin-core)
 - Ethereum
   - [ethereum/go-ethereum: Official Go implementation of the Ethereum protocol](https://github.com/ethereum/go-ethereum)
   - [ethereum/client-go - Docker Image | Docker Hub](https://hub.docker.com/r/ethereum/client-go)
+  - [wealdtech/ethereal](https://github.com/wealdtech/ethereal)
+  - [ethereumjs/ethereumjs-wallet: Utilities for handling Ethereum keys](https://github.com/ethereumjs/ethereumjs-wallet)
 
 # 任務
 
@@ -44,8 +57,9 @@
 - 製作一個靜態 HTTP 服務
 - 顯示一組 NVD 有漏洞紀錄的 Common Platform Enumeration
 - 製作一個動態 HTTP 服務
-- 製作一個比特幣帳戶地址
-- 製作一個以太坊帳戶地址
+- 製作一個 Hyperledger Fabric 帳戶之私鑰與自簽 X.509 憑證
+- 製作一個比特幣帳戶之私鑰與地址
+- 製作一個以太坊帳戶之私鑰與地址
 
 docker hello-world 與讀取網路 HTTP 資源
 
@@ -67,7 +81,6 @@ EOF
 
 $ bash hello-world.sh
 ```
-
 
 資料庫 PostgreSQL 新增使用者
 
@@ -150,16 +163,89 @@ docker rm my-php
 docker network rm foonet
 ```
 
-比特幣與以太坊新增地址
+製作一個 Hyperledger Fabric 帳戶之私鑰與自簽 X.509 憑證
 
 ```sh
-docker run --entrypoint sh docker.io/ruimarinho/bitcoin-core:0.16-alpine \
-  -c "bitcoind -printtoconsole -regtest=1 & sleep 7 ; bitcoin-cli -regtest getnewaddress"
-docker run --entrypoint sh docker.io/ethereum/client-go:v1.10.4 \
-  -c "echo "TESTONLY" > pwd.txt ; geth account new --password pwd.txt"
-docker run -it docker.io/ethereum/client-go:v1.10.4 account new
+docker run -i --rm docker.io/alpine:3.14 /bin/sh <<\EOF
+apk add openssl
+openssl version
+X509_CN="Fabric_"$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 6 ; echo )
+KEY_PASS=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 20 ; echo )
+echo ${X509_CN} ${KEY_PASS}
+DIR_KEY="/opt${X509_CN}"
+mkdir -p "${DIR_KEY}" && cd "${DIR_KEY}"
+OPENSSL_SUBJ="/CN=${X509_CN}/O=DLTDOJO/C=TW/ST=Taichung/OU=Fabric"
+openssl ecparam -genkey -name prime256v1 -noout -out ec-p256-priv-key.pem
+openssl ec -in ec-p256-priv-key.pem -pubout -out ec-p256-public-key.pem
+openssl req -new -x509 -days 10 -out client-cert.crt -key ec-p256-priv-key.pem \
+        -subj "${OPENSSL_SUBJ}"
+cat ec-p256-priv-key.pem client-cert.crt > client-cert.pem
+openssl pkcs12 -export -out keystore.p12 \
+        -inkey ec-p256-priv-key.pem \
+        -in client-cert.pem \
+        -passout "pass:${KEY_PASS}"
+ls -al -h
+openssl x509 -in client-cert.crt -text -noout
+cat ec-p256-priv-key.pem ec-p256-public-key.pem client-cert.crt
+openssl pkcs12 -info -passin "pass:${KEY_PASS}" -nodes -in keystore.p12
+EOF
+```
+
+製作比特幣使用之帳戶私鑰與地址
+
+```sh
+docker run -i --rm --entrypoint sh docker.io/ruimarinho/bitcoin-core:0.16-alpine <<\EOF
+bitcoind -printtoconsole -regtest=1 & 
+sleep 7
+ADDR=$(bitcoin-cli -regtest getnewaddress)
+echo ${ADDR}
+bitcoin-cli -regtest dumpprivkey "${ADDR}"
+EOF
+docker run -i --rm --entrypoint sh docker.io/ethereum/client-go:v1.10.4 <<\EOF
+LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 20 ; echo > pwd.txt
+geth account new --password pwd.txt
+EOF
+```
+
+製作以太坊之帳戶地址
+
+```sh
+docker run -i --rm --entrypoint sh docker.io/ruimarinho/bitcoin-core:0.16-alpine <<\EOF
+bitcoind -printtoconsole -regtest=1 & 
+sleep 7
+ADDR=$(bitcoin-cli -regtest getnewaddress)
+echo ${ADDR}
+bitcoin-cli -regtest dumpprivkey "${ADDR}"
+EOF
+docker run -i --rm --entrypoint sh docker.io/ethereum/client-go:v1.10.4 <<\EOF
+LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 20 ; echo > pwd.txt
+geth account new --password pwd.txt
+EOF
+```
+
+製作以太坊之帳戶私鑰與地址
+
+```sh
+docker run -i --rm docker.io/node:16.10-alpine3.12 /bin/sh <<\EOF
+npm version
+mkdir -p /opt/app && cd /opt/app
+npm init -y 
+npm install --save ethereumjs-wallet
+cat <<\HERE > eth_new_account.js
+const wallet = require('ethereumjs-wallet').default
+const w = wallet.generate();
+const address = `0x${w.getAddress().toString('hex')}`;
+const privateKey = w.getPrivateKey().toString('hex');
+console.log(`Address: ${address}`);
+console.log(`Private Key: ${privateKey}`);
+HERE
+node eth_new_account.js
+EOF
 ```
 
 # 其他討論
 
 docker-compose 是個方便使用的容器服務組合工具，請自行參照 [Overview of Docker Compose | Docker Documentation](https://docs.docker.com/compose/) 練習，DLTDOJO-CD 會以 kubernetes 作為服務組建調度為練習目標。
+
+
+
