@@ -201,22 +201,11 @@ ADDR=$(bitcoin-cli -regtest getnewaddress)
 echo ${ADDR}
 bitcoin-cli -regtest dumpprivkey "${ADDR}"
 EOF
-docker run -i --rm --entrypoint sh docker.io/ethereum/client-go:v1.10.4 <<\EOF
-LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 20 ; echo > pwd.txt
-geth account new --password pwd.txt
-EOF
 ```
 
 製作以太坊之帳戶地址
 
 ```sh
-docker run -i --rm --entrypoint sh docker.io/ruimarinho/bitcoin-core:0.16-alpine <<\EOF
-bitcoind -printtoconsole -regtest=1 & 
-sleep 7
-ADDR=$(bitcoin-cli -regtest getnewaddress)
-echo ${ADDR}
-bitcoin-cli -regtest dumpprivkey "${ADDR}"
-EOF
 docker run -i --rm --entrypoint sh docker.io/ethereum/client-go:v1.10.4 <<\EOF
 LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 20 ; echo > pwd.txt
 geth account new --password pwd.txt
