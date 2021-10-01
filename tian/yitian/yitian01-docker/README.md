@@ -16,6 +16,7 @@
 - T8 製作一個以太坊帳戶之私鑰與地址
 - T9 幫 Alice 製作一個 W3C Decentralized Identifiers (DIDs) v1.0 規格的 DID
 - T10 製作一個 HTTP 狀態與資源內容的 API Endpoint 整合性測試
+- T11 製作一個公開給其他人下載使用的 Docker Image
 
 # T1 Docker
 
@@ -400,6 +401,66 @@ docker network rm foonet
 - [API Testing using Jest and SuperTest](https://www.mariedrake.com/post/api-testing-using-jest-and-supertest)
 - [Endpoint testing with Jest and Supertest | Zell Liew](https://zellwk.com/blog/endpoint-testing/)
 - [Testing Express Api with Jest and Supertest - DEV Community](https://dev.to/franciscomendes10866/testing-express-api-with-jest-and-supertest-3gf)
+
+# T11 Docker Image
+
+```sh
+cat <<\EOF | DOCKER_BUILDKIT=1 docker build -t foo -
+# syntax=docker/dockerfile:1.3-labs
+FROM docker.io/node:16.10-alpine3.12
+RUN mkdir -p /opt/app
+WORKDIR /opt/app
+RUN <<HERE
+cat <<\CORE > package.json
+{
+  "name": "apitest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {"test": "jest"},
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+CORE
+npm install --save jest supertest
+HERE
+EOF
+
+# tag image
+docker tag foo dltdojo/jest-supertest:v0.1
+
+# docker login
+# push image
+docker push dltdojo/jest-supertest:v0.1
+
+# run dltdojo/jest-supertest
+docker run -i --rm docker.io/dltdojo/jest-supertest:v0.1 /bin/sh <<\EOF
+cat <<\CORE > todoapp.test.js
+const request = require('supertest');
+let req = request('https://jsonplaceholder.typicode.com');
+describe('todo api e2e tests', () => {
+    // { "userId": 1, "id": 1, "title": "delectus aut autem", "completed": false }
+    test("resp status code ok", async () => {
+        // supertest.get().expect()
+        const resp = await req.get("/todos/2").expect('Content-Type', /json/).expect(200);
+        let r = resp.body;
+        // https://jestjs.io/docs/en/expect
+        expect(r.id).toBe(2);
+        expect(r).toHaveProperty('title');
+        expect(r).toHaveProperty('userId');
+      });
+});
+CORE
+npm test
+EOF
+```
+
+- [docker push | Docker Documentation](https://docs.docker.com/engine/reference/commandline/push/)
+- [Introduction to heredocs in Dockerfiles - Docker Blog](https://www.docker.com/blog/introduction-to-heredocs-in-dockerfiles/)
+- [dltdojo/jest-supertest - Docker Image | Docker Hub](https://hub.docker.com/r/dltdojo/jest-supertest)
 
 # 其他討論
 
