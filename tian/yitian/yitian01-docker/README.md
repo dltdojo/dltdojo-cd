@@ -15,6 +15,7 @@
 - T7 製作一個比特幣帳戶之私鑰與地址
 - T8 製作一個以太坊帳戶之私鑰與地址
 - T9 幫 Alice 製作一個 W3C Decentralized Identifiers (DIDs) v1.0 規格的 DID
+- T10 製作一個 HTTP 狀態與資源內容的 API Endpoint 整合性測試
 
 # T1 Docker
 
@@ -289,6 +290,116 @@ EOF
 - [Decentralized Identifiers (DIDs) v1.0](https://www.w3.org/TR/did-core/)
 - [did:web Method Specification](https://w3c-ccg.github.io/did-method-web/)
 - [@digitalcredentials/did-method-key - npm](https://www.npmjs.com/package/@digitalcredentials/did-method-key)
+
+# T10 HTTP Endpoint Testing
+
+製作一個 HTTP 狀態與資源內容的 API Endpoint 整合性測試
+
+```sh
+docker network create --driver bridge foonet
+docker run -i --name didweb -p 8080:8080 --network foonet docker.io/node:16.10-alpine3.12 /bin/sh <<\EOF
+apk add git curl
+mkdir -p /opt/app && cd /opt/app
+npm init -y  && npm install --save @digitalcredentials/did-method-key
+cat <<\EOF1 > did.js
+const didKeyDriver = require('@digitalcredentials/did-method-key').driver();
+async function start_server() {
+    const http = require('http');
+    const server = http.createServer();
+    server.on('request', async (req, res) => {
+        if (req.url == '/user/alice/did.json') {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            const { didDocument, keyPairs, methodFor } = await didKeyDriver.generate();
+            didDocument.id = 'did:web:dltdojo-cd.local:user:alice';
+            res.write(JSON.stringify(didDocument, null, 2));
+            res.end();
+        } else {
+            res.end('Invalid Request!');
+        }
+    });
+    server.listen(8080);
+}
+start_server();
+EOF1
+node did.js
+EOF
+
+# sleep 60 ?
+
+docker run -i --rm --network foonet docker.io/node:16.10-alpine3.12 /bin/sh <<\EOF
+npm version
+mkdir -p /opt/app && cd /opt/app
+cat <<\EOF1 > package.json
+{
+  "name": "apitest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {"test": "jest"},
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+EOF1
+npm install --save jest supertest
+cat <<\EOF2 > todoapp.test.js
+const supertest = require('supertest');
+let request = supertest('https://jsonplaceholder.typicode.com');
+describe('todo api e2e tests', () => {
+    // {
+    //  "userId": 1,
+    //  "id": 1,
+    //  "title": "delectus aut autem",
+    //  "completed": false
+    //  }
+    test("resp status code ok", () => {
+        // supertest.get().expect()
+        return request.get("/todos/2")
+        .expect('Content-Type', /json/)
+        .expect(200).expect(function(resp){
+            let r = resp.body;
+            // https://jestjs.io/docs/en/expect
+            expect(r.id).toBe(2);
+            expect(r).toHaveProperty('id',2);
+            expect(r).toHaveProperty('title');
+            expect(r).toHaveProperty('userId');
+
+        });
+    });
+})
+EOF2
+cat <<\EOF3 > alice-didweb.test.js
+const request = require('supertest');
+let req = request('http://localhost:8080');
+describe('alice did api e2e tests', () => {
+    test("resp status code ok", async () => {
+        // supertest.get().expect()
+        const resp = await req.get("/user/alice/did.json").set("Accept", "application/json")
+            .expect("Content-Type", /json/)
+            .expect(200);;
+        expect(resp.statusCode).toBe(200)
+        let diddoc = resp.body;
+        // https://jestjs.io/docs/en/expect
+        expect(diddoc.id).toBe('did:web:dltdojo-cd.local:user:alice');
+        expect(diddoc).toHaveProperty('id');
+        expect(diddoc.verificationMethod[0]).toHaveProperty('publicKeyMultibase');
+    });
+})
+EOF3
+npm test
+EOF
+
+docker stop didweb && docker rm didweb 
+docker network rm foonet
+```
+
+- [Jest · 🃏 Delightful JavaScript Testing](https://jestjs.io/)
+- [visionmedia/supertest: 🕷 Super-agent driven library for testing node.js HTTP servers using a fluent API.](https://github.com/visionmedia/supertest)
+- [API Testing using Jest and SuperTest](https://www.mariedrake.com/post/api-testing-using-jest-and-supertest)
+- [Endpoint testing with Jest and Supertest | Zell Liew](https://zellwk.com/blog/endpoint-testing/)
+- [Testing Express Api with Jest and Supertest - DEV Community](https://dev.to/franciscomendes10866/testing-express-api-with-jest-and-supertest-3gf)
 
 # 其他討論
 
