@@ -462,6 +462,118 @@ EOF
 - [Introduction to heredocs in Dockerfiles - Docker Blog](https://www.docker.com/blog/introduction-to-heredocs-in-dockerfiles/)
 - [dltdojo/jest-supertest - Docker Image | Docker Hub](https://hub.docker.com/r/dltdojo/jest-supertest)
 
+# CASE 2021-09-ethjs
+
+```sh
+docker run -i --rm --network foonet docker.io/node:16.10-alpine3.12 /bin/sh <<\EOF
+mkdir -p /opt/app && cd /opt/app
+npm init -y && npm install --save ethjs-util@0.1.4
+cat <<\CORE > main.js
+const util = require('ethjs-util');
+[33974229950.550003 ,33974229950.55003, 33974229950.5503 , 33974229950.5, 33974229950].forEach(e => {
+  console.log(`intToBuffer(${e})=`);
+  console.log(util.intToBuffer(e));
+});
+CORE
+node main.js 
+EOF
+
+docker run -i --network foonet docker.io/buildkite/puppeteer:10.0.0 /bin/sh <<\EOF
+mkdir -p /opt/app && cd /opt/app
+npm init -y && npm install --save ethjs-util@0.1.4
+cat <<\CORE > server.js
+const http = require('http');
+const html = `
+<HTML>
+<HEAD>
+<TITLE>DLTDOJO-CD</TITLE>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/ethjs-util@0.1.4/dist/ethjs-util.min.js"></script>
+</HEAD>
+<BODY>
+<H2 id="result">TEST</H2>
+<script>
+function toHexString(byteArray) {
+  return Array.prototype.map.call(byteArray, function(byte) {
+    return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+  }).join('');
+}
+document.getElementById("result").innerHTML = "intToBuffer(33974229950.550003)="+toHexString(ethUtil.intToBuffer(33974229950.550003));
+</script>
+</BODY>
+</HTML>
+`;
+
+function start_server() {
+  const server = http.createServer();
+  server.on('request', (req, res) => {
+    if (req.url == '/test.html') {
+            res.write(html);
+            res.end();
+        } else {
+            res.end('Invalid Request!');
+        }
+    });
+    server.listen(8080);
+}
+start_server();
+CORE
+cat <<\CORE > test.js
+const util = require('ethjs-util');
+const puppeteer = require('puppeteer');
+
+function node_test() {
+  [33974229950.550003 ,33974229950.55003, 33974229950.5503 , 33974229950.5, 33974229950].forEach(e => {
+    console.log(`intToBuffer(${e})=`);
+    console.log(util.intToBuffer(e));
+  });
+}
+
+node_test();
+
+(async () => {
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
+  const page = await browser.newPage();
+  await page.goto("http://localhost:8080/test.html", {waitUntil: 'networkidle0'});
+  const html = await page.content(); // serialized HTML of page DOM.
+  console.log(html);
+  await browser.close();
+})();
+CORE
+node --version
+node server.js &
+sleep 3
+node test.js
+EOF
+```
+
+下面測試結果可看出 nodejs 與 puppeteer headless chrome 都用 V8 但有差異，不確定是否版本差異，至於 Firefox 的 SpiderMonkey 或是 Safari 的 JavaScriptCore 以及各式各樣手機瀏覽器內的 JavaScript Engine 是否類似還要實際開瀏覽器來比對。
+
+```
+v14.16.0
+intToBuffer(33974229950.550003)=
+<Buffer 7e 90 59 bb>
+intToBuffer(33974229950.55003)=
+<Buffer 07 e9 05 9b be>
+intToBuffer(33974229950.5503)=
+<Buffer 07 e9 05 9b be>
+intToBuffer(33974229950.5)=
+<Buffer 07 e9 05 9b be>
+intToBuffer(33974229950)=
+<Buffer 07 e9 05 9b be>
+
+...
+<h2 id="result">intToBuffer(33974229950.550003)=7e9059bb0e8ccd</h2>
+```
+
+- [Passing decimal values to FeeMarketEIP1559Transaction generates invalid output silently · Issue #1497 · ethereumjs/ethereumjs-monorepo](https://github.com/ethereumjs/ethereumjs-monorepo/issues/1497)
+- [ethjs/ethjs-util: A simple set of Ethereum JS utilities such toBuffer and isHexPrefixed.](https://github.com/ethjs/ethjs-util)
+- [The V8 JavaScript Engine](https://nodejs.dev/learn/the-v8-javascript-engine)
+- [Ethereum Transaction Hash (Txhash) Details | Etherscan](https://etherscan.io/tx/0x2c9931793876db33b1a9aad123ad4921dfb9cd5e59dbb78ce78f277759587115)
+- [天價手續費分析：Bitfinex「2,300萬鎂ETH」Gas費案例背後原因解析 | 動區動趨-最具影響力的區塊鏈媒體 (比特幣, 加密貨幣)](https://www.blocktempo.com/analysis-of-sky-high-transaction-fees-bitfinex-23-million-eth-gas-fee/)
+
 # 其他討論
 
 docker-compose 是個方便使用的容器服務組合工具，請自行參照 [Overview of Docker Compose | Docker Documentation](https://docs.docker.com/compose/) 練習，DLTDOJO-CD 會以 kubernetes 作為服務組建調度為練習目標。
