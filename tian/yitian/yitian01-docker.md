@@ -465,7 +465,7 @@ EOF
 # CASE 2021-09-ethjs
 
 ```sh
-docker run -i --rm --network foonet docker.io/node:16.10-alpine3.12 /bin/sh <<\EOF
+docker run -i --rm docker.io/node:16.10-alpine3.12 /bin/sh <<\EOF
 mkdir -p /opt/app && cd /opt/app
 npm init -y && npm install --save ethjs-util@0.1.4
 cat <<\CORE > main.js
@@ -478,7 +478,7 @@ CORE
 node main.js 
 EOF
 
-docker run -i --network foonet docker.io/buildkite/puppeteer:10.0.0 /bin/sh <<\EOF
+docker run -i --rm docker.io/buildkite/puppeteer:10.0.0 /bin/sh <<\EOF
 mkdir -p /opt/app && cd /opt/app
 npm init -y && npm install --save ethjs-util@0.1.4
 cat <<\CORE > server.js
@@ -487,7 +487,8 @@ const html = `
 <HTML>
 <HEAD>
 <TITLE>DLTDOJO-CD</TITLE>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/ethjs-util@0.1.4/dist/ethjs-util.min.js"></script>
+<script type="text/javascript" 
+  src="https://cdn.jsdelivr.net/npm/ethjs-util@0.1.4/dist/ethjs-util.min.js"></script>
 </HEAD>
 <BODY>
 <H2 id="result">TEST</H2>
@@ -497,7 +498,8 @@ function toHexString(byteArray) {
     return ('0' + (byte & 0xFF).toString(16)).slice(-2);
   }).join('');
 }
-document.getElementById("result").innerHTML = "intToBuffer(33974229950.550003)="+toHexString(ethUtil.intToBuffer(33974229950.550003));
+document.getElementById("result").innerHTML = "intToBuffer(33974229950.550003)=" 
+  + toHexString(ethUtil.intToBuffer(33974229950.550003));
 </script>
 </BODY>
 </HTML>
