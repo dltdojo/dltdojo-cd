@@ -1,6 +1,6 @@
-# WIP 一天 YiTian
+# 壹天 YiTian
 
-- 撿工具 [yitian01-docker](yitian01-docker)
-- 組工具 yitian02-pipe
-- 造工具 yitian03-build
+- 撿工具 [yitian01-docker](yitian01-docker.md)
+- 組工具
+- 造工具
 - 註冊
