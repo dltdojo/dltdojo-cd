@@ -96,9 +96,6 @@ docker network rm foonet
 - HTTP
   - [Httpd - Official Image | Docker Hub](https://hub.docker.com/_/httpd)
   - [The Apache HTTP Server Project](https://httpd.apache.org/)
-  - [Php - Official Image | Docker Hub](https://hub.docker.com/_/php)
-  - [buildkite/puppeteer - Docker Image | Docker Hub](https://hub.docker.com/r/buildkite/puppeteer)
-  - [puppeteer/puppeteer: Headless Chrome Node.js API](https://github.com/puppeteer/puppeteer)
 - Nmap Network Scanning
   - [instrumentisto/nmap - Docker Image | Docker Hub](https://hub.docker.com/r/instrumentisto/nmap)
   - [Common Platform Enumeration (CPE) | Nmap Network Scanning](https://nmap.org/book/output-formats-cpe.html)
@@ -160,6 +157,10 @@ docker stop my-php
 docker rm my-php
 docker network rm foonet
 ```
+
+- [Php - Official Image | Docker Hub](https://hub.docker.com/_/php)
+- [buildkite/puppeteer - Docker Image | Docker Hub](https://hub.docker.com/r/buildkite/puppeteer)
+- [puppeteer/puppeteer: Headless Chrome Node.js API](https://github.com/puppeteer/puppeteer)
 
 # T6 Hyperledger Fabric
 
@@ -478,8 +479,7 @@ CORE
 node main.js 
 EOF
 
-docker run -i --rm docker.io/buildkite/puppeteer:10.0.0 /bin/sh <<\EOF
-mkdir -p /opt/app && cd /opt/app
+docker run -i --rm -w /app docker.io/buildkite/puppeteer:10.0.0 /bin/sh <<\EOF
 npm init -y && npm install --save ethjs-util@0.1.4
 cat <<\CORE > server.js
 const http = require('http');
@@ -575,6 +575,172 @@ intToBuffer(33974229950)=
 - [The V8 JavaScript Engine](https://nodejs.dev/learn/the-v8-javascript-engine)
 - [Ethereum Transaction Hash (Txhash) Details | Etherscan](https://etherscan.io/tx/0x2c9931793876db33b1a9aad123ad4921dfb9cd5e59dbb78ce78f277759587115)
 - [天價手續費分析：Bitfinex「2,300萬鎂ETH」Gas費案例背後原因解析 | 動區動趨-最具影響力的區塊鏈媒體 (比特幣, 加密貨幣)](https://www.blocktempo.com/analysis-of-sky-high-transaction-fees-bitfinex-23-million-eth-gas-fee/)
+
+
+利用 cypress 測試 chrome 與 firefox，這次只測試前端，cypress 有個本地端靜態 HTTP 服務。
+
+```sh
+# NOTE: cypress/included image size > 1GB 
+docker pull cypress/included:8.5.0
+docker run -i -w /app --entrypoint=/bin/bash docker.io/cypress/included:8.5.0 <<\EOF
+cat <<\CORE > ethjs-util.html
+<HTML><HEAD><TITLE>DLTDOJO-CD</TITLE>
+<script type="text/javascript" 
+  src="https://cdn.jsdelivr.net/npm/ethjs-util@0.1.4/dist/ethjs-util.min.js"></script>
+</HEAD>
+<BODY><P>intToBuffer(33974229950.550003)=<span id="result">0</span></P>
+<script>
+function toHexString(byteArray) {
+  return Array.prototype.map.call(byteArray, function(byte) {
+    return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+  }).join('');
+}
+document.getElementById("result").innerHTML = toHexString(ethUtil.intToBuffer(33974229950.550003));
+</script>
+</BODY>
+</HTML>
+CORE
+cat <<\CORE > cypress.json
+{ "video": false , "screenshotOnRunFailure": false, "pluginsFile": false, "supportFile": false }
+CORE
+mkdir -p /app/cypress/integration
+cat <<\CORE > /app/cypress/integration/ethjs_spec.js
+// Cypress will automatically attempt to serve your files 
+// if you don't provide a host and baseUrl is not defined. 
+describe('ethjs.util Test', () => {
+  it('Visits the ethjs test page', () => {
+    cy.visit('ethjs-util.html')
+    cy.get('#result').should(($r) => {
+        const text = $r.text()
+        expect(text).to.equal('07e9059bbe')
+    })
+  })
+})
+CORE
+
+node --version
+cypress info
+cypress run --browser firefox
+cypress run --browser chrome
+EOF
+```
+
+兩種瀏覽器執行結果一樣
+
+```
+  1) ethjs.util Test
+       Visits the ethjs test page:
+
+      Timed out retrying after 4000ms
+      + expected - actual
+
+      -'7e9059bb0e8ccd'
+      +'07e9059bbe'
+```
+
+- [Run Cypress with a single Docker command](https://www.cypress.io/blog/2019/05/02/run-cypress-with-a-single-docker-command/)
+- [visit | Cypress Documentation](https://docs.cypress.io/api/commands/visit#Syntax)
+- [End-to-End Testing Web Apps: The Painless Way · mtlynch.io](https://mtlynch.io/painless-web-app-testing/)
+- [cypress-io/cypress-docker-images: Docker images with Cypress dependencies and browsers](https://github.com/cypress-io/cypress-docker-images)
+
+如果只測靜態網頁可省掉上述 server.js 的啟動，不過如果要一起送到前端測試還是寫 server.js 來跑。
+
+```sh
+docker run -i -w /app --entrypoint=/bin/bash docker.io/cypress/included:8.5.0 <<\EOF
+npm init -y && npm install --save ethjs-util@0.1.4
+cat <<\CORE > server.js
+const http = require('http');
+const util = require('ethjs-util');
+const html = `
+<HTML><HEAD><TITLE>DLTDOJO-CD</TITLE>
+<script type="text/javascript" 
+  src="https://cdn.jsdelivr.net/npm/ethjs-util@0.1.4/dist/ethjs-util.min.js"></script>
+</HEAD>
+<BODY>
+<P>ethUtil.intToBuffer(33974229950.550003)=<span id="be-result">_TPL_RESULT_</span></P>
+<P>ethUtil.intToBuffer(33974229950.550003)=<span id="fe-result">0</span></P>
+<script>
+function toHexString(byteArray) {
+  return Array.prototype.map.call(byteArray, function(byte) {
+    return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+  }).join('');
+}
+document.getElementById("fe-result").innerHTML = toHexString(ethUtil.intToBuffer(33974229950.550003));
+</script>
+</BODY>
+</HTML>`;
+
+function start_server() {
+  const server = http.createServer();
+  server.on('request', (req, res) => {
+    if (req.url == '/test.html') {
+      const nodejsResult = util.intToBuffer(33974229950.550003).toString('hex');
+      res.write(html.replace('_TPL_RESULT_',nodejsResult));
+      res.end();
+    } else {
+      res.end('Invalid Request!');
+    }
+  });
+  server.listen(8080);
+}
+start_server();
+CORE
+
+cat <<\CORE > cypress.json
+{ "video": false , "screenshotOnRunFailure": false, "pluginsFile": false, "supportFile": false }
+CORE
+mkdir -p /app/cypress/integration
+cat <<\CORE > /app/cypress/integration/ethjs_spec.js
+describe('ethjs.util test', () => {
+  before(() => {
+    cy.visit('http://localhost:8080/test.html')
+  });
+  it('[BackEnd] test ethjs.util.intToBuffer', () => {
+    cy.get('#be-result').should('have.text', '07e9059bbe');
+  })
+  it('[FrontEnd] test ethjs.util.intToBuffer', () => {
+    cy.get('#fe-result').should(($r) => {
+        expect($r.text()).to.equal('07e9059bbe')
+    })
+  })
+})
+CORE
+
+node --version
+node server.js &
+sleep 3
+cypress info
+cypress run --browser firefox
+cypress run --browser chrome
+EOF
+```
+
+兩個結果一樣，摘錄 chrome 部份測試結果。
+
+```
+ 1) ethjs.util test
+       [BackEnd] test ethjs.util.intToBuffer:
+
+      Timed out retrying after 4000ms
+      + expected - actual
+
+      -'7e9059bb'
+      +'07e9059bbe'
+      
+      at Context.eval (http://localhost:8080/__cypress/tests?p=cypress/integration/ethjs_spec.js:104:26)
+
+  2) ethjs.util test
+       [FrontEnd] test ethjs.util.intToBuffer:
+
+      Timed out retrying after 4000ms
+      + expected - actual
+
+      -'7e9059bb0e8ccd'
+      +'07e9059bbe'
+      
+      at Context.eval (http://localhost:8080/__cypress/tests?p=cypress/integration/ethjs_spec.js:108:28)
+
+```
 
 # 其他討論
 
