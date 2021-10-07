@@ -12,12 +12,16 @@
 
 # T1 Kubernetes and kubectl
 
-下載安裝 [kubectl](https://kubernetes.io/docs/tasks/tools/) 與 [rancher/k3d](https://github.com/rancher/k3d)
+下載安裝 [kubectl](https://kubernetes.io/docs/tasks/tools/) 與 [rancher/k3d](https://github.com/rancher/k3d) 或是直接使用 docker 來執行不須下載 kubectl。
+
+
+
+建立 cluster
 
 ```sh
 k3d version
 k3d cluster create foo2021
-sleep 5
+
 kubectl version
 # wait coredns ready
 kubectl rollout status -n kube-system deployment.apps/coredns
@@ -28,42 +32,61 @@ kubectl get pods --all-namespaces
 kubectl wait --for=condition=complete job/${JOB_NAME} --timeout=60s
 echo "Job output:"
 kubectl logs job/${JOB_NAME}
-sleep 2
+
 k3d cluster delete foo2021
 ```
 
-如果需要繼續使用這個 kubernetes cluster 可不執行 ```k3d cluster delete foo2021``` 讓後面沿用。
+如要繼續使用這個 kubernetes cluster 可不執行 ```k3d cluster delete foo2021``` 讓後面沿用。
 
 - [Overview of kubectl | Kubernetes](https://kubernetes.io/docs/reference/kubectl/overview/)
 
 # T2 docker and kubectl
 
 ```sh
+cat <<\EOF | DOCKER_BUILDKIT=1  docker build -t k101s -
+# syntax=docker/dockerfile:1.3-labs
+FROM docker.io/debian:bullseye-slim
+RUN apt-get update && apt-get install -y openssl curl jq
+RUN <<\CORE
+
+KUBECTL_VERSION=v1.22.0
+curl -sL https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /bin/kubectl && \
+  chmod +x /bin/kubectl
+
+KUSTOMIZE_VERSION=v4.4.0
+curl -sL https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz \
+  | tar xz -C /tmp && mv /tmp/kustomize /bin/
+
+HELM_V3=v3.7.0
+curl -sSL https://get.helm.sh/helm-${HELM_V3}-linux-amd64.tar.gz | tar xz && \
+  mv linux-amd64/helm /bin/helm && rm -rf linux-amd64
+CORE
+
+ENV KUBECONFIG /kube/config
+RUN mkdir -p /kube && chmod a+w /kube
+EOF
+
 # k3d cluster create foo2021
 
-docker run -i --rm -v ${HOME}/.kube/config:/.kube/config:ro \
-  -u $(id -u):$(id -g) --entrypoint /bin/bash --network host bitnami/kubectl:1.22 <<\EOF
-mkdir /tmp/.kube && cp /.kube/config /tmp/.kube/config
-export KUBEHOME="/tmp/.kube"
-export KUBECONFIG=$KUBEHOME/config
+docker run -i --rm -v ${HOME}/.kube/config:/kube/config:ro \
+  -v /var/run/docker.sock:/var/run/docker.sock --network host k101s <<\EOF
 kubectl config set current-context k3d-foo2021
 kubectl version && kubectl config view && kubectl config current-context
 JOB_NAME=hello-$(date +%s | sha256sum | head -c 8 ; echo)
-kubectl create job ${JOB_NAME} --image=busybox -- echo "Hello World"
+kubectl create job ${JOB_NAME} --image=busybox -- echo "Hello World $(date)"
 kubectl get pods --all-namespaces
 kubectl wait --for=condition=complete job/${JOB_NAME} --timeout=60s
 echo "Job output:"
 kubectl logs job/${JOB_NAME}
 EOF
 
-docker run --rm busybox echo "Hello World"
-
-# sleep 20
 # k3d cluster delete foo2021
 ```
 
 使用 [bitnami-docker-kubectl/Dockerfile](https://github.com/bitnami/bitnami-docker-kubectl/blob/master/1.21/debian-10/Dockerfile) 會有寫好 ```USER 1001``` 與掛載使用者之間的權限問題，需將 host 端的 uid/gid 對應上去避開，另設唯讀 ```/.kube/config:ro``` 避免改到 host 系統的 kube/config，因為開發系統有多叢集運行，需要先設定 context 來執行，注意 k3d 需前置 ```k3d-```，job 名稱附加亂數避免同名撞擊。
 
+
+kubernetes 執行一次性的工作可與 ```docker run --rm busybox echo "Hello World"``` 比較相對複雜。
 
 - [Use volumes | Docker Documentation](https://docs.docker.com/storage/volumes/)
 - [Organizing Cluster Access Using kubeconfig Files | Kubernetes](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/)
@@ -196,3 +219,90 @@ kubectl exec deploy/${DEPLOY_NAME} -- env
 kubectl delete deploy/${DEPLOY_NAME} 
 EOF
 ```
+
+
+# skaffold 
+
+```docker build|run``` 轉到 kubernetes 變成使用 ```skaffold build|run``` 為何不只是使用 sh + kubectl ？ 因為可以簡化很多寫 sh 錯誤，可開```skaffold run -vdebug```來看看這些工作有可以用 sh 完成只是要考慮後續維護問題。
+
+```sh
+cat <<\EOF | DOCKER_BUILDKIT=1  docker build -t k102s -
+# syntax=docker/dockerfile:1.3-labs
+FROM k101s
+RUN <<\CORE
+SKAFFOLD_VERSION=v1.32.0
+curl -sLo skaffold https://storage.googleapis.com/skaffold/releases/${SKAFFOLD_VERSION}/skaffold-linux-amd64 && \
+  chmod +x skaffold && mv skaffold /bin/
+
+K3D_VERSION=5.0.0
+curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v$K3D_VERSION bash
+
+curl -sLo yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 \
+  && chmod +x yq && mv yq /bin/
+CORE
+EOF
+
+docker run -i --rm -v ${HOME}/.kube/config:/kube/config:ro \
+  -v /var/run/docker.sock:/var/run/docker.sock --network host k102s <<\EOF
+cat <<\CORE > Dockerfile
+FROM golang:1.15 as builder
+COPY main.go .
+ARG SKAFFOLD_GO_GCFLAGS
+RUN go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /app main.go
+
+FROM alpine:3
+ENV GOTRACEBACK=single
+CMD ["./app"]
+COPY --from=builder /app .
+CORE
+
+cat <<\CORE > k8s-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: getting-started
+spec:
+  containers:
+  - name: getting-started
+    image: skaffold-example
+CORE
+
+cat <<\CORE > main.go
+package main
+
+import (
+  "fmt"
+  "time"
+)
+
+func main() {
+  for {
+	  fmt.Println("Hello dltdojo-cd 2021!")
+	  time.Sleep(time.Second * 1)
+	}
+}
+CORE
+
+cat <<\CORE > skaffold.yaml
+apiVersion: skaffold/v2beta23
+kind: Config
+build:
+  artifacts:
+  - image: skaffold-example
+deploy:
+  kubectl:
+    manifests:
+      - k8s-*
+CORE
+
+ls -al
+skaffold run --tail
+EOF
+
+# docker ps
+# docker stop CONTAINER_ID
+```
+
+這個設定不需要 push image 所以可以避開一開始要先有 image registy 類服務，直接將 image tarball 匯入 [k3d image import](https://k3d.io/usage/commands/k3d_image_import/)，如果 ```skaffold run -vdebug``` 可以看到 ```Importing images from tarball '/k3d/images/k3d-foo2021-images-20211007085633.tar' into node 'k3d-foo2021-server-0'``` 這類訊息。
+
+另外不直接用 gcr.io/k8s-skaffold/skaffold 是因為太過肥大需 2.77GB 以及內建的 kubectl 版本過舊。
