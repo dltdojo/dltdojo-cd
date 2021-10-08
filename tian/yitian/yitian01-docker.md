@@ -17,6 +17,7 @@
 - T9 幫 Alice 製作一個 W3C Decentralized Identifiers (DIDs) v1.0 規格的 DID
 - T10 製作一個 HTTP 狀態與資源內容的 API Endpoint 整合性測試
 - T11 製作一個公開給其他人下載使用的 Docker Image
+- T12 監聽網路通訊協定 HTTP 並顯示對應之 OSI 層資訊
 
 # T1 Docker
 
@@ -462,6 +463,37 @@ EOF
 - [docker push | Docker Documentation](https://docs.docker.com/engine/reference/commandline/push/)
 - [Introduction to heredocs in Dockerfiles - Docker Blog](https://www.docker.com/blog/introduction-to-heredocs-in-dockerfiles/)
 - [dltdojo/jest-supertest - Docker Image | Docker Hub](https://hub.docker.com/r/dltdojo/jest-supertest)
+
+
+# T12 HTTP Communication and OSI Model
+
+```sh
+cat <<\EOF | DOCKER_BUILDKIT=1  docker build -t shark101 -
+# syntax=docker/dockerfile:1.3-labs
+FROM docker.io/debian:bullseye-slim
+RUN apt-get update && apt-get install -y openssl tshark curl
+ARG TERMSHARK_VERSION=2.3.0
+RUN curl -LSs https://github.com/gcla/termshark/releases/download/v${TERMSHARK_VERSION}/termshark_${TERMSHARK_VERSION}_linux_x64.tar.gz \
+    -o /tmp/termshark_${TERMSHARK_VERSION}_linux_x64.tar.gz \
+    &&  tar -zxvf /tmp/termshark_${TERMSHARK_VERSION}_linux_x64.tar.gz \
+    &&  mv termshark_${TERMSHARK_VERSION}_linux_x64/termshark /usr/local/bin/termshark \
+    &&  chmod +x /usr/local/bin/termshark
+EOF
+
+docker run -it --rm --name tmp404 shark101 termshark -i eth0 -Y http
+
+# testing web sites
+docker exec tmp404 curl http://www.apache.org
+docker exec tmp404 curl http://www.w3.org
+docker exec tmp404 curl http://www.google.com
+docker exec tmp404 curl http://www.facebook.com
+```
+
+- [gcla/termshark: A terminal UI for tshark, inspired by Wireshark](https://github.com/gcla/termshark)
+- [tshark - The Wireshark Network Analyzer 3.4.9](https://www.wireshark.org/docs/man-pages/tshark.html)
+- [OSI模型 - 維基百科，自由的百科全書](https://zh.wikipedia.org/wiki/OSI%E6%A8%A1%E5%9E%8B)
+- [HTTP analysis using Wireshark](https://linuxhint.com/http_wireshark/)
+
 
 # 其他討論
 
