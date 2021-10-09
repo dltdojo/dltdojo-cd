@@ -14,8 +14,6 @@
 
 下載安裝 [kubectl](https://kubernetes.io/docs/tasks/tools/) 與 [rancher/k3d](https://github.com/rancher/k3d) 或是直接使用 docker 來執行不須下載 kubectl。
 
-
-
 建立 cluster
 
 ```sh
@@ -43,33 +41,10 @@ k3d cluster delete foo2021
 # T2 docker and kubectl
 
 ```sh
-DOCKER_BUILDKIT=1 docker build -t k101s - <<\EOF
-# syntax=docker/dockerfile:1.3-labs
-FROM docker.io/debian:bullseye-slim
-RUN apt-get update && apt-get install -y openssl curl jq
-RUN <<\EOOF
-
-KUBECTL_VERSION=v1.22.0
-curl -sL https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /bin/kubectl && \
-  chmod +x /bin/kubectl
-
-KUSTOMIZE_VERSION=v4.4.0
-curl -sL https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz \
-  | tar xz -C /tmp && mv /tmp/kustomize /bin/
-
-HELM_V3=v3.7.0
-curl -sSL https://get.helm.sh/helm-${HELM_V3}-linux-amd64.tar.gz | tar xz && \
-  mv linux-amd64/helm /bin/helm && rm -rf linux-amd64
-EOOF
-
-ENV KUBECONFIG /kube/config
-RUN mkdir -p /kube && chmod a+w /kube
-EOF
-
 # k3d cluster create foo2021
 
 docker run -i --rm -v ${HOME}/.kube/config:/kube/config:ro \
-  -v /var/run/docker.sock:/var/run/docker.sock --network host k101s <<\EOF
+  --network host dltdojo/yitian:01-k8s <<\EOF
 kubectl config set current-context k3d-foo2021
 kubectl version && kubectl config view && kubectl config current-context
 JOB_NAME=hello-$(date +%s | sha256sum | head -c 8 ; echo)
@@ -83,8 +58,9 @@ EOF
 # k3d cluster delete foo2021
 ```
 
-使用 [bitnami-docker-kubectl/Dockerfile](https://github.com/bitnami/bitnami-docker-kubectl/blob/master/1.21/debian-10/Dockerfile) 會有寫好 ```USER 1001``` 與掛載使用者之間的權限問題，需將 host 端的 uid/gid 對應上去避開，另設唯讀 ```/.kube/config:ro``` 避免改到 host 系統的 kube/config，因為開發系統有多叢集運行，需要先設定 context 來執行，注意 k3d 需前置 ```k3d-```，job 名稱附加亂數避免同名撞擊。
+關於 ```dltdojo/yitian:01-k8s``` 說明在 yitian01-docker.md 內。
 
+一開始使用 [bitnami-docker-kubectl/Dockerfile](https://github.com/bitnami/bitnami-docker-kubectl/blob/master/1.21/debian-10/Dockerfile) 會有 ```USER 1001``` 與掛載使用者之間的權限問題，需將 host 端的 uid/gid 對應上去避開，另設唯讀 ```/.kube/config:ro``` 避免改到 host 系統的 kube/config，因為開發系統有多叢集運行，需要先設定 context 來執行，注意 k3d 需前置 ```k3d-```，job 名稱附加亂數避免同名撞擊。
 
 kubernetes 執行一次性的工作可與 ```docker run --rm busybox echo "Hello World"``` 比較相對複雜。
 

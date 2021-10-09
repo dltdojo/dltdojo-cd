@@ -112,7 +112,7 @@ docker network create --driver bridge foonet
 docker run -d --name my-php -p 8081:80 --network foonet docker.io/php:7.2-apache
 # sleep 6
 docker exec -i my-php /bin/sh <<\EOF
-cat <<\HERE > /var/www/html/index.php
+cat <<\EOOF > /var/www/html/index.php
 <HTML>
 <HEAD>
 <TITLE>DLTDOJO-CD</TITLE>
@@ -131,12 +131,12 @@ document.getElementById("frontend-time").innerHTML = d.toISOString();
 </script>
 </BODY>
 </HTML>
-HERE
+EOOF
 EOF
 # 
 docker run --network foonet docker.io/curlimages/curl:7.79.1 -sv http://my-php:80
-docker run -i --network foonet docker.io/buildkite/puppeteer:10.0.0 /bin/sh <<\EOF2
-cat <<\HERE2 > test.js
+docker run -i --network foonet docker.io/buildkite/puppeteer:10.0.0 /bin/sh <<\EOF
+cat <<\EOOF > test.js
 const puppeteer = require('puppeteer');
 
 (async () => {
@@ -150,9 +150,9 @@ const puppeteer = require('puppeteer');
   console.log(html);
   await browser.close();
 })();
-HERE2
+EOOF
 node test.js
-EOF2
+EOF
 #
 docker stop my-php
 docker rm my-php
@@ -334,16 +334,10 @@ npm version
 mkdir -p /opt/app && cd /opt/app
 cat <<\EOF1 > package.json
 {
-  "name": "apitest",
-  "version": "1.0.0",
-  "description": "",
-  "main": "main.js",
-  "dependencies": {},
-  "devDependencies": {},
+  "name": "apitest", "version": "1.0.0", "description": "",
+  "main": "main.js", "dependencies": {}, "devDependencies": {},
   "scripts": {"test": "jest"},
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "keywords": [], "author": "", "license": "ISC"
 }
 EOF1
 npm install --save jest supertest
@@ -440,7 +434,7 @@ docker push dltdojo/jest-supertest:v0.1
 
 # run dltdojo/jest-supertest
 docker run -i --rm docker.io/dltdojo/jest-supertest:v0.1 /bin/sh <<\EOF
-cat <<\CORE > todoapp.test.js
+cat <<\EOOF > todoapp.test.js
 const request = require('supertest');
 let req = request('https://jsonplaceholder.typicode.com');
 describe('todo api e2e tests', () => {
@@ -455,7 +449,7 @@ describe('todo api e2e tests', () => {
         expect(r).toHaveProperty('userId');
       });
 });
-CORE
+EOOF
 npm test
 EOF
 ```
@@ -506,7 +500,46 @@ DOCKER_BUILDKIT=1 docker build -t dltdojo/yitian:01 - <<\EOF
 FROM docker.io/debian:bullseye-slim
 ARG DEBIAN_FRONTEND=noninteractive
 RUN <<\EOOF
-apt-get update && apt-get install -y openssl curl jq git tshark
+apt-get update && apt-get install -y openssl curl jq git && apt-get clean
+EOOF
+EOF
+
+docker images | grep dltdojo/yitian
+docker run dltdojo/yitian:01 echo hello world
+docker run dltdojo/yitian:01 curl --version
+docker run dltdojo/yitian:01 curl http://www.apache.org
+
+DOCKER_BUILDKIT=1 docker build -t dltdojo/yitian:01-node - <<\EOF
+# syntax=docker/dockerfile:1.3-labs
+FROM dltdojo/yitian:01
+ARG DEBIAN_FRONTEND=noninteractive
+RUN <<\EOOF
+curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
+apt-get install -y nodejs
+EOOF
+WORKDIR /opt/tapp
+RUN <<\EOOF
+cat <<\EOOOF > package.json
+{
+  "name": "apitest", "version": "1.0.0", "description": "",
+  "main": "main.js", "dependencies": {}, "devDependencies": {},
+  "scripts": {"test": "jest"},
+  "keywords": [], "author": "", "license": "ISC"
+}
+EOOOF
+npm install --save jest supertest
+EOOF
+EOF
+
+docker images | grep dltdojo/yitian
+docker run dltdojo/yitian:01-node node -v
+
+DOCKER_BUILDKIT=1 docker build -t dltdojo/yitian:01-nmap - <<\EOF
+# syntax=docker/dockerfile:1.3-labs
+FROM dltdojo/yitian:01
+ARG DEBIAN_FRONTEND=noninteractive
+RUN <<\EOOF
+apt-get update && apt-get install -y tshark nmap && apt-get clean
 
 TERMSHARK_VERSION=2.3.0
 curl -LSs https://github.com/gcla/termshark/releases/download/v${TERMSHARK_VERSION}/termshark_${TERMSHARK_VERSION}_linux_x64.tar.gz \
@@ -517,8 +550,49 @@ curl -LSs https://github.com/gcla/termshark/releases/download/v${TERMSHARK_VERSI
 EOOF
 EOF
 
-docker images | grep dltdojo/yitian
 
+DOCKER_BUILDKIT=1 docker build -t dltdojo/yitian:01-k8s - <<\EOF
+# syntax=docker/dockerfile:1.3-labs
+FROM dltdojo/yitian:01
+
+RUN <<\EOOF
+KUBECTL_VERSION=v1.22.0
+curl -sL https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /bin/kubectl && \
+  chmod +x /bin/kubectl
+
+KUSTOMIZE_VERSION=v4.4.0
+curl -sL https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz \
+  | tar xz -C /tmp && mv /tmp/kustomize /bin/
+
+HELM_V3=v3.7.0
+curl -sSL https://get.helm.sh/helm-${HELM_V3}-linux-amd64.tar.gz | tar xz && \
+  mv linux-amd64/helm /bin/helm && rm -rf linux-amd64
+EOOF
+
+ENV KUBECONFIG /kube/config
+RUN mkdir -p /kube && chmod a+w /kube
+
+RUN <<\EOOF
+SKAFFOLD_VERSION=v1.32.0
+curl -sLo skaffold https://storage.googleapis.com/skaffold/releases/${SKAFFOLD_VERSION}/skaffold-linux-amd64 && \
+  chmod +x skaffold && mv skaffold /bin/
+
+K3D_VERSION=5.0.0
+curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v$K3D_VERSION bash
+
+curl -sLo yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 \
+  && chmod +x yq && mv yq /bin/
+EOOF
+EOF
+
+
+docker images | grep dltdojo/yitian
+docker run dltdojo/yitian:01-nmap nmap --version
+docker run dltdojo/yitian:01-nmap termshark --version
+
+docker push dltdojo/yitian:01
+docker push dltdojo/yitian:01-node
+docker push dltdojo/yitian:01-nmap
 ```
 
 # WIP: T1x 
