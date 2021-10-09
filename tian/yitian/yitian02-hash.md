@@ -9,7 +9,7 @@
 # Bash OpenSSL SHA3-256
 
 ```sh
-cat <<\EOF | DOCKER_BUILDKIT=1  docker build -t openssl-sha3 -
+DOCKER_BUILDKIT=1 docker build -t openssl-sha3 - <<\EOF
 # syntax=docker/dockerfile:1.3-labs
 FROM docker.io/debian:bullseye-slim
 RUN apt-get update && apt-get install -y openssl
@@ -33,12 +33,12 @@ EOF
 # Rust SHA3-256
 
 ```sh
-cat <<\EOF | DOCKER_BUILDKIT=1  docker build -t rcrypto2021 -
+DOCKER_BUILDKIT=1 docker build -t rcrypto2021 - <<\EOF
 # syntax=docker/dockerfile:1.3-labs
 FROM rust:1.55.0-slim-bullseye
 RUN cargo new app
 WORKDIR /app
-RUN cat <<\CORE > Cargo.toml
+RUN cat <<\EOOF > Cargo.toml
 [package]
 name = "my_app"
 version = "0.1.0"
@@ -46,12 +46,12 @@ edition = "2018"
 
 [dependencies]
 rust-crypto = "0.2.36"
-CORE
+EOOF
 RUN cargo update && cargo build
 EOF
 
 docker run -i -w /app --rm rcrypto2021 <<\EOF
-cat <<\CORE > src/main.rs
+cat <<\EOOF > src/main.rs
 extern crate crypto as rcrypto;
 use rcrypto::digest::Digest;
 use rcrypto::sha3::Sha3;
@@ -66,7 +66,7 @@ fn main() {
               "008a24183fde2d8bd57b4309fe670262"));
   println!("Hello SHA3-256")
 }
-CORE
+EOOF
 cargo run
 EOF
 ```

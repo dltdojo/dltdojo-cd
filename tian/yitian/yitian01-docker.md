@@ -407,13 +407,13 @@ docker network rm foonet
 # T11 Docker Image
 
 ```sh
-cat <<\EOF | DOCKER_BUILDKIT=1 docker build -t foo -
+DOCKER_BUILDKIT=1 docker build -t foo - <<\EOF
 # syntax=docker/dockerfile:1.3-labs
 FROM docker.io/node:16.10-alpine3.12
 RUN mkdir -p /opt/app
 WORKDIR /opt/app
-RUN <<HERE
-cat <<\CORE > package.json
+RUN <<EOOF
+cat <<\EOOOF > package.json
 {
   "name": "apitest",
   "version": "1.0.0",
@@ -426,9 +426,9 @@ cat <<\CORE > package.json
   "author": "",
   "license": "ISC"
 }
-CORE
+EOOOF
 npm install --save jest supertest
-HERE
+EOOF
 EOF
 
 # tag image
@@ -468,7 +468,7 @@ EOF
 # T12 HTTP Communication and OSI Model
 
 ```sh
-cat <<\EOF | DOCKER_BUILDKIT=1  docker build -t shark101 -
+DOCKER_BUILDKIT=1 docker build -t shark101 - <<\EOF
 # syntax=docker/dockerfile:1.3-labs
 FROM docker.io/debian:bullseye-slim
 RUN apt-get update && apt-get install -y openssl tshark curl
@@ -494,6 +494,61 @@ docker exec tmp404 curl http://www.facebook.com
 - [OSI模型 - 維基百科，自由的百科全書](https://zh.wikipedia.org/wiki/OSI%E6%A8%A1%E5%9E%8B)
 - [HTTP analysis using Wireshark](https://linuxhint.com/http_wireshark/)
 
+# WIP: T13 My Toolbox
+
+接下來要考慮一個 [Monorepo - Wikipedia](https://en.wikipedia.org/wiki/Monorepo) 類似問題，打算做出各種專用工具的映像檔還是集中式？工具越大方便使用，但對於只需單一特定版本工具來說變成累贅，一般建議採用更新頻率低置頂集中策略來做出目前應用所需的工具箱。
+
+> What really matters when it comes to disk usage is the size of frequently changing layers. As a side note: reducing base image size usually comes at a price – the smaller the image size, the smaller the functionality. [Docker Image Size - Does It Matter? - Semaphore](https://semaphoreci.com/blog/2018/03/14/docker-image-size.html)
+
+```sh
+DOCKER_BUILDKIT=1 docker build -t dltdojo/yitian:01 - <<\EOF
+# syntax=docker/dockerfile:1.3-labs
+FROM docker.io/debian:bullseye-slim
+ARG DEBIAN_FRONTEND=noninteractive
+RUN <<\EOOF
+apt-get update && apt-get install -y openssl curl jq git tshark
+
+TERMSHARK_VERSION=2.3.0
+curl -LSs https://github.com/gcla/termshark/releases/download/v${TERMSHARK_VERSION}/termshark_${TERMSHARK_VERSION}_linux_x64.tar.gz \
+    -o /tmp/termshark_${TERMSHARK_VERSION}_linux_x64.tar.gz \
+    &&  tar -zxvf /tmp/termshark_${TERMSHARK_VERSION}_linux_x64.tar.gz \
+    &&  mv termshark_${TERMSHARK_VERSION}_linux_x64/termshark /usr/local/bin/termshark \
+    &&  chmod +x /usr/local/bin/termshark
+EOOF
+EOF
+
+docker images | grep dltdojo/yitian
+
+```
+
+# WIP: T1x 
+
+弱點掃描
+
+[CVE - Download CVE List](https://cve.mitre.org/data/downloads/index.html)
+[vulnersCom/nmap-vulners: NSE script based on Vulners.com API](https://github.com/vulnersCom/nmap-vulners)
+
+
+```sh
+cat <<\EOF | docker build -t nmap101 -
+FROM docker.io/instrumentisto/nmap:7.92
+RUN apk add git curl
+RUN git version
+WORKDIR /usr/share/nmap
+RUN cd scripts && git clone --depth=1 https://github.com/scipag/vulscan
+RUN cd scripts/vulscan && curl -sLO https://www.computec.ch/projekte/vulscan/download/cve.csv
+EOF
+
+docker network create --driver bridge foonet
+docker run -d --name my-http -p 8081:80 --network foonet docker.io/httpd:2.4.49-alpine
+docker run --rm -it --network foonet nmap101 -sV --script=vulscan/vulscan.nse my-http
+docker stop my-http && docker rm my-http
+docker network rm foonet
+```
+
+- [Apache Releases HTTP Server version 2.4.51 to Address Vulnerabilities Under Exploitation | CISA](https://us-cert.cisa.gov/ncas/current-activity/2021/10/07/apache-releases-http-server-version-2451-address-vulnerabilities)
+- [How to Perform a Nmap Vulnerability Scan using NSE scripts](https://securitytrails.com/blog/nmap-vulnerability-scan)
+- [nmap-docker-image/Dockerfile at master · instrumentisto/nmap-docker-image](https://github.com/instrumentisto/nmap-docker-image/blob/master/Dockerfile)
 
 # 其他討論
 

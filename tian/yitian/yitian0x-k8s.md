@@ -1,4 +1,4 @@
-# YiTian0x Kubernetes
+# WIP: YiTian0x Kubernetes
 
 
 任務
@@ -43,11 +43,11 @@ k3d cluster delete foo2021
 # T2 docker and kubectl
 
 ```sh
-cat <<\EOF | DOCKER_BUILDKIT=1  docker build -t k101s -
+DOCKER_BUILDKIT=1 docker build -t k101s - <<\EOF
 # syntax=docker/dockerfile:1.3-labs
 FROM docker.io/debian:bullseye-slim
 RUN apt-get update && apt-get install -y openssl curl jq
-RUN <<\CORE
+RUN <<\EOOF
 
 KUBECTL_VERSION=v1.22.0
 curl -sL https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /bin/kubectl && \
@@ -60,7 +60,7 @@ curl -sL https://github.com/kubernetes-sigs/kustomize/releases/download/kustomiz
 HELM_V3=v3.7.0
 curl -sSL https://get.helm.sh/helm-${HELM_V3}-linux-amd64.tar.gz | tar xz && \
   mv linux-amd64/helm /bin/helm && rm -rf linux-amd64
-CORE
+EOOF
 
 ENV KUBECONFIG /kube/config
 RUN mkdir -p /kube && chmod a+w /kube
@@ -226,10 +226,10 @@ EOF
 ```docker build|run``` 轉到 kubernetes 變成使用 ```skaffold build|run``` 為何不只是使用 sh + kubectl ？ 因為可以簡化很多寫 sh 錯誤，可開```skaffold run -vdebug```來看看這些工作有可以用 sh 完成只是要考慮後續維護問題。
 
 ```sh
-cat <<\EOF | DOCKER_BUILDKIT=1  docker build -t k102s -
+DOCKER_BUILDKIT=1 docker build -t k102s - <<\EOF
 # syntax=docker/dockerfile:1.3-labs
 FROM k101s
-RUN <<\CORE
+RUN <<\EOOF
 SKAFFOLD_VERSION=v1.32.0
 curl -sLo skaffold https://storage.googleapis.com/skaffold/releases/${SKAFFOLD_VERSION}/skaffold-linux-amd64 && \
   chmod +x skaffold && mv skaffold /bin/
@@ -239,12 +239,12 @@ curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v$K3
 
 curl -sLo yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 \
   && chmod +x yq && mv yq /bin/
-CORE
+EOOF
 EOF
 
 docker run -i --rm -v ${HOME}/.kube/config:/kube/config:ro \
   -v /var/run/docker.sock:/var/run/docker.sock --network host k102s <<\EOF
-cat <<\CORE > Dockerfile
+cat <<\EOOF > Dockerfile
 FROM golang:1.15 as builder
 COPY main.go .
 ARG SKAFFOLD_GO_GCFLAGS
@@ -254,9 +254,9 @@ FROM alpine:3
 ENV GOTRACEBACK=single
 CMD ["./app"]
 COPY --from=builder /app .
-CORE
+EOOF
 
-cat <<\CORE > k8s-pod.yaml
+cat <<\EOOF > k8s-pod.yaml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -265,9 +265,9 @@ spec:
   containers:
   - name: getting-started
     image: skaffold-example
-CORE
+EOOF
 
-cat <<\CORE > main.go
+cat <<\EOOF > main.go
 package main
 
 import (
@@ -281,9 +281,9 @@ func main() {
 	  time.Sleep(time.Second * 1)
 	}
 }
-CORE
+EOOF
 
-cat <<\CORE > skaffold.yaml
+cat <<\EOOF > skaffold.yaml
 apiVersion: skaffold/v2beta23
 kind: Config
 build:
@@ -293,7 +293,7 @@ deploy:
   kubectl:
     manifests:
       - k8s-*
-CORE
+EOOF
 
 ls -al
 skaffold run --tail
