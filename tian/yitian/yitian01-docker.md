@@ -23,6 +23,7 @@
   - ```docker run dltdojo/yitian:01-k8s```
   - ```docker run dltdojo/yitian:01-node```
   - ```docker run dltdojo/yitian:01-nmap```
+- T14 以 ```cpe:/a:apache:http_server:2.4.48``` 為例製作一個弱點掃描 CVE 的範例
 
 # T1 Docker
 
@@ -414,16 +415,10 @@ WORKDIR /opt/app
 RUN <<EOOF
 cat <<\EOOOF > package.json
 {
-  "name": "apitest",
-  "version": "1.0.0",
-  "description": "",
-  "main": "main.js",
-  "dependencies": {},
-  "devDependencies": {},
+  "name": "apitest", "version": "1.0.0", "description": "",
+  "main": "main.js", "dependencies": {}, "devDependencies": {},
   "scripts": {"test": "jest"},
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "keywords": [], "author": "", "license": "ISC"
 }
 EOOOF
 npm install --save jest supertest
@@ -618,34 +613,25 @@ docker push dltdojo/yitian:01-node
 docker push dltdojo/yitian:01-nmap
 ```
 
-# WIP: T1x 
+# T14 nmap script vulners
 
 弱點掃描
 
-[CVE - Download CVE List](https://cve.mitre.org/data/downloads/index.html)
-[vulnersCom/nmap-vulners: NSE script based on Vulners.com API](https://github.com/vulnersCom/nmap-vulners)
-
-
 ```sh
-cat <<\EOF | docker build -t nmap101 -
-FROM docker.io/instrumentisto/nmap:7.92
-RUN apk add git curl
-RUN git version
-WORKDIR /usr/share/nmap
-RUN cd scripts && git clone --depth=1 https://github.com/scipag/vulscan
-RUN cd scripts/vulscan && curl -sLO https://www.computec.ch/projekte/vulscan/download/cve.csv
-EOF
-
 docker network create --driver bridge foonet
-docker run -d --name my-http -p 8081:80 --network foonet docker.io/httpd:2.4.49-alpine
-docker run --rm -it --network foonet nmap101 -sV --script=vulscan/vulscan.nse my-http
+docker run -d --name my-http -p 8081:80 --network foonet docker.io/httpd:2.4.48-alpine
+docker run --rm -it --network foonet dltdojo/yitian:01-nmap nmap -sV --script vulners --script-args mincvss=5.0 my-http
 docker stop my-http && docker rm my-http
 docker network rm foonet
 ```
 
+測試當下 ```cpe:/a:apache:http_server:2.4.49``` 掃不出 CVE-2021-41773 確認掃出 CVE 非即時有時間差，當下新版本如 2.4.49 需要另外再確認。
+
+- [Apache HTTP Server 2.4 vulnerabilities - The Apache HTTP Server Project](https://httpd.apache.org/security/vulnerabilities_24.html)
 - [Apache Releases HTTP Server version 2.4.51 to Address Vulnerabilities Under Exploitation | CISA](https://us-cert.cisa.gov/ncas/current-activity/2021/10/07/apache-releases-http-server-version-2451-address-vulnerabilities)
-- [How to Perform a Nmap Vulnerability Scan using NSE scripts](https://securitytrails.com/blog/nmap-vulnerability-scan)
+- [vulnersCom/nmap-vulners: NSE script based on Vulners.com API](https://github.com/vulnersCom/nmap-vulners)
 - [nmap-docker-image/Dockerfile at master · instrumentisto/nmap-docker-image](https://github.com/instrumentisto/nmap-docker-image/blob/master/Dockerfile)
+- [Expert published NMAP script for Apache CVE-2021-41773 vulnerabilitySecurity Affairs](https://securityaffairs.co/wordpress/123148/hacking/nmap-script-cve-apache-2021-41773.html)
 
 # 其他討論
 

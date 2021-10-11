@@ -3,6 +3,7 @@
 各式各樣 Hello SHA3-256
 
 - Bash + OpenSSL
+- Java
 - Rust
 - Python
 
@@ -27,7 +28,6 @@ echo
 # db8aa6c4ca3f27b80512c4ce1d94352c008a24183fde2d8bd57b4309fe670262
 EOF
 ```
-
 
 
 # Rust SHA3-256
@@ -72,6 +72,20 @@ EOF
 ```
 
 - [rust-crypto - crates.io: Rust Package Registry](https://crates.io/crates/rust-crypto)
+
+
+# Java
+
+```sh
+docker run -i -w /app --rm --entrypoint=/bin/bash maven:3.8.3-openjdk-11 <<\EOF
+java --version
+mvn --version
+EOF
+```
+
+- [Gradle - Official Image | Docker Hub](https://hub.docker.com/_/gradle)
+- [Maven – Maven in 5 Minutes](https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html)
+- [Maven - How to create a Java project - Mkyong.com](https://mkyong.com/maven/how-to-create-a-java-project-with-maven/)
 
 
 # TODO
