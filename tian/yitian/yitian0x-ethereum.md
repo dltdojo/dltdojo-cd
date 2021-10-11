@@ -383,3 +383,9 @@ EOF
 Compound test ?
 
 - [Fix COMP distribution bug by TylerEther · Pull Request #165 · compound-finance/compound-protocol](https://github.com/compound-finance/compound-protocol/pull/165)
+
+# Law
+
+- Incomplete Contracts and Blockchain | by Cathy Barrera, PhD | Prysm Group | Medium https://medium.com/prysmeconomics/incomplete-contracts-and-blockchain-ac9f348a2e6f
+- Contract theory - Wikipedia https://en.wikipedia.org/wiki/Contract_theory
+- [Blockchain in Supply Chain: Smart Contracts for Supply Agreements](https://www.natlawreview.com/article/legal-implications-blockchain-supply-chain-what-s-law-got-to-do-it)

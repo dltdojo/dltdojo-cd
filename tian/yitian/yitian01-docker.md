@@ -18,6 +18,11 @@
 - T10 製作一個 HTTP 狀態與資源內容的 API Endpoint 整合性測試
 - T11 製作一個公開給其他人下載使用的 Docker Image
 - T12 監聽網路通訊協定 HTTP 並顯示對應之 OSI 層資訊
+- T13 客製工具箱
+  - ```docker run dltdojo/yitian:01```
+  - ```docker run dltdojo/yitian:01-k8s```
+  - ```docker run dltdojo/yitian:01-node```
+  - ```docker run dltdojo/yitian:01-nmap```
 
 # T1 Docker
 
@@ -488,11 +493,9 @@ docker exec tmp404 curl http://www.facebook.com
 - [OSI模型 - 維基百科，自由的百科全書](https://zh.wikipedia.org/wiki/OSI%E6%A8%A1%E5%9E%8B)
 - [HTTP analysis using Wireshark](https://linuxhint.com/http_wireshark/)
 
-# WIP: T13 My Toolbox
+# T13 My Toolbox
 
 接下來要考慮一個 [Monorepo - Wikipedia](https://en.wikipedia.org/wiki/Monorepo) 類似問題，打算做出各種專用工具的映像檔還是集中式？工具越大方便使用，但對於只需單一特定版本工具來說變成累贅，一般建議採用更新頻率低置頂集中策略來做出目前應用所需的工具箱。
-
-> What really matters when it comes to disk usage is the size of frequently changing layers. As a side note: reducing base image size usually comes at a price – the smaller the image size, the smaller the functionality. [Docker Image Size - Does It Matter? - Semaphore](https://semaphoreci.com/blog/2018/03/14/docker-image-size.html)
 
 ```sh
 DOCKER_BUILDKIT=1 docker build -t dltdojo/yitian:01 - <<\EOF
@@ -500,56 +503,15 @@ DOCKER_BUILDKIT=1 docker build -t dltdojo/yitian:01 - <<\EOF
 FROM docker.io/debian:bullseye-slim
 ARG DEBIAN_FRONTEND=noninteractive
 RUN <<\EOOF
-apt-get update && apt-get install -y openssl curl jq git && apt-get clean
+apt-get update && apt-get install -y openssl curl jq git tree && apt-get clean
 EOOF
 EOF
 
 docker images | grep dltdojo/yitian
 docker run dltdojo/yitian:01 echo hello world
 docker run dltdojo/yitian:01 curl --version
-docker run dltdojo/yitian:01 curl http://www.apache.org
-
-DOCKER_BUILDKIT=1 docker build -t dltdojo/yitian:01-node - <<\EOF
-# syntax=docker/dockerfile:1.3-labs
-FROM dltdojo/yitian:01
-ARG DEBIAN_FRONTEND=noninteractive
-RUN <<\EOOF
-curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
-apt-get install -y nodejs
-EOOF
-WORKDIR /opt/tapp
-RUN <<\EOOF
-cat <<\EOOOF > package.json
-{
-  "name": "apitest", "version": "1.0.0", "description": "",
-  "main": "main.js", "dependencies": {}, "devDependencies": {},
-  "scripts": {"test": "jest"},
-  "keywords": [], "author": "", "license": "ISC"
-}
-EOOOF
-npm install --save jest supertest
-EOOF
-EOF
-
-docker images | grep dltdojo/yitian
-docker run dltdojo/yitian:01-node node -v
-
-DOCKER_BUILDKIT=1 docker build -t dltdojo/yitian:01-nmap - <<\EOF
-# syntax=docker/dockerfile:1.3-labs
-FROM dltdojo/yitian:01
-ARG DEBIAN_FRONTEND=noninteractive
-RUN <<\EOOF
-apt-get update && apt-get install -y tshark nmap && apt-get clean
-
-TERMSHARK_VERSION=2.3.0
-curl -LSs https://github.com/gcla/termshark/releases/download/v${TERMSHARK_VERSION}/termshark_${TERMSHARK_VERSION}_linux_x64.tar.gz \
-    -o /tmp/termshark_${TERMSHARK_VERSION}_linux_x64.tar.gz \
-    &&  tar -zxvf /tmp/termshark_${TERMSHARK_VERSION}_linux_x64.tar.gz \
-    &&  mv termshark_${TERMSHARK_VERSION}_linux_x64/termshark /usr/local/bin/termshark \
-    &&  chmod +x /usr/local/bin/termshark
-EOOF
-EOF
-
+docker run --rm dltdojo/yitian:01 curl http://www.apache.org
+docker run --rm -w /app dltdojo/yitian:01 tree -L 2 /
 
 DOCKER_BUILDKIT=1 docker build -t dltdojo/yitian:01-k8s - <<\EOF
 # syntax=docker/dockerfile:1.3-labs
@@ -585,12 +547,73 @@ curl -sLo yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_a
 EOOF
 EOF
 
+docker run dltdojo/yitian:01-k8s kubectl version
+
+DOCKER_BUILDKIT=1 docker build -t dltdojo/yitian:01-node - <<\EOF
+# syntax=docker/dockerfile:1.3-labs
+FROM dltdojo/yitian:01
+ARG DEBIAN_FRONTEND=noninteractive
+RUN <<\EOOF
+curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
+apt-get install -y nodejs
+EOOF
+WORKDIR /tapp
+RUN <<\EOOF
+cat <<\EOOOF > package.json
+{
+  "name": "apitest", "version": "1.0.0", "description": "",
+  "main": "main.js", "dependencies": {}, "devDependencies": {},
+  "scripts": {"test": "jest"},
+  "keywords": [], "author": "", "license": "ISC"
+}
+EOOOF
+npm install --save jest supertest
+EOOF
+EOF
+
+docker images | grep dltdojo/yitian
+docker run dltdojo/yitian:01-node node -v
+docker run dltdojo/yitian:01-node tree -L 2 /tapp
+
+DOCKER_BUILDKIT=1 docker build -t dltdojo/yitian:01-nmap - <<\EOF
+# syntax=docker/dockerfile:1.3-labs
+FROM dltdojo/yitian:01
+ARG DEBIAN_FRONTEND=noninteractive
+RUN <<\EOOF
+apt-get update && apt-get install -y tshark nmap && apt-get clean
+
+TERMSHARK_VERSION=2.3.0
+curl -LSs https://github.com/gcla/termshark/releases/download/v${TERMSHARK_VERSION}/termshark_${TERMSHARK_VERSION}_linux_x64.tar.gz \
+    -o /tmp/termshark_${TERMSHARK_VERSION}_linux_x64.tar.gz \
+    &&  tar -zxvf /tmp/termshark_${TERMSHARK_VERSION}_linux_x64.tar.gz \
+    &&  mv termshark_${TERMSHARK_VERSION}_linux_x64/termshark /usr/local/bin/termshark \
+    &&  chmod +x /usr/local/bin/termshark
+EOOF
+EOF
 
 docker images | grep dltdojo/yitian
 docker run dltdojo/yitian:01-nmap nmap --version
 docker run dltdojo/yitian:01-nmap termshark --version
 
+
+DOCKER_BUILDKIT=1 docker build -t dltdojo/yitian:01-dlt - <<\EOF
+# syntax=docker/dockerfile:1.3-labs
+FROM dltdojo/yitian:01
+ARG DEBIAN_FRONTEND=noninteractive
+RUN <<\EOOF
+BITCOIND_VER=22.0
+cd /tmp
+curl https://bitcoincore.org/bin/bitcoin-core-${BITCOIND_VER}/bitcoin-${BITCOIND_VER}-x86_64-linux-gnu.tar.gz | tar -xz
+cd /tmp/bitcoin-${BITCOIND_VER}/bin
+mv bitcoind bitcoin-cli /usr/local/bin/
+rm -rf /tmp/bitcoin-${BITCOIND_VER}/bin
+EOOF
+EOF
+
+docker run -it --rm dltdojo/yitian:01-dlt bitcoin-cli --version
+
 docker push dltdojo/yitian:01
+docker push dltdojo/yitian:01-k8s
 docker push dltdojo/yitian:01-node
 docker push dltdojo/yitian:01-nmap
 ```
