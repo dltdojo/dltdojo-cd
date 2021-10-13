@@ -24,7 +24,7 @@
   - ```docker run dltdojo/yitian:01-node```
   - ```docker run dltdojo/yitian:01-nmap```
 - T14 以 ```cpe:/a:apache:http_server:2.4.48``` 為例製作一個弱點掃描 CVE 的範例
-
+- T15 訓練一個深度神經網路 TabNet 預測鐵達尼存活率模型。
 # T1 Docker
 
 docker hello-world 與讀取網路 HTTP 資源
@@ -632,6 +632,29 @@ docker network rm foonet
 - [vulnersCom/nmap-vulners: NSE script based on Vulners.com API](https://github.com/vulnersCom/nmap-vulners)
 - [nmap-docker-image/Dockerfile at master · instrumentisto/nmap-docker-image](https://github.com/instrumentisto/nmap-docker-image/blob/master/Dockerfile)
 - [Expert published NMAP script for Apache CVE-2021-41773 vulnerabilitySecurity Affairs](https://securityaffairs.co/wordpress/123148/hacking/nmap-script-cve-apache-2021-41773.html)
+
+
+# T15 Lightning Flash and Titanic
+
+NOTE: notebook101 image size 4.5 GB 
+
+```sh
+docker build -t notebook101 - <<\EOF
+FROM jupyter/minimal-notebook:notebook-6.4.4
+RUN conda install -c conda-forge ipywidgets
+RUN pip install 'lightning-flash[tabular]'
+EOF
+
+docker run -it --rm -p 8888:8888 notebook101
+```
+
+- [深度學習 - 維基百科，自由的百科全書](https://zh.wikipedia.org/zh-tw/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0)
+- [Titanic Dataset | Kaggle](https://www.kaggle.com/c/titanic-dataset/data)
+- [jupyter/minimal-notebook Tags | Docker Hub](https://hub.docker.com/r/jupyter/minimal-notebook/tags)
+- [Installation — Flash documentation](https://lightning-flash.readthedocs.io/en/latest/installation.html)
+- [Tabular Classification — Flash documentation](https://lightning-flash.readthedocs.io/en/latest/reference/tabular_classification.html)
+- [TabNet — Deep Neural Network for Structured, Tabular Data | by Ryan Burke | Towards Data Science](https://towardsdatascience.com/tabnet-deep-neural-network-for-structured-tabular-data-39eb4b27a9e4)
+- [ML model, TabNet is easy to use on Cloud AI Platform | Google Cloud Blog](https://cloud.google.com/blog/products/ai-machine-learning/ml-model-tabnet-is-easy-to-use-on-cloud-ai-platform)
 
 # 其他討論
 
