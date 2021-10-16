@@ -4,10 +4,11 @@
 任務
 
 - T1 建立一個 kubernetes cluster 使用 kubectl 執行  job 後刪除 cluster
-- 建立一個 docker 內 kubectl 執行 job 的範例
+- 建立一個 docker 內 kubectl 執行 job 的範例並用終端機模式檢視 kubernetes 資源
 - 建立一個 Web 界面操作之 kubectl 執行 job 範例（檢視資源？）
 - 建立 http 服務並使用 job 來測試輸出結果
 - 建立 http 服務並使用 pod 來測試輸出結果
+- 建立一個 hyperledger fabric 網路
 
 
 # T1 Kubernetes and kubectl
@@ -54,6 +55,9 @@ kubectl wait --for=condition=complete job/${JOB_NAME} --timeout=60s
 echo "Job output:"
 kubectl logs job/${JOB_NAME}
 EOF
+
+# k9s 
+docker run -it --rm -v ${HOME}/.kube/config:/kube/config:ro --network host dltdojo/yitian:01-k8s k9s
 
 # k3d cluster delete foo2021
 ```
@@ -282,3 +286,16 @@ EOF
 這個設定不需要 push image 所以可以避開一開始要先有 image registy 類服務，直接將 image tarball 匯入 [k3d image import](https://k3d.io/usage/commands/k3d_image_import/)，如果 ```skaffold run -vdebug``` 可以看到 ```Importing images from tarball '/k3d/images/k3d-foo2021-images-20211007085633.tar' into node 'k3d-foo2021-server-0'``` 這類訊息。
 
 另外不直接用 gcr.io/k8s-skaffold/skaffold 是因為太過肥大需 2.77GB 以及內建的 kubectl 版本過舊。
+
+# WIP: 
+
+> An SSL error has occurred and a secure connection to the server cannot be made. [SHAKESPEARE QUOTE OF THE DAY](https://www.google.com/search?q=SHAKESPEARE+QUOTE)
+
+
+- [An SSL error has occurred and a secure connection to the server cannot be made. error is seen in iOS 10 devices. · Issue #27 · google/gtm-http-fetcher](https://github.com/google/gtm-http-fetcher/issues/27)
+- [Secure connection failed and Firefox did not connect | Firefox Help](https://support.mozilla.org/en-US/kb/secure-connection-failed-firefox-did-not-connect)
+
+# WIP: Hyperledger Fabric
+
+- [Kubectl plugins available · Krew](https://krew.sigs.k8s.io/plugins/)
+- [kfsoftware/hlf-operator: Hyperledger Fabric Kubernetes operator - Hyperledger Fabric operator for Kubernetes (v2.2+)](https://github.com/kfsoftware/hlf-operator)

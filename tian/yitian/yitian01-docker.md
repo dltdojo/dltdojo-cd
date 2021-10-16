@@ -513,7 +513,7 @@ DOCKER_BUILDKIT=1 docker build -t dltdojo/yitian:01-k8s - <<\EOF
 FROM dltdojo/yitian:01
 
 RUN <<\EOOF
-KUBECTL_VERSION=v1.22.0
+KUBECTL_VERSION=v1.22.2
 curl -sL https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /bin/kubectl && \
   chmod +x /bin/kubectl
 
@@ -524,10 +524,10 @@ curl -sL https://github.com/kubernetes-sigs/kustomize/releases/download/kustomiz
 HELM_V3=v3.7.0
 curl -sSL https://get.helm.sh/helm-${HELM_V3}-linux-amd64.tar.gz | tar xz && \
   mv linux-amd64/helm /bin/helm && rm -rf linux-amd64
-EOOF
 
-ENV KUBECONFIG /kube/config
-RUN mkdir -p /kube && chmod a+w /kube
+K9S_VERSION=v0.24.15
+curl -sSL https://github.com/derailed/k9s/releases/download/${K9S_VERSION}/k9s_Linux_x86_64.tar.gz | tar xz && mv k9s /bin/k9s 
+EOOF
 
 RUN <<\EOOF
 SKAFFOLD_VERSION=v1.32.0
@@ -540,6 +540,8 @@ curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v$K3
 curl -sLo yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 \
   && chmod +x yq && mv yq /bin/
 EOOF
+ENV KUBECONFIG /kube/config
+RUN mkdir -p /kube && chmod a+w /kube
 EOF
 
 docker run dltdojo/yitian:01-k8s kubectl version
