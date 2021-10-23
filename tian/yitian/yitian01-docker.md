@@ -23,8 +23,9 @@
   - ```docker run dltdojo/yitian:01-k8s```
   - ```docker run dltdojo/yitian:01-node```
   - ```docker run dltdojo/yitian:01-nmap```
-- T14 以 ```cpe:/a:apache:http_server:2.4.48``` 為例製作一個弱點掃描 CVE 的範例
+- T14 以 ```cpe:/a:apache:http_server:2.4.48``` 為例製作一個弱點掃描 CVE 的範例。
 - T15 訓練一個深度神經網路 TabNet 預測鐵達尼存活率模型。
+- T16 搭建一個與本機環境隔離的 Rust 2021 Edition 編譯與容器執行測試範例。
 # T1 Docker
 
 docker hello-world 與讀取網路 HTTP 資源
@@ -657,6 +658,60 @@ docker run -it --rm -p 8888:8888 notebook101
 - [Tabular Classification — Flash documentation](https://lightning-flash.readthedocs.io/en/latest/reference/tabular_classification.html)
 - [TabNet — Deep Neural Network for Structured, Tabular Data | by Ryan Burke | Towards Data Science](https://towardsdatascience.com/tabnet-deep-neural-network-for-structured-tabular-data-39eb4b27a9e4)
 - [ML model, TabNet is easy to use on Cloud AI Platform | Google Cloud Blog](https://cloud.google.com/blog/products/ai-machine-learning/ml-model-tabnet-is-easy-to-use-on-cloud-ai-platform)
+
+
+# T16 Rust 2021
+
+```sh
+cd /tmp
+docker run -e APP=foo321 -e HUID=$(id -u) -e HGID=$(id -g) -v $PWD/app:/app -w /app -i rust:1.56.0-bullseye <<\EOF
+cargo new $APP
+cd $APP
+cat > .dockerignore <<\EOOF
+target
+Dockerfile
+.dockerignore
+.git
+.gitignore
+EOOF
+cat > Dockerfile <<EOOF
+FROM rust:1.56.0-bullseye AS chef
+RUN cargo install cargo-chef 
+WORKDIR app
+
+FROM chef AS planner
+COPY . .
+RUN cargo chef prepare  --recipe-path recipe.json
+
+FROM chef AS builder
+COPY --from=planner /app/recipe.json recipe.json
+RUN cargo chef cook --release --recipe-path recipe.json
+COPY . .
+RUN cargo build --release --bin $APP
+
+# helloworld 84 MB
+# FROM debian:bullseye-slim AS runtime
+# RUN apt-get update && apt-get install -y git openssl curl jq
+# WORKDIR app
+# COPY --from=builder /app/target/release/$APP /usr/local/bin
+# ENTRYPOINT ["/usr/local/bin/$APP"]
+
+# helloworld 26 MB https://github.com/GoogleContainerTools/distroless
+# helloworld 12 MB https://github.com/docker-slim/docker-slim
+FROM gcr.io/distroless/cc
+COPY --from=builder /app/target/release/$APP /
+CMD ["/$APP"]
+EOOF
+chown -R $HUID:$HGID /app
+EOF
+
+cd app/foo321
+docker build -t foo . && docker run foo
+```
+
+- [Docker and the host filesystem owner matching problem – Joyful Bikeshedding](https://www.joyfulbikeshedding.com/blog/2021-03-15-docker-and-the-host-filesystem-owner-matching-problem.html)
+- [Shell Scripting in Rust?. tl;dr: Yes, for a performance-oriented… | by Jason McCampbell | ITNEXT](https://itnext.io/shell-scripting-in-rust-2bdb8c738c94)
+- [Tiny and Fast Docker image for Rust Application - AZZAMSA](https://azzamsa.com/n/rust-docker/)
 
 # 其他討論
 

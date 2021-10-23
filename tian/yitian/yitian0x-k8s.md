@@ -299,3 +299,8 @@ EOF
 
 - [Kubectl plugins available · Krew](https://krew.sigs.k8s.io/plugins/)
 - [kfsoftware/hlf-operator: Hyperledger Fabric Kubernetes operator - Hyperledger Fabric operator for Kubernetes (v2.2+)](https://github.com/kfsoftware/hlf-operator)
+
+# WIP: SQL Inject
+
+- [Running an SQL Injection Attack - Computerphile - YouTube](https://www.youtube.com/watch?v=ciNHn38EyRc)
+- [What is SQL Injection? Tutorial & Examples | Web Security Academy](https://portswigger.net/web-security/sql-injection)
