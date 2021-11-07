@@ -26,6 +26,7 @@
 - T14 以 ```cpe:/a:apache:http_server:2.4.48``` 為例製作一個弱點掃描 CVE 的範例。
 - T15 訓練一個深度神經網路 TabNet 預測鐵達尼存活率模型。
 - T16 搭建一個與本機環境隔離的 Rust 2021 Edition 編譯與容器執行測試範例。
+- T17 計算 BIP39 中文「真 實 無 雙 花 分 散 式 去 中 心 化 抗 拔 線 雙 花 風 險 很 難 難 難」的第 24 個字
 # T1 Docker
 
 docker hello-world 與讀取網路 HTTP 資源
@@ -712,6 +713,40 @@ docker build -t foo . && docker run foo
 - [Docker and the host filesystem owner matching problem – Joyful Bikeshedding](https://www.joyfulbikeshedding.com/blog/2021-03-15-docker-and-the-host-filesystem-owner-matching-problem.html)
 - [Shell Scripting in Rust?. tl;dr: Yes, for a performance-oriented… | by Jason McCampbell | ITNEXT](https://itnext.io/shell-scripting-in-rust-2bdb8c738c94)
 - [Tiny and Fast Docker image for Rust Application - AZZAMSA](https://azzamsa.com/n/rust-docker/)
+
+# T17 Rust BIP39
+
+```sh
+docker build -t rust-bip39 - <<\EOF
+FROM rust:1.56.1-bullseye
+RUN cargo new app && \
+    cd app && \
+    echo tiny-bip39 = \"0.8.2\" >> Cargo.toml &&\
+    cargo build
+WORKDIR /app
+EOF
+
+docker run -w /app -i rust-bip39 <<\EOF
+cat Cargo.toml
+cat > src/main.rs <<\EOOF
+fn main() {
+    use bip39::{Language, Mnemonic};
+    let lang = Language::ChineseTraditional;
+    for x in 0..2048 {
+        let phrase = format!("真 實 無 雙 花 分 散 式 去 中 心 化 抗 拔 線 雙 花 風 險 很 難 難 難 {}", 
+          lang.wordlist().get_word(x.into()));
+        if Mnemonic::validate(&phrase, lang).is_ok() {
+            println!("{}", phrase);
+        }
+    }
+}
+EOOF
+cargo run
+EOF
+```
+
+- [tiny-bip39 - crates.io: Rust Package Registry](https://crates.io/crates/tiny-bip39)
+- [BIP39 how software found the checksum?](https://bitcointalk.org/index.php?topic=5300691.0)
 
 # 其他討論
 
