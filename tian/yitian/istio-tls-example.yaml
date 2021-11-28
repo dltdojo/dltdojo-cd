@@ -1,0 +1,172 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-issuer
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ingress-cert-foo
+  namespace: istio-system
+spec:
+  secretName: ingress-cert-foo # must be the same as credentialName in gateway.yaml
+  isCA: false
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  commonName: "*.local"
+  subject:
+    countries: 
+      - TW
+    organizations:
+      - DEV
+      - FOO
+    organizationalUnits:
+      - K8S
+      - ETH
+  duration: 2160h0m0s # 90d
+  renewBefore: 360h0m0s # 15d
+  dnsNames:
+    - "*.local"
+    - "*.nip.io"
+  ipAddresses:
+    - 0.0.0.0
+    - 127.0.0.1
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: mygateway
+spec:
+  selector:
+    istio: ingressgateway # use istio default ingress gateway
+  servers:
+    - port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      tls:
+        mode: SIMPLE
+        minProtocolVersion: TLSV1_2
+        credentialName: ingress-cert-foo # must be the same as secretName in cert.yaml
+      hosts:
+        - "*.nip.io"
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: httpbin
+spec:
+  hosts:
+    - "httpbin-127-0-0-1.nip.io"
+  gateways:
+    - mygateway
+  http:
+    - route:
+        - destination:
+            port:
+              number: 8000
+            host: httpbin
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: nginx
+spec:
+  hosts:
+    - "nginx-127-0-0-1.nip.io"
+  gateways:
+    - mygateway
+  http:
+    - route:
+        - destination:
+            port:
+              number: 80
+            host: nginx
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  ports:
+    - name: http-web
+      port: 80
+  selector:
+    app: nginx
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: nginx
+        version: v1
+    spec:
+      containers:
+        - image: nginx
+          imagePullPolicy: IfNotPresent
+          name: nginx
+          ports:
+            - containerPort: 80
+          resources: {}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: httpbin
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpbin
+  labels:
+    app: httpbin
+    service: httpbin
+spec:
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 80
+  selector:
+    app: httpbin
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpbin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpbin
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: httpbin
+        version: v1
+    spec:
+      serviceAccountName: httpbin
+      containers:
+        - image: docker.io/kennethreitz/httpbin:latest
+          imagePullPolicy: IfNotPresent
+          name: httpbin
+          ports:
+            - containerPort: 80
+          resources: {}
