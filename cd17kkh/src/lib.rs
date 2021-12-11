@@ -11,11 +11,12 @@ pub fn greet(name: &str) -> String {
 }
 
 #[wasm_bindgen]
-pub fn svg_img_dataurl() -> String {
+pub fn svg_img_dataurl(color: &str) -> String {
     // [css - svg fill color not working with hex colors - Stack Overflow](https://stackoverflow.com/questions/61099149/svg-fill-color-not-working-with-hex-colors)
     // # in URLs starts a fragment identifier. So, in order to make that work, write %23 instead of #. 
     // That is the value of escaped # character.
-    format!("data:image/svg+xml;utf8,{}", svg_output().replace("#", "%23"))
+    let newcolor = format!("%23{}", color);
+    format!("data:image/svg+xml;utf8,{}", svg_output().replace("#000000", &newcolor))
 }
 
 fn bip39_last_word() -> String {
