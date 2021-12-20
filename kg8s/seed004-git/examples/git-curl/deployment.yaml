@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: git-curl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: git-curl
+  template:
+    metadata:
+      labels:
+        app: git-curl
+    spec:
+      containers:
+        - name: git-curl
+          image: docker.io/bitnami/git:2-debian-10
+          command:
+            - sh
+            - -c
+            - echo $(date) > /data/date.txt ; tail -f /dev/null
+          volumeMounts:
+            - name: vol001
+              mountPath: /data
+          resources:
+            limits:
+              cpu: "1"
+              memory: 256Mi
+            requests:
+              cpu: 200m
+              memory: 128Mi
+      volumes:
+        - name: vol001
+          persistentVolumeClaim:
+            claimName: pvc-git-curl

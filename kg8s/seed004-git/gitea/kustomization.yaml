@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: gitea
+# gitea [gitea/helm-chart: Helm chart for gitea - helm-chart - Gitea: Git with a cup of tea](https://gitea.com/gitea/helm-chart/)
+# helm repo add gitea-charts https://dl.gitea.io/charts/
+# helm repo update
+# without existingClaim
+# helm template gitea gitea-charts/gitea -n gitea --set gitea.admin.email=fooadmin@gitea.local --set gitea.admin.existingSecret=gitea-credentials > gitea.yaml
+resources:
+  - gitea.yaml
+secretGenerator:
+  - name: gitea-credentials
+    literals:
+      - username=gitops-admin
+      - password=1fJyRTcesfe2e67df123XYZ
+patchesStrategicMerge:
+  # 
+  # 對外的 ROOT_URL = https://gitea-127-0-0-1.nip.io:9443 需要覆寫
+  # 注意很多名稱與 namespace 綁在一起，如果改 namespace 需要一起改。
+  #
+  - gitea-conf.yaml
+  #
+  # 坑
+  # 這 gitea-test-connection pod 因 label 設計與 gitea 一樣
+  # 這樣會被 gitea-http.svc 的 selector 選上造成混亂無法用 curl -v http://gitea-http.gitea.svc.cluster.local:3000
+  # 但是從 istio-ingressgateway 進來的卻不受影響，可是 argocd 需要使用內部網址必須將這個衝突去掉，可以改 label 或是直接刪除
+  # 不用 kiali 實在看不出來這種問題，直接拿 helm 輸出來改要注意。
+  - remove-test-connection.yaml
+  #
+  # volumeClaimTemplates/spec/volumeName 預設沒有會自動建一個 PV
+  # 一旦開始後需要轉為 prod 綁定 PV 否則會每次用全新增的 PV
+  - init-storageclass-retain.yaml

@@ -1,0 +1,121 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: mygateway
+spec:
+  selector:
+    istio: ingressgateway # use istio default ingress gateway
+  servers:
+    - port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      tls:
+        mode: SIMPLE
+        minProtocolVersion: TLSV1_2
+        credentialName: temp-nip-io-credential
+      hosts:
+        - my-nginx.127.0.0.1.nip.io
+        - kiali-istio-system.127.0.0.1.nip.io
+        - grafana-istio-system.127.0.0.1.nip.io
+        - prometheus-istio-system.127.0.0.1.nip.io
+        - tracing-istio-system.127.0.0.1.nip.io
+        - gitea.127.0.0.1.nip.io
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: my-nginx
+  labels:
+    app: my-nginx
+spec:
+  hosts:
+    - "my-nginx.127.0.0.1.nip.io"
+  gateways:
+    - mygateway
+  http:
+    - route:
+        - destination:
+            port:
+              number: 80
+            host: my-nginx.default.svc.cluster.local
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: kiali
+spec:
+  hosts:
+    - "kiali-istio-system.127.0.0.1.nip.io"
+  gateways:
+    - mygateway
+  http:
+    - route:
+        - destination:
+            port:
+              number: 20001
+            host: kiali.istio-system.svc.cluster.local
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: grafana
+spec:
+  hosts:
+    - "grafana-istio-system.127.0.0.1.nip.io"
+  gateways:
+    - mygateway
+  http:
+    - route:
+        - destination:
+            port:
+              number: 3000
+            host: grafana.istio-system.svc.cluster.local
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: prometheus
+spec:
+  hosts:
+    - "prometheus-istio-system.127.0.0.1.nip.io"
+  gateways:
+    - mygateway
+  http:
+    - route:
+        - destination:
+            port:
+              number: 9090
+            host: prometheus.istio-system.svc.cluster.local
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: tracing
+spec:
+  hosts:
+    - "tracing-istio-system.127.0.0.1.nip.io"
+  gateways:
+    - mygateway
+  http:
+    - route:
+        - destination:
+            port:
+              number: 80
+            host: tracing.istio-system.svc.cluster.local
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: gitea
+spec:
+  hosts:
+    - "gitea.127.0.0.1.nip.io"
+  gateways:
+    - mygateway
+  http:
+    - route:
+        - destination:
+            port:
+              number: 3000
+            host: gitea-http.gitea.svc.cluster.local

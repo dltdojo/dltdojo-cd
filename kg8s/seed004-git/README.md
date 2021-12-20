@@ -1,4 +1,4 @@
-# seed003-ctl
+# seed004-git
 
 注意：這版無權限控制只能用於內部練習，不可改為對外服務。
 
@@ -8,6 +8,7 @@
   - https://grafana-istio-system.127.0.0.1.nip.io:9443
   - https://prometheus-istio-system.127.0.0.1.nip.io:9443
   - https://tracing-istio-system.127.0.0.1.nip.io:9443
+- https://gitea.127.0.0.1.nip.io:9443
 
 
 ```sh
