@@ -128,9 +128,9 @@ PushRepoSysSeed(){
     docker run -i -w /src -v $PWD:/src:ro \
       --network host  --rm -v ${HOME}/.kube/config:/kube/config:ro $KCTL_IMG <<EOF
 echo "Init sys-seed repo"
-kubectl apply -f  layer0/git-repo-push-job.yaml
-kubectl wait --for=condition=complete job/git-repo-push --timeout=300s
-kubectl delete jobs git-repo-push
+kubectl apply -f  gitea/job-repo-seed/git-repo-push-job.yaml
+kubectl wait --for=condition=complete job/git-repo-push --timeout=300s -n gitea
+# kubectl delete jobs git-repo-push -n gitea
 EOF
 }
 

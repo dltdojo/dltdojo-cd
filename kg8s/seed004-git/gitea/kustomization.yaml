@@ -8,11 +8,20 @@ namespace: gitea
 # helm template gitea gitea-charts/gitea -n gitea --set gitea.admin.email=fooadmin@gitea.local --set gitea.admin.existingSecret=gitea-credentials > gitea.yaml
 resources:
   - gitea.yaml
+#
+# [Ability to disable hash suffix for generated secrets and configmaps. · Issue #50 · kubernetes-sigs/kustomize](https://github.com/kubernetes-sigs/kustomize/issues/50)
+#
 secretGenerator:
+  #
+  # gitea-credentials 除了預設在 helm 建立 --set gitea.admin.existingSecret=gitea-credentials 之外
+  # 還會應用到 git-repo-push-job 上，需固定不能加上後綴，失去後綴缺點是更新要手動重起生效。
+  #
   - name: gitea-credentials
     literals:
       - username=gitops-admin
       - password=1fJyRTcesfe2e67df123XYZ
+    options:
+      disableNameSuffixHash: true
 patchesStrategicMerge:
   # 
   # 對外的 ROOT_URL = https://gitea-127-0-0-1.nip.io:9443 需要覆寫

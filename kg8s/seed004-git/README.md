@@ -8,10 +8,13 @@
   - https://grafana-istio-system.127.0.0.1.nip.io:9443
   - https://prometheus-istio-system.127.0.0.1.nip.io:9443
   - https://tracing-istio-system.127.0.0.1.nip.io:9443
-- https://gitea.127.0.0.1.nip.io:9443
+- gitea 
+  - https://gitea.127.0.0.1.nip.io:9443
+  - https://gitea.127.0.0.1.nip.io:9443/gitops-admin/seed101
 
 
 ```sh
+$ bash init.sh -b
 $ bash init.sh -n foo2021
 ```
 
