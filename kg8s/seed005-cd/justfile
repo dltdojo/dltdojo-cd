@@ -1,0 +1,122 @@
+set shell := ["bash", "-uc"]
+
+cluster_name := "foo101"
+kctl_img :="kg8s-local/kctl:v21.12.1"
+
+check_cmd:
+  @command -v docker >/dev/null 2>&1 || { echo "docker is not installed.  aborting." >&2; exit 1; }
+  @command -v k3d >/dev/null 2>&1 || { echo "k3d is not installed.  aborting." >&2; exit 1; }
+  @command -v kubectl >/dev/null 2>&1 || { echo "kubectl is not installed.  aborting." >&2; exit 1; }
+  @command -v istioctl >/dev/null 2>&1 || { echo "istioctl is not installed.  aborting." >&2; exit 1; }
+  @command -v curl >/dev/null 2>&1 || { echo "curl is not installed.  aborting." >&2; exit 1; }
+  @command -v openssl >/dev/null 2>&1 || { echo "openssl is not installed.  aborting." >&2; exit 1; }
+
+build:
+  DOCKER_BUILDKIT=1 docker build -t {{kctl_img}} .
+
+img_import cluster: build
+  k3d image import {{kctl_img}} -c {{cluster}}
+
+create cluster: check_cmd
+  just init {{cluster}}
+  just test_pv {{cluster}}
+  just init_istio
+  just test_http
+
+init cluster: build
+  echo 'k3d cluster create {{cluster}}'
+  mkdir -p $HOME/k3dvol/{{cluster}}
+  k3d cluster create {{cluster}} --api-port 6550 --agents 1 \
+    --volume $HOME/k3dvol/{{cluster}}:/var/lib/rancher/k3s/storage@all \
+    -p "9443:443@loadbalancer" --k3s-arg '--disable=traefik@server:*'
+  k3d cluster list
+  just img_import {{cluster}}
+  docker run -i --rm -w /src --network host -v $HOME/.kube/config:/kube/config:ro {{kctl_img}} just kapply_ns_storage
+
+init_istio:
+  echo "Init istio"
+  istioctl install --set profile=default -y
+  docker run -i --rm -w /src --network host -v $HOME/.kube/config:/kube/config:ro {{kctl_img}} just kwait_istio
+  just test_istio_metrics
+
+kwait_istio:
+  kubectl wait -n istio-system deployment --all --for=condition=available --timeout=300s
+  kubectl label namespace default istio-injection=enabled
+  just kcreate_gw_tls temp-nip-io-credential
+  kubectl apply -n default -f layer0/istio-gateway-vs.yaml
+  just kapply_istio_metrics
+
+kapply_istio_metrics:
+  kubectl apply -k istio-metrics
+  kubectl wait -n istio-system deployment --all --for=condition=available --timeout=300s
+
+kcreate_gw_tls foo:
+  mkdir -p /tmp/cert && cd /tmp/cert
+  openssl req -new -x509 -nodes -newkey ec:<(openssl ecparam -name secp256r1) -subj '/O=LOCALDEV/CN=CA.TESTONLY.LOCAL' -keyout ca.key -out ca.crt -days 3650
+  openssl req -out nip.io.csr -newkey ec:<(openssl ecparam -name secp256r1) -nodes -keyout nip.io.key -subj "/CN=*.nip.io/O=LOCALDEV"
+  openssl x509 -req -days 3650 -CA ca.crt -CAkey ca.key -set_serial 0x$(openssl rand -hex 8) -in nip.io.csr -out nip.io.crt
+  kubectl create -n istio-system secret tls {{foo}} --key=nip.io.key --cert=nip.io.crt
+
+kapply_gitea:
+  echo "Init gitea"
+  kubectl apply -k gitea
+  # kubectl wait works for Deployment, but does not for StatefulSet · Issue #79606 · kubernetes/kubernetes
+  # https://github.com/kubernetes/kubernetes/issues/79606#issuecomment-779779928
+  kubectl rollout status statefulset/gitea -n gitea --timeout=300s
+
+kapply_job_push_repo:
+  echo "Init sys-seed repo"
+  kubectl apply -f gitea/job-repo-seed/git-repo-push-job.yaml
+  kubectl wait --for=condition=complete job/git-repo-push --timeout=300s -n gitea
+  # kubectl delete jobs git-repo-push -n gitea
+
+git_create_seed_repo gitea_auth_url repo_name:
+  #!/usr/bin/env bash
+  set -euxo pipefail
+  #
+  # examples just git_create_seed_repo https://gitops-admin:1fJyRTcesfe2e67df123XYZ@gitea.127.0.0.1.nip.io:9443 seed404
+  # json - Using curl POST with variables defined in bash script functions - Stack Overflow
+  # https://stackoverflow.com/questions/17029902/using-curl-post-with-variables-defined-in-bash-script-functions
+  #
+  # Feature request: Enable setting Variables in a Recipe · Issue #1023 · casey/just
+  # https://github.com/casey/just/issues/1023)
+  # 
+  API={{gitea_auth_url}}/api/v1/user/repos
+  curl -skv -X POST $API -H 'accept: application/json' -H 'Content-Type: application/json' \
+    -d '{ "name": "{{repo_name}}" }'
+
+kapply_ns_storage:
+  kubectl apply -f layer0/storage-retain-local-path.yaml
+  kubectl apply -f layer0/namespaces.yaml
+  kubectl get storageclass
+
+kapply_examples_pv:
+  kubectl apply -k examples/git-curl
+  kubectl rollout status deployment/git-curl --timeout=300s
+  kubectl apply -k examples/kctl
+  kubectl rollout status deployment/kctl --timeout=300s
+
+test_pv cluster:
+  docker run -i --rm -w /src --network host -v $HOME/.kube/config:/kube/config:ro {{kctl_img}} just kapply_examples_pv
+  echo "Tests: print files in the mounted volume of host"
+  find $HOME/k3dvol/{{cluster}} -type f -exec bash -c 'echo {} ; cat {}; echo ;' \;
+
+test_istio_metrics:
+  echo "Tests: Kiali and grafana"
+  curl -kvI --retry 8 --retry-all-errors https://kiali-istio-system.127.0.0.1.nip.io:9443
+  echo
+  curl -kvI --retry 8 --retry-all-errors https://grafana-istio-system.127.0.0.1.nip.io:9443
+
+kapply_example_nginx:
+  echo "Init examples nginx"
+  kubectl apply -k examples/nginx
+  kubectl rollout status deployment/my-nginx --timeout=180s
+
+test_http:
+  docker run -i --rm -w /src --network host -v $HOME/.kube/config:/kube/config:ro {{kctl_img}} just kapply_example_nginx
+  echo "Tests: Nginx"
+  curl -kv --retry 8 --retry-all-errors https://my-nginx.127.0.0.1.nip.io:9443
+
+foo target:
+  echo 'This is a recipe! {{cluster_name}}'
+  echo {{target}}

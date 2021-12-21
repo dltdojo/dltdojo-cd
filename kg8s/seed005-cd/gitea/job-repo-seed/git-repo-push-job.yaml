@@ -1,0 +1,59 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: git-repo-push
+  namespace: gitea
+spec:
+  template:
+    metadata:
+      labels:
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+      - name: git-repo-push
+        image: kg8s-local/kctl:v21.12.1
+        env:
+          - name: GITEA_URL
+            value: gitea-http.gitea.svc.cluster.local:3000
+          - name: GITEA_GITOPS_REPO_NAME
+            value: seed101
+          - name: GITEA_ADMIN_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key:  username
+                name: gitea-credentials
+          - name: GITEA_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key:  password
+                name: gitea-credentials
+        command: ["bash"]
+        args:
+          - -c
+          - |
+            echo $(date)
+            GITEA_AUTH_URL=http://${GITEA_ADMIN_USERNAME}:${GITEA_ADMIN_PASSWORD}@${GITEA_URL}
+            echo $GITEA_AUTH_URL
+            #  just git_create_seed_repo https://gitops-admin:1fJyRTcesfe2e67df123XYZ@gitea.127.0.0.1.nip.io:9443 seed409
+            ls -al /src
+            echo "Init sys-seed repo"
+            gitea_repo_api=$GITEA_AUTH_URL/api/v1/user/repos
+            echo $gitea_repo_api
+            #
+            # json - Using curl POST with variables defined in bash script functions - Stack Overflow
+            # https://stackoverflow.com/questions/17029902/using-curl-post-with-variables-defined-in-bash-script-functions
+            #
+            curl -skv -X POST $gitea_repo_api -H 'accept: application/json' -H 'Content-Type: application/json' \
+              -d '{ "name": "'$GITEA_GITOPS_REPO_NAME'" }'
+            cd /src
+            echo
+            echo "push seed repo"
+            git init
+            git remote add origin $GITEA_AUTH_URL/${GITEA_ADMIN_USERNAME}/${GITEA_GITOPS_REPO_NAME}.git
+            git config user.email "alice@example.local"
+            git config user.name "Alice"
+            git add .
+            git commit -m "push seed content"
+            git push -u origin master
+      restartPolicy: Never
+  backoffLimit: 0

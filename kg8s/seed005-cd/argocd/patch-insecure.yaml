@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cmd-params-cm # https://github.com/argoproj/argo-cd/blob/v2.1.7/docs/operator-manual/argocd-cmd-params-cm.yaml
+data:
+  ## Server properties
+  # Run server without TLS
+  server.insecure: "true"
