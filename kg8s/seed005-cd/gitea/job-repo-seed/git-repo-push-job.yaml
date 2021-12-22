@@ -10,32 +10,29 @@ spec:
         sidecar.istio.io/inject: "false"
     spec:
       containers:
-      - name: git-repo-push
-        image: kg8s-local/kctl:v21.12.1
-        env:
-          - name: GITEA_URL
-            value: gitea-http.gitea.svc.cluster.local:3000
-          - name: GITEA_GITOPS_REPO_NAME
-            value: seed101
-          - name: GITEA_ADMIN_USERNAME
-            valueFrom:
-              secretKeyRef:
-                key:  username
-                name: gitea-credentials
-          - name: GITEA_ADMIN_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key:  password
-                name: gitea-credentials
-        command: ["bash"]
-        args:
-          - -c
-          - |
-            echo $(date)
-            cd /src
-            GITEA_AUTH_URL=http://${GITEA_ADMIN_USERNAME}:${GITEA_ADMIN_PASSWORD}@${GITEA_URL}
-            #  just gitea_create_seed_repo https://gitops-admin:1fJyRTcesfe2e67df123XYZ@gitea.127.0.0.1.nip.io:9443 seed409
-            just gitea_create_seed_repo $GITEA_AUTH_URL $GITEA_GITOPS_REPO_NAME
-            just gitea_push_seed $GITEA_AUTH_URL $GITEA_ADMIN_USERNAME $GITEA_GITOPS_REPO_NAME
+        - name: git-repo-push
+          image: kg8s-local/kctl:v21.12.1
+          workingDir: /src
+          env:
+            - name: GITEA_URL
+              value: gitea-http.gitea.svc.cluster.local:3000
+            - name: GITEA_PROTOCOL
+              value: http
+            - name: GITEA_GITOPS_REPO_NAME
+              value: seed101
+            - name: GITEA_ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: gitea-credentials
+            - name: GITEA_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: gitea-credentials
+          command:
+            - just
+            - gitea_create_seed_repo
+            - gitea_push_seed
       restartPolicy: Never
   backoffLimit: 0

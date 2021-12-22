@@ -84,7 +84,7 @@ kapply_job_push_repo:
   kubectl wait --for=condition=complete job/git-repo-push --timeout=300s -n gitea
   # kubectl delete jobs git-repo-push -n gitea
 
-gitea_create_seed_repo gitea_auth_url repo_name:
+gitea_create_seed_repo:
   #!/usr/bin/env bash
   set -euxo pipefail
   #
@@ -95,17 +95,16 @@ gitea_create_seed_repo gitea_auth_url repo_name:
   # Feature request: Enable setting Variables in a Recipe · Issue #1023 · casey/just
   # https://github.com/casey/just/issues/1023)
   # 
-  API={{gitea_auth_url}}/api/v1/user/repos
+  API={{env_var('GITEA_PROTOCOL')}}://{{env_var('GITEA_ADMIN_USERNAME')}}:{{env_var('GITEA_ADMIN_PASSWORD')}}@{{env_var('GITEA_URL')}}/api/v1/user/repos
   curl -skv -X POST $API -H 'accept: application/json' -H 'Content-Type: application/json' \
-    -d '{ "name": "{{repo_name}}" }'
+    -d '{ "name": "{{env_var('GITEA_GITOPS_REPO_NAME')}}" }'
 
-
-gitea_push_seed gitea_auth_url user_name repo_name:
+gitea_push_seed:
   echo "push seed repo"
   git init
-  git remote add origin {{gitea_auth_url}}/{{user_name}}/{{repo_name}}.git
-  git config user.email "{{user_name}}@example.local"
-  git config user.name "{{user_name}}"
+  git remote add origin {{env_var('GITEA_PROTOCOL')}}://{{env_var('GITEA_ADMIN_USERNAME')}}:{{env_var('GITEA_ADMIN_PASSWORD')}}@{{env_var('GITEA_URL')}}/{{env_var('GITEA_ADMIN_USERNAME')}}/{{env_var('GITEA_GITOPS_REPO_NAME')}}.git
+  git config user.email "{{env_var('GITEA_ADMIN_USERNAME')}}@example.local"
+  git config user.name "{{env_var('GITEA_ADMIN_USERNAME')}}"
   git add .
   git commit -m "push seed content"
   git push -u origin master
@@ -134,7 +133,7 @@ test_istio_metrics:
 kapply_example_nginx:
   echo "Init examples nginx"
   kubectl apply -k examples/nginx
-  kubectl rollout status deployment/my-nginx --timeout=180s
+  kubectl rollout status deployment/my-nginx --timeout=300s -n default
 
 test_http:
   echo "Tests: Nginx"
