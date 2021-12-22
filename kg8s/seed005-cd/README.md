@@ -18,7 +18,7 @@
   - https://vault-dev.127.0.0.1.nip.io:9443
 
 ```sh
-$ just create foo2021
+$ just build_all foo2021
 $ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
 

@@ -3,48 +3,54 @@ set shell := ["bash", "-uc"]
 cluster_name := "foo101"
 kctl_img :="kg8s-local/kctl:v21.12.1"
 
-check_cmd:
-  @command -v docker >/dev/null 2>&1 || { echo "docker is not installed.  aborting." >&2; exit 1; }
-  @command -v k3d >/dev/null 2>&1 || { echo "k3d is not installed.  aborting." >&2; exit 1; }
-  @command -v kubectl >/dev/null 2>&1 || { echo "kubectl is not installed.  aborting." >&2; exit 1; }
-  @command -v istioctl >/dev/null 2>&1 || { echo "istioctl is not installed.  aborting." >&2; exit 1; }
-  @command -v curl >/dev/null 2>&1 || { echo "curl is not installed.  aborting." >&2; exit 1; }
-  @command -v openssl >/dev/null 2>&1 || { echo "openssl is not installed.  aborting." >&2; exit 1; }
+@check_cmd:
+  command -v docker >/dev/null 2>&1 || { echo "docker is not installed.  aborting." >&2; exit 1; }
+  command -v k3d >/dev/null 2>&1 || { echo "k3d is not installed.  aborting." >&2; exit 1; }
+  command -v kubectl >/dev/null 2>&1 || { echo "kubectl is not installed.  aborting." >&2; exit 1; }
+  command -v istioctl >/dev/null 2>&1 || { echo "istioctl is not installed.  aborting." >&2; exit 1; }
+  command -v curl >/dev/null 2>&1 || { echo "curl is not installed.  aborting." >&2; exit 1; }
+  command -v openssl >/dev/null 2>&1 || { echo "openssl is not installed.  aborting." >&2; exit 1; }
 
-build:
+build_image:
   DOCKER_BUILDKIT=1 docker build -t {{kctl_img}} .
 
-img_import cluster: build
+img_import cluster: build_image
   k3d image import {{kctl_img}} -c {{cluster}}
 
-create cluster: check_cmd
+build_all cluster: check_cmd
   just init {{cluster}}
+  just img_import {{cluster}}
+  #
+  # [Bash Heredoc Support · Issue #881 · casey/just](https://github.com/casey/just/issues/881)
+  #
+  docker run -i --rm -w /src --network host -v $HOME/.kube/config:/kube/config:ro {{kctl_img}} \
+    just kapply_ns_storage kapply_examples_pv
   just test_pv {{cluster}}
   just init_istio
+  docker run -i --rm -w /src --network host -v $HOME/.kube/config:/kube/config:ro {{kctl_img}} \
+    just kwait_istio kapply_istio_metrics
+  just test_istio_metrics
+  docker run -i --rm -w /src --network host -v $HOME/.kube/config:/kube/config:ro {{kctl_img}} \
+    just kapply_gitea kapply_job_push_repo kapply_argocd kapply_argocd_apps kapply_example_nginx
   just test_http
 
-init cluster: build
+init cluster:
   echo 'k3d cluster create {{cluster}}'
   mkdir -p $HOME/k3dvol/{{cluster}}
   k3d cluster create {{cluster}} --api-port 6550 --agents 1 \
     --volume $HOME/k3dvol/{{cluster}}:/var/lib/rancher/k3s/storage@all \
     -p "9443:443@loadbalancer" --k3s-arg '--disable=traefik@server:*'
   k3d cluster list
-  just img_import {{cluster}}
-  docker run -i --rm -w /src --network host -v $HOME/.kube/config:/kube/config:ro {{kctl_img}} just kapply_ns_storage
 
 init_istio:
   echo "Init istio"
   istioctl install --set profile=default -y
-  docker run -i --rm -w /src --network host -v $HOME/.kube/config:/kube/config:ro {{kctl_img}} just kwait_istio
-  just test_istio_metrics
 
 kwait_istio:
   kubectl wait -n istio-system deployment --all --for=condition=available --timeout=300s
   kubectl label namespace default istio-injection=enabled
   just kcreate_gw_tls temp-nip-io-credential
   kubectl apply -n default -f layer0/istio-gateway-vs.yaml
-  just kapply_istio_metrics
 
 kapply_istio_metrics:
   kubectl apply -k istio-metrics
@@ -64,13 +70,21 @@ kapply_gitea:
   # https://github.com/kubernetes/kubernetes/issues/79606#issuecomment-779779928
   kubectl rollout status statefulset/gitea -n gitea --timeout=300s
 
+kapply_argocd:
+  kubectl apply -k argocd
+  kubectl wait -n argocd deployment --all --for=condition=available --timeout=300s
+
+kapply_argocd_apps:
+  kubectl apply -f argocd/apps/capp-examples.yaml 
+  kubectl apply -f argocd/apps/capp-gitops.yaml 
+
 kapply_job_push_repo:
   echo "Init sys-seed repo"
   kubectl apply -f gitea/job-repo-seed/git-repo-push-job.yaml
   kubectl wait --for=condition=complete job/git-repo-push --timeout=300s -n gitea
   # kubectl delete jobs git-repo-push -n gitea
 
-git_create_seed_repo gitea_auth_url repo_name:
+gitea_create_seed_repo gitea_auth_url repo_name:
   #!/usr/bin/env bash
   set -euxo pipefail
   #
@@ -85,6 +99,17 @@ git_create_seed_repo gitea_auth_url repo_name:
   curl -skv -X POST $API -H 'accept: application/json' -H 'Content-Type: application/json' \
     -d '{ "name": "{{repo_name}}" }'
 
+
+gitea_push_seed gitea_auth_url user_name repo_name:
+  echo "push seed repo"
+  git init
+  git remote add origin {{gitea_auth_url}}/{{user_name}}/{{repo_name}}.git
+  git config user.email "{{user_name}}@example.local"
+  git config user.name "{{user_name}}"
+  git add .
+  git commit -m "push seed content"
+  git push -u origin master
+
 kapply_ns_storage:
   kubectl apply -f layer0/storage-retain-local-path.yaml
   kubectl apply -f layer0/namespaces.yaml
@@ -97,7 +122,6 @@ kapply_examples_pv:
   kubectl rollout status deployment/kctl --timeout=300s
 
 test_pv cluster:
-  docker run -i --rm -w /src --network host -v $HOME/.kube/config:/kube/config:ro {{kctl_img}} just kapply_examples_pv
   echo "Tests: print files in the mounted volume of host"
   find $HOME/k3dvol/{{cluster}} -type f -exec bash -c 'echo {} ; cat {}; echo ;' \;
 
@@ -113,7 +137,6 @@ kapply_example_nginx:
   kubectl rollout status deployment/my-nginx --timeout=180s
 
 test_http:
-  docker run -i --rm -w /src --network host -v $HOME/.kube/config:/kube/config:ro {{kctl_img}} just kapply_example_nginx
   echo "Tests: Nginx"
   curl -kv --retry 8 --retry-all-errors https://my-nginx.127.0.0.1.nip.io:9443
 
