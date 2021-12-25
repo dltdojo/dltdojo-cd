@@ -20,6 +20,19 @@ img_import cluster: build_image
 build_all cluster: check_cmd
   just init {{cluster}}
   just img_import {{cluster}}
+  just kapply_ns_storage kapply_examples_pv
+  just test_pv {{cluster}}
+  just init_istio
+  just kwait_istio kapply_istio_metrics
+  just test_istio_metrics
+  just kapply_gitea kapply_job_push_repo 
+  just kapply_argocd kapply_argocd_apps 
+  just kapply_example_nginx
+  just test_http
+
+build_all_docker cluster: check_cmd
+  just init {{cluster}}
+  just img_import {{cluster}}
   #
   # [Bash Heredoc Support · Issue #881 · casey/just](https://github.com/casey/just/issues/881)
   #
@@ -33,6 +46,7 @@ build_all cluster: check_cmd
   docker run -i --rm -w /src --network host -v $HOME/.kube/config:/kube/config:ro {{kctl_img}} \
     just kapply_gitea kapply_job_push_repo kapply_argocd kapply_argocd_apps kapply_example_nginx
   just test_http
+  just version
 
 init cluster:
   echo 'k3d cluster create {{cluster}}'
@@ -56,12 +70,17 @@ kapply_istio_metrics:
   kubectl apply -k istio-metrics
   kubectl wait -n istio-system deployment --all --for=condition=available --timeout=300s
 
-kcreate_gw_tls foo:
-  mkdir -p /tmp/cert && cd /tmp/cert
+kcreate_gw_tls secret_name:
+  #!/usr/bin/env bash
+  set -euxo pipefail
+  # https://github.com/casey/just#changing-the-working-directory-in-a-recipe
+  WORK_DIR=$(mktemp -d)
+  cd $WORK_DIR
   openssl req -new -x509 -nodes -newkey ec:<(openssl ecparam -name secp256r1) -subj '/O=LOCALDEV/CN=CA.TESTONLY.LOCAL' -keyout ca.key -out ca.crt -days 3650
   openssl req -out nip.io.csr -newkey ec:<(openssl ecparam -name secp256r1) -nodes -keyout nip.io.key -subj "/CN=*.nip.io/O=LOCALDEV"
   openssl x509 -req -days 3650 -CA ca.crt -CAkey ca.key -set_serial 0x$(openssl rand -hex 8) -in nip.io.csr -out nip.io.crt
-  kubectl create -n istio-system secret tls {{foo}} --key=nip.io.key --cert=nip.io.crt
+  kubectl create -n istio-system secret tls {{secret_name}} --key=nip.io.key --cert=nip.io.crt
+  rm -rf $WORK_DIR
 
 kapply_gitea:
   echo "Init gitea"
@@ -139,6 +158,18 @@ test_http:
   echo "Tests: Nginx"
   curl -kv --retry 8 --retry-all-errors https://my-nginx.127.0.0.1.nip.io:9443
 
+version:
+  docker version
+  k3d version
+  kubectl version
+  istioctl version
+  just --version
+  curl --version
+  openssl version
+
+update_vault:
+  helm repo update
+  cd vault-dev ; helm template vault hashicorp/vault -n vault --set "server.dev.enabled=true" --set "injector.enabled=false" --set "csi.enabled=false" > vault.yaml
 foo target:
   echo 'This is a recipe! {{cluster_name}}'
   echo {{target}}

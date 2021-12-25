@@ -28,3 +28,17 @@ cleanup
 $ k3d cluster delete foo2021
 $ sudo rm -rf $HOME/k3dvol/foo2021
 ```
+
+
+# tools
+
+- docker [Install Docker Engine | Docker Documentation](https://docs.docker.com/engine/install/)
+- [k3d](https://k3d.io/v5.2.2/)
+- kubectl [Install and Set Up kubectl on Linux | Kubernetes](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
+- istioctl [istio/istio: Connect, secure, control, and observe services.](https://github.com/istio/istio)
+- just [casey/just: 🤖 Just a command runner](https://github.com/casey/just)
+
+
+```sh
+sudo bash install-just.sh --to /usr/local/bin
+```

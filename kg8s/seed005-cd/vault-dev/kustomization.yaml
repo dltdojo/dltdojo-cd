@@ -15,4 +15,7 @@ resources:
   - vault.yaml
 patchesStrategicMerge:
   - remove-test.yaml
+  #
+  # [OIDC provider: nonce should be optional in authorization code flow · Issue #13204 · hashicorp/vault](https://github.com/hashicorp/vault/issues/13204)
+  #
   - img-env-dev-token.yaml
