@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana
+  namespace: istio-system
+data:
+  grafana.ini: |
+    [analytics]
+    check_for_updates = true
+    [grafana_net]
+    url = https://grafana.net
+    [log]
+    mode = console
+    [paths]
+    data = /var/lib/grafana/
+    logs = /var/log/grafana
+    plugins = /var/lib/grafana/plugins
+    provisioning = /etc/grafana/provisioning
+    [server]
+    root_url = https://grafana-istio-system.127.0.0.1.nip.io:9443
+    [auth.generic_oauth]
+    enabled = true
+    client_id = client101
+    client_secret = "1997e8mgccZOA4Jx7EGO4HdhAxAu99icDQkp"
+    scopes = openid profile email
+    empty_scopes = false
+    auth_url = https://keycloak.127.0.0.1.nip.io:9443/auth/realms/pro101/protocol/openid-connect/auth
+    token_url = https://keycloak.127.0.0.1.nip.io:9443/auth/realms/pro101/protocol/openid-connect/token
+    api_url = https://keycloak.127.0.0.1.nip.io:9443/auth/realms/pro101/protocol/openid-connect/userinfo
+    allow_sign_up = true
+    tls_skip_verify_insecure = true
+    role_attribute_path = contains(groups[*], 'grafana-admin') && 'Admin' || contains(groups[*], 'grafana-editor') && 'Editor' || 'Viewer'

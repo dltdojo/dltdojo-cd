@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oidc404
+  labels:
+    app: oidc404
+spec:
+  selector:
+    matchLabels:
+      run: oidc404
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: oidc404
+    spec:
+      containers:
+        - name: oidc404
+          image: public.ecr.aws/docker/library/nginx:1.21
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: "1"
+              memory: 256Mi
+            requests:
+              cpu: 200m
+              memory: 128Mi
+          volumeMounts:
+            - name: nginx-index-file
+              mountPath: /usr/share/nginx/html/
+            - name: oidc-pro101
+              mountPath: /usr/share/nginx/html/pro101/.well-known/
+            - name: oidc-argocd
+              mountPath: /usr/share/nginx/html/argocd/.well-known/
+            - name: nginx-conf-cm
+              mountPath: /etc/nginx/
+              readOnly: true
+      volumes:
+      - name: nginx-index-file
+        configMap:
+          name: index-html-configmap
+      - name: oidc-pro101
+        configMap:
+          name: oidc-conf-pro101
+      - name: oidc-argocd
+        configMap:
+          name: oidc-conf-argocd
+      - name: nginx-conf-cm
+        configMap:
+          name: nginx-conf-cm
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oidc404
+  labels:
+    run: oidc404
+    app: oidc404
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      name: http-web
+  selector:
+    run: oidc404

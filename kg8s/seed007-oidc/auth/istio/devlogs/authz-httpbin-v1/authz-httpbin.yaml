@@ -1,0 +1,77 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: httpbin-oauth2
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: httpbin
+  action: CUSTOM
+  provider:
+    # Extension provider configured when we installed Istio
+    name: oauth2-proxy
+  rules: 
+     - {}
+#---
+# [Request denied with RequestAuthentication and an unknown jwt token and an allowing AuthorizationPolicy · Issue #24371 · istio/istio](https://github.com/istio/istio/issues/24371)
+#apiVersion: security.istio.io/v1beta1
+#kind: RequestAuthentication
+#metadata:
+#  name: httpbin
+#  namespace: default
+#spec:
+#  selector:
+#    matchLabels:
+#      app: httpbin
+#  jwtRules:
+#    - issuer: "keycloak-oidc-oauth2-proxy"
+#      jwksUri: "https://keycloak.127.0.0.1.nip.io:9443/auth/realms/pro101/protocol/openid-connect/certs"
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: httpbin-get-root
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: httpbin
+  action: ALLOW
+  #
+  # allow pass oauth2-proxy
+  #
+  rules:
+    - to:
+        - operation:
+            methods: ["GET"]
+            paths: ["/*"]
+      when:
+        - key: request.headers[User-Agent]
+          values: ["Mozilla/*"]
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: httpbin-get-ip
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: httpbin
+  action: DENY
+  #
+  # httpbin-admin group only
+  #
+  rules:
+    - to:
+        - operation:
+            methods: ["GET"]
+            paths: ["/ip*"]
+      when:
+        - key: request.headers[x-auth-request-groups]
+          notValues: 
+           - httpbin-user
+           - dev-101,httpbin-user
+           - dev-102,httpbin-user
+           - prod-101,httpbin-user

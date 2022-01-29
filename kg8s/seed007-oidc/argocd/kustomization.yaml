@@ -1,0 +1,40 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: argocd
+# 2021-1221
+# curl -sL -o argocd.yaml https://raw.githubusercontent.com/argoproj/argo-cd/v2.2.1/manifests/install.yaml
+# 
+resources:
+  - argocd.yaml
+  # 避免使用線上依賴版本，一來可以檢視內容，二來避免遠端斷線無法重起，三來可以用 gitops 控管內容。
+  # - https://github.com/argoproj/argo-cd/manifests/cluster-install
+  #
+configMapGenerator:
+  - name: argocd-cm
+    behavior: replace
+    literals:
+      - url=https://argocd.127.0.0.1.nip.io:9443
+    files:
+      - oidc.config
+    options:
+      disableNameSuffixHash: true
+#
+# https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/#sensitive-data-and-sso-client-secrets
+#
+secretGenerator:
+  - name: argocd-secret
+    behavior: merge
+    literals:
+      - oidc.client101.clientID=client101
+      - oidc.client101.clientSecret=prb81CNvETDmAA0CjUpj1Jmrs9NtoyQ1
+patchesStrategicMerge:
+  #
+  # insecure mode [Argo CD Istio deploy compatibility · Issue #2784 · argoproj/argo-cd](https://github.com/argoproj/argo-cd/issues/2784)
+  #
+  # oidc.config
+  # [SSO Overview - Argo CD - Declarative GitOps CD for Kubernetes](https://argo-cd-docs.readthedocs.io/en/latest/operator-manual/sso/#existing-oidc-provider)
+  # policy 
+  # [Keycloak - Argo CD - Declarative GitOps CD for Kubernetes](https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/keycloak/)
+  #
+  - argocd-cm.yaml
+  - patch-argocd-server.yaml

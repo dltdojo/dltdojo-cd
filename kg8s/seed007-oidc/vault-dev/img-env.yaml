@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: vault
+  namespace: vault
+spec:
+  updateStrategy:
+    #
+    # rollout status is only available for RollingUpdate strategy type
+    #
+    type: RollingUpdate
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        storageClassName: local-path-retain
+        accessModes:
+            - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "512Mi"
+  template:
+    spec:
+      containers:
+        - name: vault
+          image: public.ecr.aws/docker/library/vault:1.9.2
+

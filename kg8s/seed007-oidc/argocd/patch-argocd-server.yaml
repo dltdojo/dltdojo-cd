@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-server
+spec:
+  template:
+    metadata:
+      labels: 
+        version: 2.2.1-7
+    spec:
+      containers:
+        - name: argocd-server
+          # 
+          # https://github.com/argoproj/argo-cd/blob/master/Dockerfile
+          # docker.io/library/ubuntu:21.04
+          # USER 999
+          # cp: cannot create regular file '/usr/local/share/ca-certificates/nip-io-ca.crt': Permission denied
+          image: quay.io/argoproj/argocd:v2.2.1
+          #
+          # [Received cert error when configuring AroCD SSO to use OIDC with self signed certificate · Issue #4344 · argoproj/argo-cd](https://github.com/argoproj/argo-cd/issues/4344)
+          #
+          volumeMounts:
+            - name: cm-ca-nip
+              mountPath: /etc/ssl/certs/ca-nip.crt 
+              subPath: ca.crt
+      volumes:
+        - name: cm-ca-nip
+          configMap:
+            name: ca-nip
+            defaultMode: 420

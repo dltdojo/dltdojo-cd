@@ -1,0 +1,37 @@
+{
+    "listen_address": "0.0.0.0",
+    "listen_port": "10003",
+    "log_level": "debug",
+    "threads": 8,
+    "chains": [
+        {
+            "name": "idp_filter_chain",
+            "filters": [
+                {
+                    "oidc": {
+                        "authorization_uri": "https://keycloak.127.0.0.1.nip.io:9443/auth/realms/pro101/protocol/openid-connect/auth" ,
+                        "token_uri": "https://keycloak.127.0.0.1.nip.io:9443/auth/realms/pro101/protocol/openid-connect/token",
+                        "callback_uri": "https://prometheus-istio-system.127.0.0.1.nip.io:9443/oauth/callback",
+                        "jwks_fetcher": {
+                            "jwks_uri": "https://keycloak.127.0.0.1.nip.io:9443/auth/realms/pro101/protocol/openid-connect/certs",
+                            "periodic_fetch_interval_sec": 10
+                        },
+                        "client_id": "prometheus101",
+                        "client_secret": "kTiBjUED30LDGfE54OSkncNVlBjIf7cU",
+                        "scopes": [],
+                        "cookie_name_prefix": "prom",
+                        "id_token": {
+                            "preamble": "Bearer",
+                            "header": "Authorization"
+                        },
+                        "logout": {
+                            "path": "/authservice_logout",
+                            "redirect_uri": "https://keycloak.127.0.0.1.nip.io:9443/auth/realms/pro101/protocol/openid-connect/logout"
+                        },
+                        "trusted_certificate_authority": "-----BEGIN CERTIFICATE-----\nMIIBtDCCAVmgAwIBAgIUODYd+qF4dCoQ3L5XnR1caIG9xX8wCgYIKoZIzj0EAwIw\nLzERMA8GA1UECgwITE9DQUxERVYxGjAYBgNVBAMMEUNBLlRFU1RPTkxZLkxPQ0FM\nMB4XDTIyMDEwMzA5MjgxMFoXDTMyMDEwMTA5MjgxMFowLzERMA8GA1UECgwITE9D\nQUxERVYxGjAYBgNVBAMMEUNBLlRFU1RPTkxZLkxPQ0FMMFkwEwYHKoZIzj0CAQYI\nKoZIzj0DAQcDQgAE35ViOA4ZFbLtlpPttRMZLBGNUxcjeiUnZVgYUsVhELIbjc+6\nVVQJ21BcKhizX/MXbBqtPN8Mn/L0jnxNPsYkaaNTMFEwHQYDVR0OBBYEFBPaKQgB\nNOQCo6lcMD+rcc97T9fBMB8GA1UdIwQYMBaAFBPaKQgBNOQCo6lcMD+rcc97T9fB\nMA8GA1UdEwEB/wQFMAMBAf8wCgYIKoZIzj0EAwIDSQAwRgIhAPrU5aGDdnRJuNU0\nOxGpFLpYR2PoqVx7zi/w6PHKccy7AiEAjrBFPx6VclP7rpjQLt66BswY3QYjcH6u\nLCEjPFaRchQ=\n-----END CERTIFICATE-----\n"
+                    }
+                }
+            ]
+        }
+    ]
+}

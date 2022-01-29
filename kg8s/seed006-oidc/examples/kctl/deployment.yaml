@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kctl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kctl
+  template:
+    metadata:
+      labels:
+        app: kctl
+    spec:
+      containers:
+        - name: kctl
+          image: kg8s-local/kctl:v21.12.1
+          command:
+            - sh
+            - -c
+            - echo $(date) ; tail -f /dev/null
+          resources:
+            limits:
+              cpu: "1"
+              memory: 256Mi
+            requests:
+              cpu: 200m
+              memory: 128Mi

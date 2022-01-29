@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-server
+spec:
+  template:
+    spec:
+      containers:
+        - name: argocd-server
+          # 
+          # https://github.com/argoproj/argo-cd/blob/master/Dockerfile
+          # docker.io/library/ubuntu:21.04
+          # USER 999
+          # cp: cannot create regular file '/usr/local/share/ca-certificates/nip-io-ca.crt': Permission denied
+          image: quay.io/argoproj/argocd:v2.2.1
+          command: 
+            - /bin/sh
+          args:
+            - -c
+            - |
+              cat /opt/ca.crt
+              cp /opt/ca.crt /usr/local/share/ca-certificates/nip-io-ca.crt
+              update-ca-certificates
+              echo ""
+              echo "[UPDATE CA CERTIFICATE] check ca certificates"
+              tail -n 20 /etc/ssl/certs/ca-certificates.crt
+              argocd-server
+          securityContext:
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
+          volumeMounts:
+            - name: cm-ca-nip
+              mountPath: /opt/ca.crt
+              subPath: ca.crt
+      volumes:
+        - name: cm-ca-nip
+          configMap:
+            name: ca-nip

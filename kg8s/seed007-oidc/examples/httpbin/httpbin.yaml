@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpbin
+  labels:
+    app: httpbin
+spec:
+  selector:
+    matchLabels:
+      app: httpbin
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: httpbin
+        opa-istio-injection: enabled
+        oauth2-istio-injection: enabled
+    spec:
+      containers:
+        - name: httpbin
+          image: docker.io/kennethreitz/httpbin
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: "1"
+              memory: 256Mi
+            requests:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpbin
+  labels:
+    app: httpbin
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      name: http-web
+  selector:
+    app: httpbin

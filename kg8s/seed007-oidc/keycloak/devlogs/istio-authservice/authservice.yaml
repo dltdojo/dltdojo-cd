@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authservice
+  labels:
+    app: authservice
+spec:
+  replicas: 1 # you can scale up productpage as long as session affinity is enabled via a DestinationRule (see ./config/bookinfo-gateway.yaml)
+  selector:
+    matchLabels:
+      app: authservice
+  template:
+    metadata:
+      labels:
+        app: authservice
+    spec:
+      containers:
+        - name: authservice
+          #
+          # [Releases · istio-ecosystem/authservice](https://github.com/istio-ecosystem/authservice/releases)
+          #
+          image: ghcr.io/istio-ecosystem/authservice/authservice:0.5.0-fips
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 10003
+          volumeMounts:
+            - name: authservice-config # mount the volume containing the authservice ConfigMap
+              mountPath: /etc/authservice
+            # 這方法無效 authservice 非 golang 實做
+            #
+            # https://github.com/istio-ecosystem/authservice/blob/60dadd6181bfcac88374d5f944954b35e69d9921/config/oidc/config.proto#L170
+            # [Allow specification of TLS root certificates for an IdP · Issue #54 · istio-ecosystem/authservice](https://github.com/istio-ecosystem/authservice/issues/54)
+            #
+            #- name: cm-ca-nip
+            #  mountPath: /etc/ssl/certs/ca-nip.crt
+            #  subPath: ca.crt
+          resources: {}
+      volumes:
+        - name: authservice-config # declare the volume containing the authservice ConfigMap
+          configMap:
+            name: authservice
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: authservice
+  # namespace: istio-system
+  labels:
+    app: authservice
+spec:
+  ports:
+    - port: 10003
+      name: grpc
+  selector:
+    app: authservice

@@ -1,0 +1,18 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: prometheus-kiali-allow
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+      app: prometheus
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            # notPrincipals: ["cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account"]
+            principals:
+              - cluster.local/ns/istio-system/sa/kiali
+              - cluster.local/ns/istio-system/sa/grafana
+

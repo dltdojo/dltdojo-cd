@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cluster-apps-gitops
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  labels:
+    version: v1
+spec:
+  syncPolicy:
+    automated: {}
+  destination:
+    server: https://kubernetes.default.svc
+  source:
+    path: argocd/apps/gitops
+    repoURL: http://gitea-http.gitea.svc.cluster.local:3000/gitops-admin/seed101.git
+    targetRevision: HEAD
+  project: default
+

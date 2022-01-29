@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: git-repo-push
+  namespace: gitea
+spec:
+  template:
+    metadata:
+      labels:
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+        - name: git-repo-push
+          image: kg8s-local/kctl:v21.12.1
+          workingDir: /src
+          env:
+            - name: GITEA_URL
+              value: gitea-http.gitea.svc.cluster.local:3000
+            - name: GITEA_PROTOCOL
+              value: http
+            - name: GITEA_GITOPS_REPO_NAME
+              value: seed101
+            - name: GITEA_ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: gitea-credentials
+            - name: GITEA_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: gitea-credentials
+          command:
+            - just
+            - gitea_create_seed_repo
+            - gitea_push_seed
+      restartPolicy: Never
+  backoffLimit: 0

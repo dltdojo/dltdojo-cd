@@ -1,0 +1,30 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+spec:
+#
+# [Istio / Customizing the installation configuration](https://istio.io/latest/docs/setup/additional-setup/customize-installation/)
+# [Istio / Better External Authorization](https://istio.io/latest/blog/2021/better-external-authz/)
+# CUSTOM AuthZ provider 
+# [istio-ecosystem/authservice: Move OIDC token acquisition out of your app code and into the Istio mesh](https://github.com/istio-ecosystem/authservice)
+#
+# 
+  meshConfig:
+    extensionProviders:
+#      - name: "opa-istio"
+#        envoyExtAuthzGrpc:
+#          service: "external-authz-grpc.local"
+#          port: "9191"
+      - name: "authservice-grpc"
+        envoyExtAuthzGrpc:
+          service: "authservice.default.svc.cluster.local"
+          port: "10003"
+  components:
+    pilot:
+      k8s:
+        resources:
+          requests:
+            cpu: 300m # override from default 500m
+            memory: 1024Mi # ... default 2048Mi
+        hpaSpec:
+          maxReplicas: 2 # ... default 5
+          minReplicas: 1  # ... default 1

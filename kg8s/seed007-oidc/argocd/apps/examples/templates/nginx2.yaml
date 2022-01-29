@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: example-nginx2-app
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  labels:
+    version: v1
+spec:
+  syncPolicy:
+    automated: {}
+  destination:
+    server: {{ .Values.spec.destination.server }}
+  source:
+    path: examples/nginx2
+    repoURL: {{ .Values.spec.source.repoURL }}
+    targetRevision: {{ .Values.spec.source.targetRevision }}
+  project: default

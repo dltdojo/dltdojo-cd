@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gitea
+spec:
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        storageClassName: local-path-retain
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "5Gi"
+  template:
+    spec:
+      initContainers:
+        - name: init-directories
+          image: docker.io/gitea/gitea:1.15.9
+        - name: configure-gitea
+          image: docker.io/gitea/gitea:1.15.9
+      containers:
+        - name: gitea
+          image: docker.io/gitea/gitea:1.15.9
+          command: 
+            - /bin/sh
+          args:
+            - -c
+            - |
+              cat /opt/ca.crt
+              cp /opt/ca.crt /usr/local/share/ca-certificates/nip-io-ca.crt
+              update-ca-certificates
+              echo ""
+              echo "[UPDATE CA CERTIFICATE] check ca certificates"
+              tail -n 20 /etc/ssl/certs/ca-certificates.crt
+              /usr/bin/entrypoint /bin/s6-svscan /etc/s6
+
+          volumeMounts:
+            - name: cm-ca-nip
+              mountPath: /opt/ca.crt
+              subPath: ca.crt
+      volumes:
+        - name: cm-ca-nip
+          configMap:
+            name: ca-nip

@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kctl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kctl
+  template:
+    metadata:
+      labels:
+        app: kctl
+    spec:
+      containers:
+        - name: kctl
+          image: kg8s-local/kctl:v21.12.1
+          command:
+            - sh
+          args:
+            - -c
+            - |
+              cat /opt/ca.crt
+              cp /opt/ca.crt /usr/local/share/ca-certificates/nip-io-ca.crt
+              update-ca-certificates
+              echo ""
+              echo "[UPDATE CA CERTIFICATE] check ca certificates"
+              tail -n 20 /etc/ssl/certs/ca-certificates.crt
+              echo $(date) ; tail -f /dev/null
+          resources:
+            limits:
+              cpu: "1"
+              memory: 256Mi
+            requests:
+              cpu: 200m
+              memory: 128Mi
+          volumeMounts:
+            - name: cm-ca-nip
+              mountPath: /opt/ca.crt
+              subPath: ca.crt
+      volumes:
+        - name: cm-ca-nip
+          configMap:
+            name: ca-nip

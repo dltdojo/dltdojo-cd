@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-httpbin
+  labels:
+    app: go-httpbin
+spec:
+  selector:
+    matchLabels:
+      run: go-httpbin
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        run: go-httpbin
+    spec:
+      containers:
+        - name: go-httpbin
+          image: ghcr.io/chinaran/go-httpbin:1.2-alpine3.13
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: "1"
+              memory: 256Mi
+            requests:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-httpbin
+  labels:
+    run: go-httpbin
+    app: go-httpbin
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      name: http-web
+  selector:
+    run: go-httpbin
