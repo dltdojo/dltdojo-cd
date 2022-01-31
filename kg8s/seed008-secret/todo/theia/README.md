@@ -1,0 +1,3 @@
+- [eclipse-theia/theia-blueprint](https://github.com/eclipse-theia/theia-blueprint)
+- [Docker image · Issue #75 · eclipse-theia/theia-blueprint](https://github.com/eclipse-theia/theia-blueprint/issues/75)
+- [Theia down · Issue #254 · eclipse-theia/theia-website](https://github.com/eclipse-theia/theia-website/issues/254)

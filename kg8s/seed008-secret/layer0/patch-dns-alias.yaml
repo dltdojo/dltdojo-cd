@@ -1,0 +1,23 @@
+data:
+  Corefile: |
+    .:53 {
+        errors
+        health
+        ready
+        rewrite name keycloak.127.0.0.1.sslip.io keycloak-http.keycloak.svc.cluster.local
+        kubernetes cluster.local in-addr.arpa ip6.arpa {
+          pods insecure
+          fallthrough in-addr.arpa ip6.arpa
+        }
+        hosts /etc/coredns/NodeHosts {
+          ttl 60
+          reload 15s
+          fallthrough
+        }
+        prometheus :9153
+        forward . /etc/resolv.conf
+        cache 30
+        loop
+        reload
+        loadbalance
+    }

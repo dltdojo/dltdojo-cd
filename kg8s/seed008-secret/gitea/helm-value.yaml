@@ -1,0 +1,8 @@
+gitea:
+  admin:
+    email: gitea-admin@gitea.local.dev
+    existingSecret: gitea-credentials
+  oauth:
+    - name: 'keycloak2022'
+      provider: 'openidConnect'
+      autoDiscoverUrl: 'https://keycloak.127.0.0.1.sslip.io/auth/realms/blue101/.well-known/openid-configuration'

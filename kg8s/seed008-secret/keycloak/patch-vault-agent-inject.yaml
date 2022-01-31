@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: keycloak
+spec:
+  template:
+    metadata:
+      annotations:
+        traffic.sidecar.istio.io/excludeOutboundPorts: "8200"
+        vault.hashicorp.com/agent-init-first: "true"
+        vault.hashicorp.com/agent-inject: 'true'
+        vault.hashicorp.com/role: 'keycloak'
+        # /vault/secrets/config
+        vault.hashicorp.com/agent-inject-secret-config: 'secret101/data/keycloak'
+        vault.hashicorp.com/agent-inject-template-config: |
+          {{- with secret "secret101/data/keycloak" -}}
+          export KEYCLOAK_USER={{ .Data.data.username }}
+          export KEYCLOAK_PASSWORD={{ .Data.data.password}}
+          {{- end }}
+    spec:
+      containers:
+        - name: keycloak
+          # https://www.vaultproject.io/docs/platform/k8s/injector/examples
+          # https://github.com/keycloak/keycloak-containers/blob/5df2de0500983e7424b321cca83a02c31da18fb3/server/Dockerfile#L30
+          #
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - "source /vault/secrets/config && /opt/jboss/tools/docker-entrypoint.sh -b 0.0.0.0"

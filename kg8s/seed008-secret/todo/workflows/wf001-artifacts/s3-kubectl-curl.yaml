@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: wf-kubectl-curl-
+spec:
+  entrypoint: main
+  arguments:
+    parameters:
+      - name: kubectl-version
+        value: v1.23.0
+      - name: curl-version
+        value: v7.81.0
+  templates:
+    - name: main
+      steps:
+        - - name: call-kubectl
+            templateRef:
+              name: wft-save-s3
+              template: kubectl
+          - name: call-curl
+            templateRef:
+              name: wft-save-s3
+              template: curl

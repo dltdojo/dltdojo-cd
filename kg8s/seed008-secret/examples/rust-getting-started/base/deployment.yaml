@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: foo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skaffold-kustomize
+  labels:
+    app: skaffold-kustomize
+spec:
+  selector:
+    matchLabels:
+      app: skaffold-kustomize
+  template:
+    metadata:
+      labels:
+        app: skaffold-kustomize
+    spec:
+      containers:
+      - name: skaffold-kustomize
+        image: skaffold-kustomize

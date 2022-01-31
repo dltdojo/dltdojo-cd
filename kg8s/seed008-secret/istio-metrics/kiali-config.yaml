@@ -1,0 +1,74 @@
+auth:
+  strategy: openid
+  openid:
+    client_id: client101
+    disable_rbac: true
+    issuer_uri: https://keycloak.127.0.0.1.sslip.io:443/auth/realms/blue101
+    insecure_skip_verify_tls: true
+    username_claim: email
+  openshift:
+    client_id_prefix: kiali
+deployment:
+  accessible_namespaces:
+    - "**"
+  additional_service_yaml: {}
+  affinity:
+    node: {}
+    pod: {}
+    pod_anti: {}
+  host_aliases: []
+  hpa:
+    api_version: autoscaling/v2beta2
+    spec: {}
+  image_digest: ""
+  image_name: quay.io/kiali/kiali
+  image_pull_policy: Always
+  image_pull_secrets: []
+  image_version: v1.42
+  ingress_enabled: false
+  instance_name: kiali
+  logger:
+    log_format: text
+    log_level: info
+    sampler_rate: "1"
+    time_field_format: 2006-01-02T15:04:05Z07:00
+  namespace: istio-system
+  node_selector: {}
+  override_ingress_yaml:
+    metadata: {}
+  pod_annotations: {}
+  pod_labels:
+    sidecar.istio.io/inject: "false"
+  priority_class_name: ""
+  replicas: 1
+  resources: {}
+  secret_name: kiali
+  service_annotations: {}
+  service_type: ""
+  tolerations: []
+  version_label: v1.42.0
+  view_only_mode: false
+external_services:
+  custom_dashboards:
+    enabled: true
+  prometheus:
+    url: http://prometheus.istio-system:9090
+identity:
+  cert_file: ""
+  private_key_file: ""
+istio_namespace: istio-system
+kiali_feature_flags:
+  certificates_information_indicators:
+    enabled: true
+    secrets:
+      - cacerts
+      - istio-ca-secret
+  clustering:
+    enabled: true
+login_token:
+  signing_key: kTiBjUED30LDGfE54OSkncNVlBjIf7cU
+server:
+  metrics_enabled: true
+  metrics_port: 9090
+  port: 20001
+  web_root: /kiali

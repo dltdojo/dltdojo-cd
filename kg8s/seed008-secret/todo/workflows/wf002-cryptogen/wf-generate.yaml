@@ -1,0 +1,63 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: wf002-cryptogen-
+spec:
+  entrypoint: main
+  arguments:
+    parameters:
+      - name: fabric-version
+        value: 2.4.1
+      - name: fabric-ca-version
+        value: 1.5.2
+      - name: crypto-config-version
+        value: 2022-101
+  templates:
+    - name: main
+      steps:
+        - - name: cryptogen-fabric
+            template: req-fabric-cryptogen
+    - name: req-fabric-cryptogen
+      inputs:
+        artifacts:
+          - name: fabric
+            path: /fabric
+            #
+            # /fabric/peer orderer cryptogen
+            #
+            s3:
+              key: fabric-{{workflow.parameters.fabric-version}}.tgz
+      container:
+        image: gcr.io/distroless/base:debug
+        workingDir: /tmp
+        command: [sh, -c]
+        #
+        # https://github.com/hyperledger/fabric-samples/tree/main/test-network-k8s
+        # https://github.com/hyperledger/fabric-private-chaincode/blob/main/samples/deployment/k8s/generate.sh
+        # https://github.com/hyperledger/fabric-gateway/blob/main/scenario/node/src/fabric.ts
+        # Fabric dockerfile
+        # https://github.com/hyperledger/fabric/blob/7bf365dededa9b6b095e90fd1c9add96cadda23b/images/peer/Dockerfile#L13
+        # https://github.com/hyperledger/fabric/blob/7bf365dededa9b6b095e90fd1c9add96cadda23b/images/peer/Dockerfile#L38
+        #
+        args:
+          - |
+            date
+            du -ah /fabric
+            /fabric/bin/peer version
+            /fabric/bin/orderer version
+            /fabric/bin/cryptogen version
+            /fabric/bin/fabric-ca-server version
+            /fabric/bin/cryptogen generate
+            openssl version
+            openssl x509 -in crypto-config/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/admincerts/User1@org1.example.com-cert.pem -noout -text
+            du -ah crypto-config
+      outputs:
+        artifacts:
+          - name: fabric-cryptogen
+            path: /tmp/crypto-config
+            archive:
+              tar:
+                compressionLevel: 0
+            s3:
+              key: crypto-config-{{workflow.parameters.crypto-config-version}}.tgz
+

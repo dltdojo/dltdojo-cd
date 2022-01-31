@@ -1,0 +1,6 @@
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: http://gitea-http.gitea.svc.cluster.local:3000/gitops-admin/seed101.git
+    targetRevision: HEAD

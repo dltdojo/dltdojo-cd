@@ -1,0 +1,53 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: install-tools-
+spec:
+  entrypoint: main
+  templates:
+    - name: main
+      inputs:
+        artifacts:
+          - name: kubectl
+            path: /bin/kubectl
+            mode: 0755
+            http:
+              url: https://storage.googleapis.com/kubernetes-release/release/v1.22.0/bin/linux/amd64/kubectl
+          - name: curl
+            path: /bin/curl
+            mode: 0755
+            http:
+              url: https://github.com/moparisthebest/static-curl/releases/download/v7.81.0/curl-amd64
+      container:
+        image: gcr.io/distroless/static-debian11:debug
+        command: [sh, -c]
+        args:
+          - |
+            curl -sL https://github.com/grafana/k6/releases/download/v0.36.0/k6-v0.36.0-linux-amd64.tar.gz | tar xvz --strip-components=1 -C /bin
+            curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | sh -s -- --to /bin
+            kubectl version
+            curl --version
+            k6 version
+            just --version
+      outputs:
+        artifacts:
+          - name: kubectl
+            path: /bin/kubectl
+            s3:
+              key: kubectl-1.22.0
+          - name: curl
+            path: /bin/curl
+            s3:
+              key: curl-7.81.0
+          - name: k6
+            path: /bin/k6
+            s3:
+              key: k6-0.36.0
+          - name: just
+            path: /bin/just
+            s3:
+              key: just-0.10.5
+          - name: ca-certificates
+            path: /etc/ssl/certs/ca-certificates.crt
+            s3:
+              key: ca-bullseys-slim

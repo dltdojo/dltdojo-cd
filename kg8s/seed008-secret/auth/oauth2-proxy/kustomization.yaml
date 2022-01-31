@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+#
+# [Istio OIDC Authentication | Jetstack Blog](https://www.jetstack.io/blog/istio-oidc/)
+#
+secretGenerator:
+  - name: oauth2-proxy
+    namespace: oauth2-proxy
+    literals:
+      - OAUTH2_PROXY_CLIENT_ID=client101
+      - OAUTH2_PROXY_CLIENT_SECRET=prb81CNvETDmAA0CjUpj1Jmrs9NtoyQ1
+      - OAUTH2_PROXY_OIDC_ISSUER_URL=https://keycloak.127.0.0.1.sslip.io/auth/realms/blue101
+      #
+      # openssl rand -base64 32 | tr -- '+/' '-_'
+      # 
+      - OAUTH2_PROXY_COOKIE_SECRET=29DuNZq_rCjsa6kO9J7K8YLXtPhFZB20Jksa9Xg3W5s=
+resources:
+  - oauth2-proxy.yaml

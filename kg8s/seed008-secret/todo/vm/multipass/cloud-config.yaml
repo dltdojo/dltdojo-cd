@@ -1,0 +1,6 @@
+apt_update: true
+apt_upgrade: true
+runcmd:
+- snap install microk8s --classic --channel=1.22/stable
+- usermod -a -G microk8s ubuntu
+- iptables -P FORWARD ACCEPT

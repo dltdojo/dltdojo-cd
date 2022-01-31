@@ -1,0 +1,46 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: foo-
+spec:
+  entrypoint: main
+  templates:
+    - name: main
+      inputs:
+        artifacts:
+          - name: kubectl
+            path: /bin/kubectl
+            mode: 0755
+            s3:
+              key: kubectl-1.22.0
+          - name: curl
+            path: /bin/curl
+            mode: 0755
+            s3:
+              key: curl-7.81.0
+          - name: k6
+            path: /bin/k6
+            s3:
+              key: k6-0.36.0
+          - name: just
+            path: /bin/just
+            mode: 0755
+            s3:
+              key: just-0.10.5
+          #
+          #  for public.ecr.aws/debian/debian:bullseye-slim
+          #- name: ca-certificates
+          #  path: /etc/ssl/certs/ca-certificates.crt
+          #  s3:
+          #    key: ca-bullseys-slim
+      container:
+        image: gcr.io/distroless/static-debian11:debug
+        command: [sh, -c]
+        args:
+          - |
+            kubectl version
+            curl --version
+            curl -sv https://google.com
+            k6 version
+            just --version
+

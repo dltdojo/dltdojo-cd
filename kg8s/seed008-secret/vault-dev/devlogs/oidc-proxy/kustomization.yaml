@@ -1,0 +1,40 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: vault
+secretGenerator:
+- literals:
+  - token=ne34Rth000ared12buiSSing 
+  name: vault-dev-token
+  type: Opaque
+- name: init-oidc-scripts
+  files:
+  - init-oidc-scripts/init-client-gitea.sh
+  - init-oidc-scripts/init-client-argocd.sh
+  - init-oidc-scripts/init-provider.sh
+configMapGenerator:
+- name: index-html-configmap
+  files:
+  - webroot/index.html
+- name: nginx-conf-cm
+  files:
+  - webroot/nginx.conf
+- name: oidc-conf-pro101
+  files:
+  - webroot/pro101/openid-configuration
+- name: oidc-conf-argocd
+  files:
+  - webroot/argocd/openid-configuration
+resources:
+  #
+  # https://github.com/hashicorp/vault-helm
+  # https://learn.hashicorp.com/tutorials/vault/kubernetes-secret-store-driver?in=vault/kubernetes
+  # helm template vault hashicorp/vault -n vault --set "server.standalone.enabled=true" --set "injector.enabled=false" > vault.yaml
+  # dev token is root
+  - vault.yaml
+  - oidc404.yaml
+patchesStrategicMerge:
+  - remove-test.yaml
+  # 
+  # rollout status is only available for RollingUpdate strategy type
+  #
+  - img-env.yaml

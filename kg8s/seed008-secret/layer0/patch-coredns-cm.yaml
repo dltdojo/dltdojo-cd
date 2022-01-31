@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-custom
+  namespace: kube-system
+  #
+  # [[Feature] Customizing CoreDNS ConfigMap with overrides and additional servers by iwilltry42 · Pull Request #4397 · k3s-io/k3s](https://github.com/k3s-io/k3s/pull/4397)
+  # *.override.start
+  # defines a configuration override that will be imported at the start of the original Corefile (i.e. just before the kubernetes plugin)
+  # 無效
+data:
+  keycloak.override.start: "rewrite name keycloak.127.0.0.1.sslip.io keycloak-http.keycloak.svc.cluster.local"

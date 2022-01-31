@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gitea-postgresql
+  namespace: gitea
+spec:
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        #
+        # kubectl patch pv pvc-83cb53b9-5388-4a2c-a930-a577914b2f23 --type json --patch-file layer0/remove-pv-claimref.json 
+        # kubectl get pv 
+        volumeName: pvc-83cb53b9-5388-4a2c-a930-a577914b2f23
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gitea
+spec:
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        #
+        # kubectl patch pv pvc-fe8fab5b-b4f3-40ea-bab1-529298bcd8aa --type json --patch-file layer0/remove-pv-claimref.json 
+        # kubectl get pv 
+        volumeName: pvc-fe8fab5b-b4f3-40ea-bab1-529298bcd8aa 

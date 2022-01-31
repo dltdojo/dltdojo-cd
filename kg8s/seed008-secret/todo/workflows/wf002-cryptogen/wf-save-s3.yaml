@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: wf002-save-
+spec:
+  entrypoint: main
+  arguments:
+    parameters:
+      - name: kubectl-version
+        value: v1.23.0
+      - name: curl-version
+        value: v7.81.0
+      - name: k6-version
+        value: v0.36.0
+      - name: fabric-version
+        value: 2.4.1
+      - name: fabric-ca-version
+        value: 1.5.2
+  templates:
+    - name: main
+      steps:
+        - - name: save-kubectl
+            templateRef:
+              name: wft002-save-s3
+              template: kubectl
+        - - name: save-curl
+            templateRef:
+              name: wft002-save-s3
+              template: curl
+        - - name: save-k6
+            templateRef:
+              name: wft002-save-s3
+              template: k6
+          - name: save-fabric
+            templateRef:
+              name: wft002-save-s3
+              template: fabric
