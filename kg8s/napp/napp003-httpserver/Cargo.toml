@@ -1,0 +1,22 @@
+[package]
+name = "napp-httpserver"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+structopt = "0.3.26"
+reqwest = { version = "0.11.9", features = ["blocking", "json"] }
+anyhow = "1.0.54"
+axum = "0.4.5"
+tokio = { version = "1.17.0", features = ["full"]}
+serde_json = "1.0.79"
+tracing = "0.1.31"
+tracing-subscriber = { version = "0.3.9", features = ["env-filter","json"]}
+tower-http = { version = "0.2.3", features = ["trace"] }
+rust-embed="6.3.0"
+mime_guess = { version = "2.0.4"}
+
+[dev-dependencies]
+assert_cmd = "2.0.4"
+
+[workspace]
