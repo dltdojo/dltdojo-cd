@@ -1,10 +1,13 @@
 [package]
-name = "napp-cmd"
+name = "napp-httpclient"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 structopt = "0.3.26"
+url = "2.2.2"
+reqwest = { version = "0.11", features = ["blocking", "json"] }
+anyhow = "1.0.53"
 
 [dev-dependencies]
 assert_cmd = "2.0.4"
