@@ -1,4 +1,9 @@
-# napp002-http
+# napp003-httpserver
+
+- api test
+- swagger-ui
+
+# napp002-httpclient
 
 - [seanmonstar/reqwest: An easy and powerful Rust HTTP Client](https://github.com/seanmonstar/reqwest)
 
@@ -25,3 +30,8 @@ SUBCOMMANDS:
     help    Prints this message or the help of the given subcommand(s)
     srv     server mode
 ```
+
+
+# todos
+
+- [spacejam/sled: the champagne of beta embedded databases](https://github.com/spacejam/sled)

@@ -4,19 +4,23 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+url = "2.2.2"
 structopt = "0.3.26"
-reqwest = { version = "0.11.9", features = ["blocking", "json"] }
 anyhow = "1.0.54"
 axum = "0.4.5"
 tokio = { version = "1.17.0", features = ["full"]}
 serde_json = "1.0.79"
 tracing = "0.1.31"
 tracing-subscriber = { version = "0.3.9", features = ["env-filter","json"]}
-tower-http = { version = "0.2.3", features = ["trace"] }
+tower = { version = "0.4.12", features = ["util", "timeout"] }
+tower-http = { version = "0.2.3", features = ["trace","add-extension"] }
 rust-embed="6.3.0"
 mime_guess = { version = "2.0.4"}
+uuid = { version = "0.8.2", features = ["serde", "v4"] }
+serde = { version = "1.0", features = ["derive"] }
+ureq = { version = "2.4.0", features = ["json"] }
 
 [dev-dependencies]
 assert_cmd = "2.0.4"
-
+predicates = "2.1.1"
 [workspace]

@@ -24,7 +24,7 @@ pub(crate) struct ControlOptions {
     #[structopt(default_value = "0", long, short, env)]
     num: u16,
     #[structopt(long, env)]
-    pub(crate) geturl: Option<reqwest::Url>,
+    pub(crate) geturl: Option<url::Url>,
 }
 
 #[derive(Debug, StructOpt, Clone)]

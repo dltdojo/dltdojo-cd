@@ -1,7 +1,5 @@
 use anyhow::Result;
 use structopt::StructOpt;
-use tracing::*;
-
 mod cmd;
 mod ctl;
 mod httpsrv;
@@ -15,12 +13,7 @@ async fn main() -> Result<()> {
     match cmd::MyArgs::from_args().command {
         cmd::Command::Control(opt) => ctl::process(opt),
         cmd::Command::HttpServer(opt) => {
-            info!(
-                a_bool = true,
-                answer = 42,
-                socketaddr = opt.socketaddr.as_str(),
-                message = "preparing to start http server"
-            );
+            tracing::info!(message = "preparing to start http server", socketaddr=opt.socketaddr.as_str());
             httpsrv::process(opt).await;
             Ok(())
         }
