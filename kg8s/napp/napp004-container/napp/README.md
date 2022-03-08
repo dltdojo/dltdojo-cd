@@ -1,0 +1,61 @@
+# napp004-container
+
+- docker
+- kubernetes
+- k3d
+- skaffold
+- gitops
+  - gitea
+
+
+```sh
+k3d cluster create bar2021
+# skaffold dev -p devtest -vdebug
+skaffold dev -p devtest
+```
+
+## install gitea
+
+```
+cargo run -- srv
+cargo run -- gitops --gitea-apply
+kubectl port-forward statefulset/gitea 3000:3000
+```
+
+# napp003-httpserver
+
+- api test
+- swagger-ui
+
+# napp002-httpclient
+
+- [seanmonstar/reqwest: An easy and powerful Rust HTTP Client](https://github.com/seanmonstar/reqwest)
+
+# napp001-cmd
+
+- [structopt - crates.io: Rust Package Registry](https://crates.io/crates/structopt)
+- [assert_cmd - crates.io: Rust Package Registry](https://crates.io/crates/assert_cmd)
+
+```
+cargo run -- -h
+napp 0.1.0
+napp tool
+
+USAGE:
+    napp [FLAGS] <SUBCOMMAND>
+
+FLAGS:
+    -d, --debug      
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+SUBCOMMANDS:
+    ctl     control mode
+    help    Prints this message or the help of the given subcommand(s)
+    srv     server mode
+```
+
+
+# todos
+
+- [spacejam/sled: the champagne of beta embedded databases](https://github.com/spacejam/sled)

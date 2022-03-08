@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# gitea [gitea/helm-chart: Helm chart for gitea - helm-chart - Gitea: Git with a cup of tea](https://gitea.com/gitea/helm-chart/)
+# helm repo add gitea-charts https://dl.gitea.io/charts/
+# helm repo update
+# helm template gitea gitea-charts/gitea -f value.yaml > gitea.yaml
+# kustomize build > install.yaml
+resources:
+  - gitea.yaml
+patchesStrategicMerge:
+  - remove-test-connection.yaml

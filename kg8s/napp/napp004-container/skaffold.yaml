@@ -1,0 +1,30 @@
+apiVersion: skaffold/v2beta26
+kind: Config
+metadata:
+  name: napp2022
+build:
+  artifacts:
+    - image: napp
+      context: .
+      docker:
+        dockerfile: Dockerfile
+deploy:
+  kustomize:
+    paths:
+      - k8s
+profiles:
+  # skaffold dev -p devtest
+  # using the local cargo test command to run various integration testing
+  # [Test | Skaffold](https://skaffold.dev/docs/pipeline-stages/testers/)
+  # [Integration testing - Rust By Example](https://doc.rust-lang.org/rust-by-example/testing/integration_testing.html)
+  - name: devtest
+    test:
+      - image: napp
+        custom:
+          - command: cargo test
+    portForward:
+      - localPort: 3000
+        port: 3000
+        resourceName: napp2022
+        resourceType: deployment
+        namespace: napp2022

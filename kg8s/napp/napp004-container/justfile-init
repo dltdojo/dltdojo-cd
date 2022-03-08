@@ -1,0 +1,11 @@
+install-kubectl version="v1.22.7" path="/bin/kubectl":
+  #!/usr/bin/env bash
+  curl -L https://dl.k8s.io/release/{{version}}/bin/linux/amd64/kubectl -o {{path}}
+  chmod +x {{path}}
+
+install-deno:
+  # [Verify checksum of static lib in build script · Issue #545 · denoland/rusty_v8](https://github.com/denoland/rusty_v8/issues/545)
+  # cargo install deno --locked --version 1.19.2
+  curl -fsSL https://deno.land/x/install/install.sh | sh
+  mv $HOME/.deno/bin/deno $HOME/.cargo/bin/deno
+  deno --version

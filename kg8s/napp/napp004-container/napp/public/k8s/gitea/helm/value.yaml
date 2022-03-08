@@ -1,0 +1,7 @@
+gitea:
+  admin:
+      username: "GiteaAdmin"
+      password: "AReallyAwesomeGiteaPassword"
+      email: "gitea@dev.local"
+memcached:
+  enabled: false
