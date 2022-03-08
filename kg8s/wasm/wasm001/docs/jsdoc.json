@@ -1,0 +1,21 @@
+{
+    "source": {
+        "include": [
+            "docs/index.md",
+            "jsbind/pkg/jsbind.js",
+            "examples/foo.js"
+        ]
+    },
+    "opts": {
+        "destination": "docs/gen",
+        "recurse": true,
+        "pedantic": true
+    },
+    "templates": {
+        "systemName": "Hyperledger Fabric SDK for Node.js",
+        "theme": "cosmo"
+    },
+    "tags": {
+        "allowUnknownTags": false
+    }
+}

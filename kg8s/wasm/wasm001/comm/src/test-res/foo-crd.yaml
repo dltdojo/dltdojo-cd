@@ -1,0 +1,49 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: foos.clux.dev
+spec:
+  group: clux.dev
+  names:
+    kind: Foo
+    categories: []
+    plural: foos
+    shortNames: []
+    singular: foo
+  scope: Namespaced
+  versions:
+    - additionalPrinterColumns: []
+      name: v1
+      schema:
+        openAPIV3Schema:
+          description: "Auto-generated derived type for FooStruct via `CustomResource`"
+          properties:
+            spec:
+              additionalProperties: false
+              properties:
+                info:
+                  type: string
+                myBool:
+                  type: boolean
+                name:
+                  type: string
+                someData:
+                  additionalProperties:
+                    format: uint
+                    minimum: 0.0
+                    type: integer
+                  type: object
+              required:
+                - info
+                - myBool
+                - name
+                - someData
+              type: object
+          required:
+            - spec
+          title: Foo
+          type: object
+      served: true
+      storage: true
+      subresources: {}

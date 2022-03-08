@@ -1,0 +1,8 @@
+[workspace]
+
+members = [
+    "wapp",
+    "comm",
+    "jsbind",
+    "app-ui",
+]

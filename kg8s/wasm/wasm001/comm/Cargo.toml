@@ -1,0 +1,27 @@
+[package]
+name = "comm"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "1.0.136", features = ["derive"] }
+serde_json ="1.0.79"
+serde_yaml = "0.8.23"
+kube = { version = "0.69.1", features = ["runtime", "derive"] }
+k8s-openapi = { version = "0.14.0", features = ["v1_22"] }
+schemars = "0.8.8"
+hacspec-lib = { git = "https://github.com/hacspec/hacspec", package = "hacspec-lib" }
+hpke =  { git = "https://github.com/cryspen/hpke-spec", package = "hpke" }
+hpke_kem =  { git = "https://github.com/cryspen/hpke-spec" ,package = "hpke_kem"}
+hpke_kdf =  { git = "https://github.com/cryspen/hpke-spec" ,package = "hpke_kdf"}
+hpke_aead =  { git = "https://github.com/cryspen/hpke-spec" ,package = "hpke_aead"}
+prost = "0.9"
+
+[dev-dependencies]
+rand = { version = "0.8.5" }
+getrandom = { version = "0.2.5", features = ["js"] }
+
+[build-dependencies]
+prost-build = "0.9"

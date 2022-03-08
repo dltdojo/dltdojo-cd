@@ -1,0 +1,41 @@
+syntax = "proto3";
+package hpkeproto;
+
+message Config {
+  KEM kem = 1;
+  KDF kdf = 2;
+  AEAD aead = 3;
+
+  // https://www.rfc-editor.org/rfc/rfc9180.html#name-key-encapsulation-mechanism
+  enum KEM {
+    KEM_RESERVED = 0;
+    DHKEM_P256_HKDF_SHA256 = 16;
+    DHKEM_P384_HKDF_SHA384 = 17;
+    DHKEM_P521_HKDF_SHA512 = 18;
+    DHKEM_X25519_HKDF_SHA256 = 32;
+    DHKEM_X25519_HKDF_SHA512 = 33;
+  }
+
+  // https://www.rfc-editor.org/rfc/rfc9180.html#name-key-derivation-functions-kd
+  enum KDF {
+    KDF_RESERVED = 0;
+    HKDF_SHA256 = 1;
+    HKDF_SHA384 = 2;
+    HKDF_SHA512 = 3;
+  }
+  
+  // https://www.rfc-editor.org/rfc/rfc9180.html#name-authenticated-encryption-wi
+  enum AEAD {
+    AEAD_RESERVED = 0;
+    AES_128_GCM = 1;
+    AES_256_GCM = 2;
+    AES_ChaCha20Poly1305 = 3;
+    // EXPORT_ONLY = 0xFFFF;
+  }
+}
+
+message KeyPair {
+  Config.KEM kem_id = 1;
+  bytes private_key = 2;
+  bytes public_key = 3;
+}

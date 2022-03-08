@@ -1,0 +1,24 @@
+---
+components:
+  schemas:
+    Foo:
+      additionalProperties: false
+      properties:
+        info:
+          type: string
+        name:
+          type: string
+        myBool:
+          type: boolean
+        someData:
+          additionalProperties:
+            format: uint
+            minimum: 0.0
+            type: integer
+          type: object
+      required:
+        - info
+        - myBool
+        - name
+        - someData
+      type: object

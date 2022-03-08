@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "FooStruct",
+    "type": "object",
+    "required": [
+        "info",
+        "myBool",
+        "name",
+        "someData"
+    ],
+    "properties": {
+        "info": {
+            "type": "string"
+        },
+        "myBool": {
+            "type": "boolean"
+        },
+        "name": {
+            "type": "string"
+        },
+        "someData": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "integer",
+                "format": "uint",
+                "minimum": 0.0
+            }
+        }
+    },
+    "additionalProperties": false
+}

@@ -1,0 +1,15 @@
+#
+# [zellij-org/zellij: A terminal workspace with batteries included](https://github.com/zellij-org/zellij)
+#
+---
+tabs:
+  - name: "watch wapp"
+    direction: Horizontal
+    parts:
+      - direction: Vertical
+        run:
+          command: {cmd: just, args: ["watch-wasi"]}
+      - direction: Vertical
+        run:
+          # command: {cmd: bash, args: ["-c", "just build-wapp && exec bash"]}
+          command: {cmd: just, args: ["devserver-jsbind"]}

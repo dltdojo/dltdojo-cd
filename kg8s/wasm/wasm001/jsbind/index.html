@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>hello-wasm example</title>
+</head>
+
+<body>
+  <script type="module">
+    // https://github.com/cryspen/hpke-spec/blob/67ce7ec45dd129377eabc2b56e8bdb637fdbada5/hpke/wasm_demo/index.html#L27
+    function hex_to_bytes(hex) {
+      var typedArray = new Uint8Array(
+        hex.match(/[\da-f]{2}/gi).map(function (h) {
+          return parseInt(h, 16);
+        })
+      );
+      return typedArray;
+    }
+
+    function bytes_to_hex(bytes) {
+      return Array.from(bytes, function (byte) {
+        return ("0" + (byte & 0xff).toString(16)).slice(-2);
+      }).join("");
+    }
+    import init, { greet, getCsfYaml, hpkeKeyGen } from "./pkg/jsbind.js";
+
+    init().then(() => {
+      let x = getCsfYaml();
+      console.log(x);
+      gen_receiver_kp();
+    });
+
+    function gen_receiver_kp() {
+      let rand = new Uint8Array(32);
+      window.crypto.getRandomValues(rand);
+      const receiver_sk_pk = hpkeKeyGen(rand);
+      let skR = receiver_sk_pk.slice(0, 32);
+      let pkR = receiver_sk_pk.slice(32);
+      //document.receiver_form.pkR.value = bytes_to_hex(pkR);
+      //document.receiver_form.skR.value = bytes_to_hex(skR);
+      console.log("pkR:", bytes_to_hex(pkR))
+      console.log("skR:", bytes_to_hex(skR))
+    }
+
+  </script>
+  <h1>HELLO WASM</h1>
+  <div>HPKE Test</div>
+</body>
+
+</html>
