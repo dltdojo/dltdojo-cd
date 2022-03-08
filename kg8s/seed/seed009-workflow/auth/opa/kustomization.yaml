@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+secretGenerator:
+  - name: opa101-policy
+    namespace: default
+    files:
+      - policy.rego=policy101.rego
+resources:
+  #
+  # [openpolicyagent/opa - Docker Image | Docker Hub](https://hub.docker.com/r/openpolicyagent/opa)
+  # https://github.com/open-policy-agent/opa-envoy-plugin/blob/47d10e87dc9841c14921199ab86ea19da265c45f/Makefile#L133
+  #
+  #
+  - opa101.yaml
+  - opa101-ext-authz-default.yaml

@@ -1,0 +1,12 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: wf-kubectl-
+spec:
+  entrypoint: kubectl
+  arguments:
+    parameters:
+      - name: kubectl-version
+        value: v1.23.0
+  workflowTemplateRef:
+    name: wft-save-s3

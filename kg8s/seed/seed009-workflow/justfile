@@ -1,0 +1,255 @@
+set shell := ["bash", "-uc"]
+
+cluster_name := "foo101"
+kctl_img := "kg8s-local/kctl:v21.12.1"
+dns_port_suffix := "127.0.0.1.sslip.io:443"
+
+@check_cmd:
+  command -v docker >/dev/null 2>&1 || { echo "docker is not installed.  aborting." >&2; exit 1; }
+  command -v k3d >/dev/null 2>&1 || { echo "k3d is not installed.  aborting." >&2; exit 1; }
+  command -v kubectl >/dev/null 2>&1 || { echo "kubectl is not installed.  aborting." >&2; exit 1; }
+  command -v istioctl >/dev/null 2>&1 || { echo "istioctl is not installed.  aborting." >&2; exit 1; }
+  command -v curl >/dev/null 2>&1 || { echo "curl is not installed.  aborting." >&2; exit 1; }
+  command -v openssl >/dev/null 2>&1 || { echo "openssl is not installed.  aborting." >&2; exit 1; }
+
+build_image:
+  DOCKER_BUILDKIT=1 docker build -t {{kctl_img}} .
+
+img_import cluster: build_image
+  k3d image import {{kctl_img}} -c {{cluster}}
+
+build_all cluster dns_suffix ext_port: check_cmd
+  just init {{cluster}} {{ext_port}}
+  just img_import {{cluster}}
+  just kapply_ns_storage 
+  just init_istio
+  just new_ca
+  just new_cert {{dns_suffix}}
+  just kapply_examples_pv
+  just test_pv {{cluster}}
+  just kpatch_coredns_rewrite
+  just kapply_vault
+  just kapply_keycloak
+  just kapply_istio_metrics test_istio_metrics
+  just kapply_gitea
+  just kapply_argocd
+  just version
+
+todo_xx:
+  just kapply_job_push_repo
+  just kapply_argocd_apps 
+  just kapply_example_nginx
+  just test_http
+  just kapply_auth
+
+build_all_docker cluster: check_cmd
+  just init {{cluster}}
+  just img_import {{cluster}}
+  #
+  # [Bash Heredoc Support · Issue #881 · casey/just](https://github.com/casey/just/issues/881)
+  #
+  docker run -i --rm -w /src --network host -v $HOME/.kube/config:/kube/config:ro {{kctl_img}} \
+    just kapply_ns_storage kapply_examples_pv
+  just test_pv {{cluster}}
+  just init_istio
+  docker run -i --rm -w /src --network host -v $HOME/.kube/config:/kube/config:ro {{kctl_img}} \
+    just kwait_istio kapply_istio_metrics
+  just test_istio_metrics
+  docker run -i --rm -w /src --network host -v $HOME/.kube/config:/kube/config:ro {{kctl_img}} \
+    just kapply_gitea kapply_job_push_repo kapply_argocd kapply_argocd_apps kapply_example_nginx
+  just test_http
+  just version
+
+init cluster ext_port:
+  echo 'k3d cluster create {{cluster}}'
+  mkdir -p $HOME/k3dvol/{{cluster}}
+  k3d cluster create {{cluster}} --api-port 6550 --agents 1 \
+    --image docker.io/rancher/k3s:v1.22.5-k3s2 \
+    --volume $HOME/k3dvol/{{cluster}}:/var/lib/rancher/k3s/storage@all \
+    -p "{{ext_port}}:443@loadbalancer" --k3s-arg '--disable=traefik@server:*'
+  k3d cluster list
+  kubectl apply -f layer0/namespaces.yaml
+
+init_istio:
+  echo "Init istio"
+  # istioctl install --set profile=default -y
+  istioctl install -f layer0/istio-install.yaml -y
+  kubectl wait -n istio-system deployment --all --for=condition=available --timeout=300s
+  kubectl label namespace default istio-injection=enabled
+  kubectl apply -n default -f layer0/istio-gateway-vs.yaml
+
+kapply_istio_metrics:
+  kubectl apply -k istio-metrics
+  kubectl wait -n istio-system deployment --all --for=condition=available --timeout=300s
+
+new_ca:
+  #!/usr/bin/env bash
+  set -euxo pipefail
+  cd layer0/my-certs
+  openssl req -new -x509 -nodes -newkey ec:<(openssl ecparam -name secp256r1) -subj '/O=LOCALDEV/CN=CA.TESTONLY.LOCAL' -keyout ca.key -out ca.crt -days 3650
+  kubectl delete -n gitea configmap my-ca-cert --ignore-not-found
+  kubectl create -n gitea configmap my-ca-cert --from-file ca.crt
+  kubectl delete -n default configmap my-ca-cert --ignore-not-found
+  kubectl create -n default configmap my-ca-cert --from-file ca.crt
+  kubectl delete -n argocd configmap my-ca-cert --ignore-not-found
+  kubectl create -n argocd configmap my-ca-cert --from-file ca.crt
+
+new_cert cn_name:
+  #!/usr/bin/env bash
+  set -euxo pipefail
+  cd layer0/my-certs
+  openssl req -out {{cn_name}}.csr -newkey ec:<(openssl ecparam -name secp256r1) -nodes -keyout {{cn_name}}.key -subj "/CN=*.{{cn_name}}/O=LOCALDEV"
+  openssl x509 -req -days 3650 -CA ca.crt -CAkey ca.key -set_serial 0x$(openssl rand -hex 8) \
+    -extfile <(printf "subjectAltName=DNS:*.{{cn_name}}") \
+    -in {{cn_name}}.csr -out {{cn_name}}.crt
+  openssl verify -CAfile ca.crt {{cn_name}}.crt
+  kubectl delete -n istio-system secret {{cn_name}} --ignore-not-found
+  kubectl create -n istio-system secret tls {{cn_name}} --key={{cn_name}}.key --cert={{cn_name}}.crt
+  kubectl delete -n keycloak secret {{cn_name}} --ignore-not-found
+  kubectl create -n keycloak secret tls {{cn_name}} --key={{cn_name}}.key --cert={{cn_name}}.crt
+
+update_dns_suffix old_name new_name:
+  # grep -rn {{old_name}} ./
+  grep -rl {{old_name}} ./ | xargs -i sed -i 's/{{old_name}}/{{new_name}}/g' {}
+
+update_ssl_port dns_suffix old_port new_port:
+  # grep -rn {{dns_suffix}}:{{old_port}} ./
+  grep -rl {{dns_suffix}}:{{old_port}} ./ | xargs -i sed -i 's/{{dns_suffix}}:{{old_port}}/{{dns_suffix}}:{{new_port}}/g' {}
+
+kapply_vault:
+  kubectl apply -k vault-dev
+  # init and unseal issue
+  #
+  # kubectl rollout status statefulset/vault -n vault --timeout=300s
+
+kapply_gitea:
+  echo "Init gitea"
+  kubectl apply -k gitea
+  # kubectl wait works for Deployment, but does not for StatefulSet · Issue #79606 · kubernetes/kubernetes
+  # https://github.com/kubernetes/kubernetes/issues/79606#issuecomment-779779928
+  # vault 注入後無法完全啟動
+  # kubectl rollout status statefulset/gitea -n gitea --timeout=300s
+
+kapply_keycloak:
+  #
+  # keycloak 使用 https svc port 必須與對外一致，如原設定為 8443 需改為新的例如 9443，這樣 issuer 才會與對外的 authorization_endpoint 一致。
+  # TODO: 傳入的 port 更新
+  # 
+  echo "Init keycloak"
+  kubectl apply -k keycloak
+  # kubectl wait works for Deployment, but does not for StatefulSet · Issue #79606 · kubernetes/kubernetes
+  # https://github.com/kubernetes/kubernetes/issues/79606#issuecomment-779779928
+  # vault 注入後無法完全啟動
+  # kubectl rollout status statefulset/keycloak -n keycloak --timeout=300s
+
+krestart_keycloak:
+  kubectl rollout restart statefulset/keycloak -n keycloak
+
+krestart_gitea:
+  kubectl rollout restart statefulset/gitea -n gitea
+
+kapply_argocd:
+  kubectl apply -k argocd
+  # vault 注入後無法完全啟動
+  # kubectl wait -n argocd deployment --all --for=condition=available --timeout=300s
+
+kapply_argocd_apps:
+  kubectl apply -f argocd/apps/capp-examples.yaml 
+  kubectl apply -f argocd/apps/capp-gitops.yaml 
+
+kapply_job_push_repo:
+  echo "Init sys-seed repo"
+  kubectl apply -k gitea/job-repo-seed
+  #
+  # [Injector never complete · Issue #120 · hashicorp/vault-k8s](https://github.com/hashicorp/vault-k8s/issues/120)
+  # [Support for shutting down agent when Job ends (possibly via HTTP POST) · Issue #217 · hashicorp/vault-k8s](https://github.com/hashicorp/vault-k8s/issues/217)
+  #
+  kubectl wait --for=condition=complete job/git-repo-push --timeout=300s -n gitea
+  kubectl delete jobs git-repo-push -n gitea
+
+kpatch_coredns_rewrite:
+  # 測試無效
+  # [[Feature] Customizing CoreDNS ConfigMap with overrides and additional servers by iwilltry42 · Pull Request #4397 · k3s-io/k3s](https://github.com/k3s-io/k3s/pull/4397)
+  # kubectl apply -f layer0/patch-coredns-cm.yaml
+  # 
+  # patch every restart k3s
+  kubectl patch configmap coredns -n kube-system --patch-file=layer0/patch-dns-alias.yaml
+  #
+  kubectl rollout restart deployment coredns -n kube-system
+
+kapply_auth:
+  echo "apply auth"
+  kubectl apply -k auth/oauth2-proxy
+  kubectl apply -k auth/istio
+  kubectl apply -k auth/opa
+
+gitea_create_seed_repo:
+  #!/usr/bin/env bash
+  set -euxo pipefail
+  #
+  # examples just git_create_seed_repo https://gitops-admin:1fJyRTcesfe2e67df123XYZ@gitea.127.0.0.1.nip.io:9443 seed404
+  # json - Using curl POST with variables defined in bash script functions - Stack Overflow
+  # https://stackoverflow.com/questions/17029902/using-curl-post-with-variables-defined-in-bash-script-functions
+  #
+  # Feature request: Enable setting Variables in a Recipe · Issue #1023 · casey/just
+  # https://github.com/casey/just/issues/1023
+  # 
+  API={{env_var('GITEA_PROTOCOL')}}://{{env_var('GITEA_ADMIN_USERNAME')}}:{{env_var('GITEA_ADMIN_PASSWORD')}}@{{env_var('GITEA_URL')}}/api/v1/user/repos
+  curl -skv -X POST $API -H 'accept: application/json' -H 'Content-Type: application/json' \
+    -d '{ "name": "{{env_var('GITEA_GITOPS_REPO_NAME')}}" }'
+
+gitea_push_seed:
+  echo "push seed repo"
+  git init
+  git remote add origin {{env_var('GITEA_PROTOCOL')}}://{{env_var('GITEA_ADMIN_USERNAME')}}:{{env_var('GITEA_ADMIN_PASSWORD')}}@{{env_var('GITEA_URL')}}/{{env_var('GITEA_ADMIN_USERNAME')}}/{{env_var('GITEA_GITOPS_REPO_NAME')}}.git
+  git config user.email "{{env_var('GITEA_ADMIN_USERNAME')}}@example.local"
+  git config user.name "{{env_var('GITEA_ADMIN_USERNAME')}}"
+  git add .
+  git commit -m "push seed content"
+  git push -u origin master
+
+kapply_ns_storage:
+  kubectl apply -f layer0/storage-retain-local-path.yaml
+  kubectl get storageclass
+
+kapply_examples_pv:
+  kubectl apply -k examples/git-curl
+  kubectl rollout status deployment/git-curl --timeout=300s
+  kubectl apply -k examples/kctl
+  kubectl rollout status deployment/kctl --timeout=300s
+
+test_pv cluster:
+  echo "Tests: print files in the mounted volume of host"
+  find $HOME/k3dvol/{{cluster}} -type f -exec bash -c 'echo {} ; cat {}; echo ;' \;
+
+test_istio_metrics:
+  echo "Tests: Kiali and grafana"
+  curl -kvI --retry 8 --retry-all-errors https://kiali-istio-system.{{dns_port_suffix}}
+  echo
+  curl -kvI --retry 8 --retry-all-errors https://grafana-istio-system.{{dns_port_suffix}}
+
+kapply_example_nginx:
+  echo "Init examples nginx"
+  kubectl apply -k examples/nginx
+  kubectl rollout status deployment/my-nginx --timeout=300s -n default
+
+test_http:
+  echo "Tests: Nginx"
+  curl -kv --retry 8 --retry-all-errors https://my-nginx.{{dns_port_suffix}}
+
+version:
+  docker version
+  k3d version
+  kubectl version
+  istioctl version
+  just --version
+  curl --version
+  openssl version
+
+update_vault:
+  helm repo update
+  cd vault-dev ; helm template vault hashicorp/vault -n vault --set "server.dev.enabled=true" --set "injector.enabled=false" --set "csi.enabled=false" > vault.yaml
+
+foo target:
+  echo 'This is a recipe! {{cluster_name}}'
+  echo {{target}}

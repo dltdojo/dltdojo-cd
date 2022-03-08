@@ -1,0 +1,9 @@
+[sources.the_log]
+type = "demo_logs"
+format = "apache_common"
+count = 10
+
+[sinks.emit_log]
+inputs = ["the_log"]
+type = "console"
+encoding.codec = "json"

@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+bases:
+  - ../
+patchesStrategicMerge:
+  #
+  # 如果 volumeClaimTemplates/spec/volumeName 不存在會自動建一個 PV
+  # 要綁定特定 PV 需執行下列步驟:
+  # 1. kubectl get pv 取得兩個 volumeName 並確認為 Available 狀態
+  # 2. 兩個 volumeName 分別填入 gitea/bind-pv/bind-pvc-volumename.yaml
+  # 3. kubectl apply -k gitea/bind-pv
+  # 系統建好 PV 可綁定
+  - bind-pvc-volumename.yaml

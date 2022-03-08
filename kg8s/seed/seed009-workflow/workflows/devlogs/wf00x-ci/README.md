@@ -1,0 +1,1 @@
+[fabric-private-chaincode/README.md at main · hyperledger/fabric-private-chaincode](https://github.com/hyperledger/fabric-private-chaincode/blob/main/samples/deployment/k8s/README.md)

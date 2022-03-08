@@ -1,0 +1,15 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: httpbin-oauth2
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      oauth2-istio-injection: enabled
+  action: CUSTOM
+  provider:
+    # Extension provider configured when we installed Istio
+    name: oauth2-proxy
+  rules: 
+     - {}

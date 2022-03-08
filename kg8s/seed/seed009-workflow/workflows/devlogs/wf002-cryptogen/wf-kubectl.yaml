@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: wf002-kubectl-
+spec:
+  serviceAccountName: admin-sa
+  entrypoint: main
+  arguments:
+    parameters:
+      - name: kubectl-version
+        value: v1.23.0
+  templates:
+    - name: main
+      steps:
+        - - name: version-kubectl
+            template: req-kubectl
+    - name: req-kubectl
+      inputs:
+        artifacts:
+          - name: kubectl
+            mode: 0755
+            path: /bin/kubectl
+            s3:
+              key: kubectl-{{workflow.parameters.kubectl-version}}
+      container:
+        image: gcr.io/distroless/base:debug
+        command: [sh, -c]
+        args:
+          - |
+            date
+            kubectl version
+            kubectl get po -A
+

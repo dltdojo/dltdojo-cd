@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gitea
+spec:
+  template:
+    metadata:
+      annotations:
+        traffic.sidecar.istio.io/excludeOutboundPorts: "8200"
+        vault.hashicorp.com/agent-init-first: "true"
+        vault.hashicorp.com/agent-inject: 'true'
+        vault.hashicorp.com/role: 'gitea'
+        # /vault/secrets/config
+        vault.hashicorp.com/agent-inject-secret-config: 'secret101/data/gitea'
+        # key bad character U+002D Hyphen-Minus issue
+        # client-name (X)
+        # cleint_name (O)
+        vault.hashicorp.com/agent-inject-template-config: |
+          {{- with secret "secret101/data/gitea" -}}
+          export GITEA_ADMIN_USERNAME={{ .Data.data.username }}
+          export GITEA_ADMIN_PASSWORD={{ .Data.data.password}}
+          export GITEA_OAUTH_KEY_0={{ .Data.data.client_name}}
+          export GITEA_OAUTH_SECRET_0={{ .Data.data.client_secret}}
+          {{- end }}
+    spec:
+    #
+    # [The order of initContainers changed after the patch · Issue #3912 · kubernetes-sigs/kustomize](https://github.com/kubernetes-sigs/kustomize/issues/3912)
+    # 即使不改也要列上去保持順序
+    # 
+      initContainers:
+        - name: init-directories
+          image: docker.io/gitea/gitea:1.15.11
+        - name: init-app-ini
+          image: docker.io/gitea/gitea:1.15.11
+        - name: configure-gitea
+          image: docker.io/gitea/gitea:1.15.11
+          #
+          # command: ["/usr/sbin/configure_gitea.sh"]
+          # https://www.vaultproject.io/docs/platform/k8s/injector/examples
+          #
+          command: ["/bin/sh"]
+          #
+          # [oAuth / openID with skip-tls-verify · Issue #16376 · go-gitea/gitea](https://github.com/go-gitea/gitea/issues/16376)
+          # cat YOUR_CERT_HERE.crt >> /etc/ssl/certs/ca-certificates.crt
+          # ??
+          args:
+            - -c
+            - "source /vault/secrets/config && export SSL_CERT_FILE=/etc/ssl/certs/my-ca-cert.crt && /usr/sbin/configure_gitea.sh"
+          volumeMounts:
+            - name: cm-my-ca-cert
+              mountPath: /etc/ssl/certs/my-ca-cert.crt
+              subPath: ca.crt

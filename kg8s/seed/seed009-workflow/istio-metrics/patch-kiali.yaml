@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kiali
+  namespace: istio-system
+spec:
+  template:
+    metadata:
+      labels: 
+        sidecar.istio.io/inject: "true"
+        version: 0.1.4

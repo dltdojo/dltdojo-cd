@@ -1,0 +1,54 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+#
+# [Istio / Metrics](https://istio.io/latest/docs/tasks/observability/metrics/)
+# curl -sLO https://raw.githubusercontent.com/istio/istio/release-1.12/samples/addons/grafana.yaml
+# curl -sLO https://raw.githubusercontent.com/istio/istio/release-1.12/samples/addons/kiali.yaml
+# curl -sLO https://raw.githubusercontent.com/istio/istio/release-1.12/samples/addons/prometheus.yaml
+# curl -sLO https://raw.githubusercontent.com/istio/istio/release-1.12/samples/addons/jaeger.yaml
+#
+resources:
+  - grafana.yaml
+  - kiali.yaml
+  - prometheus.yaml
+  - jaeger.yaml
+configMapGenerator:
+  - name: kiali
+    namespace: istio-system
+    #
+    # [configMap/secretGenerator named hashes are not applied to resource that include them · Issue #1301 · kubernetes-sigs/kustomize](https://github.com/kubernetes-sigs/kustomize/issues/1301)
+    #
+    behavior: replace
+    files:
+      - config.yaml=kiali-config.yaml
+  - name: grafana
+    namespace: istio-system
+    behavior: replace
+    files:
+      - grafana.ini=grafana-cm/grafana.ini
+      - datasources.yaml=grafana-cm/datasources.yaml
+      - dashboardproviders.yaml=grafana-cm/dashboardproviders.yaml
+secretGenerator:
+  - name: kiali
+    namespace: istio-system
+    literals:
+      - oidc-secret=IeGMjnMUnJbcahSa819qBJkX5T4W6v8T
+    #
+    # grafana env
+    #
+  - name: oidc-credentials
+    namespace: istio-system
+    literals:
+      - client-id=client101
+      - client-secret=IeGMjnMUnJbcahSa819qBJkX5T4W6v8T
+patchesStrategicMerge:
+  #
+  # Grafana 8.3.1, 8.2.7, 8.1.8, and 8.0.7 released with high severity security fix | Grafana Labs
+  # https://grafana.com/blog/2021/12/07/grafana-8.3.1-8.2.7-8.1.8-and-8.0.7-released-with-high-severity-security-fix/
+  #
+  # TODO [Bump addon versions by howardjohn · Pull Request #36438 · istio/istio](https://github.com/istio/istio/pull/36438/files)
+  #
+  - patch-grafana.yaml
+  #
+  - patch-kiali.yaml
+  - patch-prometheus.yaml

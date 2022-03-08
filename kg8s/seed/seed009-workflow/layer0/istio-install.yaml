@@ -1,0 +1,64 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+spec:
+  #
+  # [Istio / Customizing the installation configuration](https://istio.io/latest/docs/setup/additional-setup/customize-installation/)
+  # [Istio / Better External Authorization](https://istio.io/latest/blog/2021/better-external-authz/)
+  # CUSTOM AuthZ provider
+  # [istio-ecosystem/authservice: Move OIDC token acquisition out of your app code and into the Istio mesh](https://github.com/istio-ecosystem/authservice)
+  #
+  #
+  meshConfig:
+    extensionProviders:
+      #
+      # [Istio OIDC Authentication | Jetstack Blog](https://www.jetstack.io/blog/istio-oidc/)
+      #
+      - name: oauth2-proxy
+        envoyExtAuthzHttp:
+          service: oauth2-proxy.oauth2-proxy.svc.cluster.local
+          port: 4180
+          includeRequestHeadersInCheck:
+            - cookie
+            - authorization
+          headersToUpstreamOnAllow:
+            - authorization
+            - path
+            - x-auth-request-user
+            - x-auth-request-email
+            - x-auth-request-groups
+            - x-auth-request-preferred-username
+          headersToDownstreamOnDeny:
+            - set-cookie
+  #      - name: "opa-istio"
+  #        envoyExtAuthzGrpc:
+  #          service: "external-authz-grpc.local"
+  #          port: "9191"
+  #      - name: "authservice-grpc"
+  #        envoyExtAuthzGrpc:
+  #          service: "authservice.default.svc.cluster.local"
+  #          port: "10003"
+  components:
+    pilot:
+      k8s:
+        resources:
+          requests:
+            cpu: 300m # override from default 500m
+            memory: 1024Mi # ... default 2048Mi
+        hpaSpec:
+          maxReplicas: 2 # ... default 5
+          minReplicas: 1 # ... default 1
+  values:
+    pilot:
+      jwksResolverExtraRootCA: |
+        -----BEGIN CERTIFICATE-----
+        MIIBtDCCAVmgAwIBAgIUODYd+qF4dCoQ3L5XnR1caIG9xX8wCgYIKoZIzj0EAwIw
+        LzERMA8GA1UECgwITE9DQUxERVYxGjAYBgNVBAMMEUNBLlRFU1RPTkxZLkxPQ0FM
+        MB4XDTIyMDEwMzA5MjgxMFoXDTMyMDEwMTA5MjgxMFowLzERMA8GA1UECgwITE9D
+        QUxERVYxGjAYBgNVBAMMEUNBLlRFU1RPTkxZLkxPQ0FMMFkwEwYHKoZIzj0CAQYI
+        KoZIzj0DAQcDQgAE35ViOA4ZFbLtlpPttRMZLBGNUxcjeiUnZVgYUsVhELIbjc+6
+        VVQJ21BcKhizX/MXbBqtPN8Mn/L0jnxNPsYkaaNTMFEwHQYDVR0OBBYEFBPaKQgB
+        NOQCo6lcMD+rcc97T9fBMB8GA1UdIwQYMBaAFBPaKQgBNOQCo6lcMD+rcc97T9fB
+        MA8GA1UdEwEB/wQFMAMBAf8wCgYIKoZIzj0EAwIDSQAwRgIhAPrU5aGDdnRJuNU0
+        OxGpFLpYR2PoqVx7zi/w6PHKccy7AiEAjrBFPx6VclP7rpjQLt66BswY3QYjcH6u
+        LCEjPFaRchQ=
+        -----END CERTIFICATE-----

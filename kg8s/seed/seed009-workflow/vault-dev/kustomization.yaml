@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: vault
+secretGenerator:
+- literals:
+  - token=ne34Rth000ared12buiSSing 
+  name: vault-dev-token
+  type: Opaque
+configMapGenerator:
+  - name: cm-vault-inject
+    files:
+      - config-k8s-inject.sh
+resources:
+  #
+  # https://github.com/hashicorp/vault-helm
+  # https://learn.hashicorp.com/tutorials/vault/kubernetes-secret-store-driver?in=vault/kubernetes
+  # helm template vault hashicorp/vault -n vault --set "server.standalone.enabled=true" --set "injector.enabled=true" --set "csi.enabled=false" > vault.yaml
+  # 
+  - vault.yaml
+patchesStrategicMerge:
+  - remove-test.yaml
+  # 
+  # rollout status is only available for RollingUpdate strategy type
+  #
+  - patch-vault.yaml
+  - patch-vault-k8s.yaml

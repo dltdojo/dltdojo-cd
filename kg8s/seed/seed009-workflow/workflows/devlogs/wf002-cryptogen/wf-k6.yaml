@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: wf002-k6-
+spec:
+  entrypoint: main
+  arguments:
+    parameters:
+      - name: k6-version
+        value: v0.36.0
+  templates:
+    - name: main
+      steps:
+        - - name: version-k6
+            template: req-k6
+    - name: req-k6
+      inputs:
+        artifacts:
+          - name: k6
+            mode: 0755
+            path: /bin/k6
+            s3:
+              key: k6-{{workflow.parameters.k6-version}}
+      container:
+        image: gcr.io/distroless/base:debug
+        command: [sh, -c]
+        args:
+          - |
+            date
+            k6 version
+

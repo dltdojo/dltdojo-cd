@@ -1,0 +1,110 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: wft002-save-s3
+spec:
+  arguments:
+    parameters:
+      - name: kubectl-version
+        value: v1.22.0
+      - name: curl-version
+        value: v7.81.0
+      - name: k6-version
+        value: v0.36.0
+      - name: fabric-version
+        value: 2.4.1
+      - name: fabric-ca-version
+        value: 1.5.2
+  templates:
+    - name: kubectl
+      inputs:
+        artifacts:
+          - name: kubectl
+            path: /bin/kubectl
+            mode: 0755
+            http:
+              url: https://storage.googleapis.com/kubernetes-release/release/{{workflow.parameters.kubectl-version}}/bin/linux/amd64/kubectl
+      container:
+        image: gcr.io/distroless/static-debian11:debug
+        command: [sh, -c]
+        args:
+          - |
+            kubectl version
+      outputs:
+        artifacts:
+          - name: kubectl
+            path: /bin/kubectl
+            s3:
+              key: kubectl-{{workflow.parameters.kubectl-version}}
+    - name: curl
+      inputs:
+        artifacts:
+          - name: curl
+            path: /bin/curl
+            mode: 0755
+            # [Release v7.81.0 · moparisthebest/static-curl](https://github.com/moparisthebest/static-curl/releases/tag/v7.81.0)
+            http:
+              url: https://github.com/moparisthebest/static-curl/releases/download/{{workflow.parameters.curl-version}}/curl-amd64
+      container:
+        image: gcr.io/distroless/static-debian11:debug
+        command: [sh, -c]
+        args:
+          - |
+            # wget -O /bin/curl https://github.com/moparisthebest/static-curl/releases/download/v7.81.0/curl-amd64 
+            curl --version
+      outputs:
+        artifacts:
+          - name: curl
+            path: /bin/curl
+            s3:
+              key: curl-{{workflow.parameters.curl-version}}
+    - name: k6
+      inputs:
+        artifacts:
+          - name: curl
+            path: /bin/curl
+            mode: 0755
+            s3:
+              key: curl-{{workflow.parameters.curl-version}}
+      container:
+        image: gcr.io/distroless/base:debug
+        command: [sh, -c]
+        args:
+          - |
+            curl -sL https://github.com/grafana/k6/releases/download/{{workflow.parameters.k6-version}}/k6-{{workflow.parameters.k6-version}}-linux-amd64.tar.gz | tar xvz --strip-components=1 -C /tmp
+            /tmp/k6 version
+      outputs:
+        artifacts:
+          - name: k6
+            path: /tmp/k6
+            s3:
+              key: k6-{{workflow.parameters.k6-version}}
+    - name: fabric
+      # [Releases · hyperledger/fabric](https://github.com/hyperledger/fabric/releases)
+      inputs:
+        artifacts:
+          - name: curl
+            path: /bin/curl
+            mode: 0755
+            s3:
+              key: curl-{{workflow.parameters.curl-version}}
+      container:
+        image: gcr.io/distroless/base:debug
+        command: [sh, -c]
+        args:
+          - |
+            # https://github.com/hyperledger/fabric/releases/download/v2.4.1/hyperledger-fabric-linux-amd64-2.4.1.tar.gz
+            curl -sL https://github.com/hyperledger/fabric/releases/download/v{{workflow.parameters.fabric-version}}/hyperledger-fabric-linux-amd64-{{workflow.parameters.fabric-version}}.tar.gz | tar xvz -C /tmp
+            /tmp/bin/peer version
+            /tmp/bin/orderer version
+            curl -sL https://github.com/hyperledger/fabric-ca/releases/download/v{{workflow.parameters.fabric-ca-version}}/hyperledger-fabric-ca-linux-amd64-{{workflow.parameters.fabric-ca-version}}.tar.gz | tar xvz -C /tmp
+            /tmp/bin/fabric-ca-server version
+      outputs:
+        artifacts:
+          - name: fabric
+            path: /tmp
+            archive:
+              tar:
+                compressionLevel: 0
+            s3:
+              key: fabric-{{workflow.parameters.fabric-version}}.tgz

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kctl
+spec:
+  template:
+    metadata:
+      labels:
+        version: 21.12.1-13
+      annotations:
+        traffic.sidecar.istio.io/excludeOutboundPorts: "8200"
+        vault.hashicorp.com/agent-init-first: "true"
+        vault.hashicorp.com/agent-inject: 'true'
+        vault.hashicorp.com/role: 'role301'
+        # /vault/secrets/foo == vault secret101/data/db2021/v123
+        vault.hashicorp.com/agent-inject-secret-foo: 'secret101/data/db2021/v123'
+        vault.hashicorp.com/agent-inject-template-foo: |
+          {{- with secret "secret101/data/db2021/v123" -}}  
+          {{ .Data.data.username }}:{{ .Data.data.password }}@postgres:5432/mydb?sslmode=disable
+          Username: {{ .Data.data.username }}
+          Password: {{ .Data.data.password}}
+          {{- end }}

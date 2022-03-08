@@ -1,0 +1,1 @@
+https://github.com/GoogleContainerTools/skaffold/tree/main/examples/getting-started-kustomize

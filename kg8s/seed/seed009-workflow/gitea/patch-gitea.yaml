@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gitea
+spec:
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        storageClassName: local-path-retain
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "5Gi"
+  template:
+    metadata:
+      labels: 
+        version: 1.15.11-001
+    spec:
+      serviceAccountName: gitea
+      containers:
+        - name: gitea
+          image: docker.io/gitea/gitea:1.15.11
+          volumeMounts:
+            - name: cm-my-ca-cert
+              mountPath: /etc/ssl/certs/my-ca-cert.crt
+              subPath: ca.crt
+      volumes:
+        - name: cm-my-ca-cert
+          configMap:
+            name: my-ca-cert
+            defaultMode: 420

@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: git-repo-push
+  namespace: gitea
+spec:
+  template:
+    metadata:
+      annotations:
+        traffic.sidecar.istio.io/excludeOutboundPorts: "8200"
+        vault.hashicorp.com/agent-init-first: "true"
+        vault.hashicorp.com/agent-inject: "true"
+        # [Injector never complete · Issue #120 · hashicorp/vault-k8s](https://github.com/hashicorp/vault-k8s/issues/120)
+        vault.hashicorp.com/agent-pre-populate-only: "true"
+        vault.hashicorp.com/role: "gitea"
+        vault.hashicorp.com/agent-inject-secret-config: "secret101/data/gitea"
+        vault.hashicorp.com/agent-inject-template-config: |
+          {{- with secret "secret101/data/gitea" -}}
+          export GITEA_ADMIN_USERNAME={{ .Data.data.username }}
+          export GITEA_ADMIN_PASSWORD={{ .Data.data.password }}
+          {{- end }}
+    spec:
+      serviceAccountName: gitea
+      containers:
+        - name: git-repo-push
+          image: kg8s-local/kctl:v21.12.1
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - ". /vault/secrets/config && just gitea_create_seed_repo gitea_push_seed"
+      restartPolicy: Never
+  backoffLimit: 0

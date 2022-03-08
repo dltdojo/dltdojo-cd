@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: vault
+secretGenerator:
+- literals:
+  - token=ne34Rth000ared12buiSSing 
+  name: vault-dev-token
+  type: Opaque
+configMapGenerator:
+- name: index-html-configmap
+  files:
+  - webroot/index.html
+- name: oidc-conf-pro101
+  files:
+  - webroot/pro101/openid-configuration
+resources:
+  #
+  # https://github.com/hashicorp/vault-helm
+  # https://learn.hashicorp.com/tutorials/vault/kubernetes-secret-store-driver?in=vault/kubernetes
+  # helm template vault hashicorp/vault -n vault --set "server.standalone.enabled=true" --set "injector.enabled=false" > vault.yaml
+  # dev token is root
+  - vault.yaml
+  - http-conf.yaml
+patchesStrategicMerge:
+  - remove-test.yaml
+  # 
+  # rollout status is only available for RollingUpdate strategy type
+  # [OIDC provider: nonce should be optional in authorization code flow · Issue #13204 · hashicorp/vault](https://github.com/hashicorp/vault/issues/13204)
+  # 
+  # [persistent dev mode · Issue #12004 · hashicorp/vault](https://github.com/hashicorp/vault/issues/12004)
+  # 
+  - img-env-dev-token.yaml

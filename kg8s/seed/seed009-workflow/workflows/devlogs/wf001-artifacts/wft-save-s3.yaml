@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: wft-save-s3
+spec:
+  arguments:
+    parameters:
+      - name: kubectl-version
+        value: v1.22.0
+      - name: curl-version
+        value: v7.81.0
+  templates:
+    - name: kubectl
+      inputs:
+        artifacts:
+          - name: kubectl
+            path: /bin/kubectl
+            mode: 0755
+            http:
+              url: https://storage.googleapis.com/kubernetes-release/release/{{workflow.parameters.kubectl-version}}/bin/linux/amd64/kubectl
+      container:
+        image: gcr.io/distroless/static-debian11:debug
+        command: [sh, -c]
+        args:
+          - |
+            kubectl version
+      outputs:
+        artifacts:
+          - name: kubectl
+            path: /bin/kubectl
+            s3:
+              key: kubectl-{{workflow.parameters.kubectl-version}}
+    - name: curl
+      inputs:
+        artifacts:
+          - name: curl
+            path: /bin/curl
+            mode: 0755
+            http:
+              url: https://github.com/moparisthebest/static-curl/releases/download/{{workflow.parameters.curl-version}}/curl-amd64
+      container:
+        image: gcr.io/distroless/static-debian11:debug
+        command: [sh, -c]
+        args:
+          - |
+            curl --version
+      outputs:
+        artifacts:
+          - name: curl
+            path: /bin/curl
+            s3:
+              key: curl-{{workflow.parameters.curl-version}}

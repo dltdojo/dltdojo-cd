@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vault-agent-injector
+  namespace: vault
+spec:
+  template:
+    metadata:
+      labels: 
+        version: 0.14.2-101
+    spec:
+      containers:
+        - name: sidecar-injector
+          image: "docker.io/hashicorp/vault-k8s:0.14.2"
+          env:
+            - name: AGENT_INJECT_VAULT_IMAGE
+              value: "docker.io/hashicorp/vault:1.9.2"
+
