@@ -1,0 +1,20 @@
+@startuml
+actor "使用者" as User #LightGreen
+participant bash #Green
+participant docker #Yellow
+participant "busybox\nash" as ash #LightCoral
+participant nc #Red
+participant website
+actor "網站管理" as WebOp #LightPink
+autonumber 100
+User -> bash: INPUT
+bash -> docker: RUN🏇
+docker -> ash: 🏇🏇
+ash -> nc: printf\nHTTP Reqeust
+nc -> website: HTTP\nRequest
+website -> nc: HTTP\nResponse
+nc -> ash: 🔟🔡
+ash -> docker: 🔟🔡
+docker -> bash: 🔟🔡
+bash -> User: OUTPUT
+@enduml

@@ -9,6 +9,8 @@
 # TOOL
 
 - [curl](https://github.com/curl/curl)
+  - [curl http - Google](https://www.google.com/search?q=curl+http)
+  - [curl http - YouTube](https://www.youtube.com/results?search_query=curl+http)
 - [Hypertext Transfer Protocol - Wikipedia](https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol)
 - [Hypertext Transfer Protocol -- HTTP/1.0 rfc1945](https://datatracker.ietf.org/doc/html/rfc1945)
 
