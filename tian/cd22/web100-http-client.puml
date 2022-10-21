@@ -1,0 +1,17 @@
+@startuml
+actor "使用者"  as User
+participant shell #Green
+participant docker #Yellow
+participant curl #Red
+participant website
+actor "網站管理" as WebSiteOp
+autonumber 100
+User -> shell: INPUT輸入
+shell -> docker: RUN🏇
+docker -> curl: 🏇🏇
+curl -> website: HTTP-message: Request  
+website -> curl: HTTP-message: Response
+curl -> docker: 🔟🔡
+docker -> shell: 🔟🔡
+shell -> User: OUTPUT輸出
+@enduml
