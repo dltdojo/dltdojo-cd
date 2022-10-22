@@ -1,14 +1,22 @@
 @startuml
+title dltdojo-cd/tian/cd22/web100-http-client
 actor "使用者"  as User
 participant shell #Green
+box Container
 participant docker #Yellow
 participant curl #Red
+end box
+box Internet/Layer0 #LightGreen
+participant "network\nsocket" as net
 participant website
+end box
 actor "網站管理" as WebSiteOp
 autonumber 100
 User -> shell: INPUT輸入
 shell -> docker: RUN🏇
 docker -> curl: 🏇🏇
+curl <--> net
+net <--> website: TCP/IP\nTransport layer\nInternet layer\nNetwork Access (link) layer
 curl -> website: HTTP-message: Request  
 website -> curl: HTTP-message: Response
 curl -> docker: 🔟🔡

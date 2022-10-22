@@ -1,7 +1,6 @@
 # GOAL
 
-使用簡易工具取得最早網站的 HTTP 協定資訊。
-
+使用簡易 http client 工具 curl 取得最早網站的 HTTP 協定資訊。
 
 ![Alt text](./web100-http-client.svg)
 

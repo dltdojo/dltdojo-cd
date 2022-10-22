@@ -1,16 +1,24 @@
 @startuml
+title dltdojo-cd/tian/cd22/web101-http-client
 actor "使用者" as User #LightGreen
 participant bash #Green
+box Container
 participant docker #Yellow
 participant "busybox\nash" as ash #LightCoral
 participant nc #Red
+end box
+box Internet/Layer0 #LightGreen
+participant "network\nsocket" as net
 participant website
+end box
 actor "網站管理" as WebOp #LightPink
 autonumber 100
 User -> bash: INPUT
 bash -> docker: RUN🏇
 docker -> ash: 🏇🏇
 ash -> nc: printf\nHTTP Reqeust
+nc <--> net
+net <--> website: TCP/IP\nTransport\nInternet\nLink
 nc -> website: HTTP\nRequest
 website -> nc: HTTP\nResponse
 nc -> ash: 🔟🔡
