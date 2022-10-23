@@ -8,7 +8,7 @@
 
 # ALTs
 
-## Static Site Generation(SSG) v.s. Server-Side Rendering(SSR)
+## Shell Script : Static Site Generation(SSG) v.s. Server-Side Rendering(SSR)
 
 apache cgi
 
@@ -110,3 +110,103 @@ Sat Oct 22 14:13:32 UTC 2022
 </html>
 * Connection #0 to host localhost left intact
 ```
+
+## JavaScript-HTML-DOM : SSG v.s. SSR
+
+實際上不會想用純 shell script 來處裡 HTML 服務端渲染，因為輸入實在太複雜容易出錯很難除錯，可參考 [ Process input to a CGI script : Search · 1995 Frank Pilhofer](https://github.com/search?l=Shell&p=1&q=1995+Frank+Pilhofer&type=Code) ，另外也缺少處理 The HTML DOM (Document Object Model) 的工具。
+
+常見的 HTML DOM 修改範例。
+
+```html
+<html>
+<body>
+<p id="demo"></p>
+<script>
+document.getElementById("demo").innerHTML = "Hello World!";
+</script>
+</body>
+</html> 
+```
+
+經過瀏覽器渲染後的呈現結果。
+
+```html
+<html>
+<body>
+<p id="demo">Hello World!</p>
+</body>
+</html>
+```
+
+將瀏覽器作的渲染移到服務端的作法分成 SSG 與 SSR。使用 deno 作範例因為不須 bundle 或是 install 很方便。
+
+- [Using JSX and the DOM | Manual | Deno](https://deno.land/manual@v1.26.0/jsx_dom)
+- [File Server | Manual | Deno](https://deno.land/manual@v1.26.1/examples/file_server)
+- [denoland/deno - Docker Image | Docker Hub](https://hub.docker.com/r/denoland/deno)
+
+SSG version
+
+```sh
+docker pull docker.io/denoland/deno:1.26.2
+
+docker run -i -p 8080:3000 --entrypoint sh docker.io/denoland/deno:1.26.2 <<\EOF
+cat <<\EOOF | deno run --allow-net - 
+import { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
+const document = new DOMParser().parseFromString(
+  `<!DOCTYPE html>
+  <html lang="en">
+    <head><meta charset="UTF-8"><title>SSG Js+DOM 2022</title></head>
+    <body><p id="demo"></p></body>
+  </html>`,
+  "text/html",
+);
+document.getElementById("demo").innerHTML = `SSG Version:  🔑🗝📦🔗⌛🦉🧩🎭🛂💸 ${new Date()} !`;
+const htmlSSG = document.documentElement.outerHTML;
+console.log(htmlSSG);
+
+import { serve } from "https://deno.land/std@0.160.0/http/server.ts";
+
+serve((_req) => {
+  return new Response(htmlSSG, {
+    headers: { "content-type": "text/html" },
+  });
+}, { port: 3000 });
+EOOF
+EOF
+```
+
+SSR version
+
+```sh
+docker run -i -p 8080:3000 --entrypoint sh docker.io/denoland/deno:1.26.2 <<\EOF
+cat <<\EOOF | deno run --allow-net - 
+import { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
+const document = new DOMParser().parseFromString(
+  `<!DOCTYPE html>
+  <html lang="en">
+    <head><meta charset="UTF-8"><title>SSR Js+DOM 2022</title></head>
+    <body><p id="demo"></p></body>
+  </html>`,
+  "text/html",
+);
+
+import { serve } from "https://deno.land/std@0.160.0/http/server.ts";
+
+serve((_req) => {
+  document.getElementById("demo").innerHTML = `SSR Version:  🔑🗝📦🔗⌛🦉🧩🎭🛂💸 ${new Date()} !`;
+  const htmlSSG = document.documentElement.outerHTML;
+  return new Response(htmlSSG, {
+    headers: { "content-type": "text/html" },
+  });
+}, { port: 3000 });
+EOOF
+EOF
+```
+
+- http://localhost:8080
+- SSG 與 SSR 觀察生成時間可發現差異。
+
+# JSX: SSG v.s. SSR
+
+- [Using JSX | Deploy Docs](https://deno.com/deploy/docs/using-jsx)
+- bundle不用之[preactjs/preact-render-to-string: Universal rendering for Preact: render JSX and Preact components to HTML.](https://github.com/preactjs/preact-render-to-string/)
