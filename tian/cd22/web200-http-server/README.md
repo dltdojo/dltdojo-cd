@@ -206,6 +206,185 @@ EOF
 - http://localhost:8080
 - SSG 與 SSR 觀察生成時間可發現差異。
 
+SG/SSR import-online-js version
+
+```sh
+docker run --rm curlimages/curl -sv https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/cd22/web200-http-server/ssg-dom101.js
+
+docker run -it --rm -p 8080:3000 docker.io/denoland/deno:1.26.2 run --allow-net https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/cd22/web200-http-server/ssg-dom101.js
+docker run -it --rm -p 8081:3000 docker.io/denoland/deno:1.26.2 run --allow-net https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/cd22/web200-http-server/ssr-dom101.js
+```
+
+- SSG version http://localhost:8080
+- SSR version http://localhost:8081
+
+SSG/SSR compose up
+
+- escape a dollar sign in a docker compose file? - Stack Overflow https://stackoverflow.com/questions/40619582/how-can-i-escape-a-dollar-sign-in-a-docker-compose-file
+- 造成要改寫 js 成難辨識的 ```$${new Date()}```
+
+docker compose up
+
+```sh
+docker compose -f - up <<\EOF
+services:
+  ssrdom:
+    image: docker.io/denoland/deno:1.26.2
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        cat <<\EOOF | deno run --allow-net - 
+        import { serve } from "https://deno.land/std@0.160.0/http/server.ts";
+        serve((_req) => {
+          const txtSSG = `SSR Version:🔑🗝📦🔗⌛🦉🧩🎭🛂💸 $${new Date()} !`;
+            return new Response(txtSSG, { headers: { "content-type": "text/plain;charset=UTF-8" },});
+          } , { port: 3000 });
+        EOOF
+    ports:
+      - "8081:3000"
+EOF
+```
+
+SSG/SSR : docker compose up
+
+```sh
+docker compose -f - up <<\EOF
+services:
+  ssgdom:
+    image: docker.io/denoland/deno:1.26.2
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        cat <<\EOOF | deno run --allow-net - 
+        import { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
+        const document = new DOMParser().parseFromString(
+           `<!DOCTYPE html><html lang="en">
+            <head><meta charset="UTF-8"><title>SSG Js+DOM 2022</title></head>
+            <body><p id="demo"></p></body></html>`,
+           "text/html",
+        );
+        document.getElementById("demo").innerHTML = `SSG Version:🔑🗝📦🔗⌛🦉🧩🎭🛂💸 $${new Date()} !`;
+        const htmlSSG = document.documentElement.outerHTML;
+        import { serve } from "https://deno.land/std@0.160.0/http/server.ts";
+        serve((_req) => {
+          return new Response(htmlSSG, { headers: { "content-type": "text/html" },});}, { port: 3000 });
+        EOOF
+    ports:
+      - "8080:3000"
+  ssrdom:
+    image: docker.io/denoland/deno:1.26.2
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        cat <<\EOOF | deno run --allow-net - 
+        import { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
+        const document = new DOMParser().parseFromString(
+           `<!DOCTYPE html><html lang="en">
+            <head><meta charset="UTF-8"><title>SSR Js+DOM 2022</title></head>
+            <body><p id="demo"></p></body></html>`,
+           "text/html",
+        );
+        import { serve } from "https://deno.land/std@0.160.0/http/server.ts";
+        serve((_req) => {
+          document.getElementById("demo").innerHTML = `SSR Version:🔑🗝📦🔗⌛🦉🧩🎭🛂💸 $${new Date()} !`;
+          const htmlSSG = document.documentElement.outerHTML;
+          return new Response(htmlSSG, { headers: { "content-type": "text/html" },});}, { port: 3000 });
+        EOOF
+    ports:
+      - "8081:3000"
+  ssrdom-online:
+    image: docker.io/denoland/deno:1.26.2
+    command: "run --allow-net https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/cd22/web200-http-server/ssr-dom101.js"
+    ports:
+      - "8082:3000"
+EOF
+```
+
+## kubernetes SSG version
+
+- Connecting Applications with Services | Kubernetes https://kubernetes.io/docs/concepts/services-networking/connect-applications-service/
+- k3d https://k3d.io/v5.4.6/
+- ```k3d cluster create k8s101 -p "8089:80@loadbalancer" --agents 2```
+- SSG http://ssg-dom.localhost:8089
+
+```sh
+kubectl apply -f - <<\EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ssg-dom-101
+spec:
+  selector:
+    matchLabels:
+      run: ssg-dom
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: ssg-dom
+    spec:
+      containers:
+      - name: ssg-dom
+        image: docker.io/denoland/deno:1.26.2
+        command: ["/bin/sh"]
+        args:
+          - -c
+          - |
+            cat <<\EOOF | deno run --allow-net - 
+            import { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
+            const document = new DOMParser().parseFromString(
+               `<!DOCTYPE html><html lang="en">
+                <head><meta charset="UTF-8"><title>SSG Js+DOM 2022</title></head>
+                <body><p id="demo"></p></body></html>`,
+               "text/html",
+            );
+            document.getElementById("demo").innerHTML = `SSG Version:🔑🗝📦🔗⌛🦉🧩🎭🛂💸 ${new Date()} !`;
+            const htmlSSG = document.documentElement.outerHTML;
+            import { serve } from "https://deno.land/std@0.160.0/http/server.ts";
+            serve((_req) => {
+              return new Response(htmlSSG, { headers: { "content-type": "text/html" },});}, { port: 3000 });
+            EOOF
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ssg-dom-101
+  labels:
+    run: ssg-dom
+spec:
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+  selector:
+    run: ssg-dom
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: k8singress
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - host: "ssg-dom.localhost"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: ssg-dom-101
+            port:
+              number: 80
+EOF
+```
+
 # JSX: SSG v.s. SSR
 
 - [Using JSX | Deploy Docs](https://deno.com/deploy/docs/using-jsx)
