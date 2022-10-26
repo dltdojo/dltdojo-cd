@@ -1,6 +1,152 @@
 # GOAL
 
-啟動 HTTP 服務。
+啟動極小 HTTP 服務，busybox httpd 約 720KB。
+
+- [busybox - Official Image | Docker Hub](https://hub.docker.com/_/busybox)
+
+```sh
+$ docker pull busybox:1.35.0
+$ docker run -i --init -p 8030:3000 busybox:1.35.0 /bin/sh <<\EOF
+echo http://Ghost-in-the-Shell.localhost:8030
+cat <<\EOOF > index.html
+<html>
+<head><title>busybox httpd 2022</title></head>
+<body><p>HELLO Busybox Httpd</p></body>
+</html>
+EOOF
+busybox httpd -f -v -p 3000 
+EOF
+
+$ curl -sv http://Ghost-in-the-Shell.localhost:8030
+*   Trying ::1:8030...
+* Connected to Ghost-in-the-Shell.localhost (::1) port 8030 (#0)
+> GET / HTTP/1.1
+> Host: Ghost-in-the-Shell.localhost:8030
+> User-Agent: curl/7.78.0
+> Accept: */*
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Date: Wed, 26 Oct 2022 08:15:37 GMT
+< Connection: close
+< Content-type: text/html
+< Accept-Ranges: bytes
+< Last-Modified: Wed, 26 Oct 2022 08:15:16 GMT
+< ETag: "6358ec94-66"
+< Content-Length: 102
+< 
+<html>
+<head><title>busybox httpd 2022</title></head>
+<body><p>HELLO Busybox Httpd</p></body>
+</html>
+* Closing connection 0
+```
+
+404 Not Found 資源位置出錯為正常反應，真的「404」找不到 Not Found 而變成 200 OK 就可能有大問題。
+
+攻擊者通常會嘗試查找未修補的缺陷、常見端點或未受保護的文件和目錄，以獲取未經授權的訪問或系統知識。[API7:2019 Security Misconfiguration · OWASP/API-Security](https://github.com/OWASP/API-Security/blob/master/2019/en/src/0xa7-security-misconfiguration.md#api72019-security-misconfiguration)
+
+
+```sh
+$ curl -sv http://Ghost-in-the-Shell.localhost:8030/etc/passwd
+*   Trying ::1:8030...
+* Connected to Ghost-in-the-Shell.localhost (::1) port 8030 (#0)
+> GET /etc/passwd HTTP/1.1
+> Host: Ghost-in-the-Shell.localhost:8030
+> User-Agent: curl/7.78.0
+> Accept: */*
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Date: Wed, 26 Oct 2022 08:16:55 GMT
+< Connection: close
+< Accept-Ranges: bytes
+< Last-Modified: Sun, 02 Oct 2022 21:21:57 GMT
+< ETag: "633a00f5-154"
+< Content-Length: 340
+< 
+root:x:0:0:root:/root:/bin/sh
+daemon:x:1:1:daemon:/usr/sbin:/bin/false
+bin:x:2:2:bin:/bin:/bin/false
+sys:x:3:3:sys:/dev:/bin/false
+sync:x:4:100:sync:/bin:/bin/sync
+mail:x:8:8:mail:/var/spool/mail:/bin/false
+www-data:x:33:33:www-data:/var/www:/bin/false
+operator:x:37:37:Operator:/var:/bin/false
+nobody:x:65534:65534:nobody:/home:/bin/false
+* Closing connection 0
+```
+
+正常配置版本。
+
+```sh
+docker run -i --init -p 8030:3000 busybox:1.35.0 /bin/sh <<\EOF
+echo http://Ghost-in-the-Shell.localhost:8030
+cd /tmp
+cat <<\EOOF > index.html
+<html>
+<head><title>busybox httpd 2022</title></head>
+<body><p>HELLO Busybox Httpd</p></body>
+</html>
+EOOF
+busybox httpd -f -v -p 3000 
+EOF
+
+$ curl -sv http://Ghost-in-the-Shell.localhost:8030/etc/passwd
+*   Trying ::1:8030...
+* Connected to Ghost-in-the-Shell.localhost (::1) port 8030 (#0)
+> GET /etc/passwd HTTP/1.1
+> Host: Ghost-in-the-Shell.localhost:8030
+> User-Agent: curl/7.78.0
+> Accept: */*
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 404 Not Found
+< Date: Wed, 26 Oct 2022 08:18:42 GMT
+< Connection: close
+< Content-type: text/html
+< 
+<HTML><HEAD><TITLE>404 Not Found</TITLE></HEAD>
+<BODY><H1>404 Not Found</H1>
+The requested URL was not found
+</BODY></HTML>
+* Closing connection 0
+```
+
+docker compose version
+
+```sh
+docker compose -f - up <<\EOF
+services:
+  busybox:
+    image: docker.io/busybox:1.35.0
+    container_name: Ghost-in-the-Shell
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        echo http://Ghost-in-the-Shell.localhost:8030
+        cd /tmp
+        cat <<\EOOF > index.html
+        <html>
+        <head><title>busybox httpd 2022</title></head>
+        <body><p>HELLO Busybox Httpd</p></body>
+        </html>
+        EOOF
+        busybox httpd -f -v -p 3000 
+    ports:
+      - "8030:3000"
+  curl:
+    image: curlimages/curl
+    command:
+      - sh
+      - -c
+      - |
+        sleep 3
+        curl -sv http://Ghost-in-the-Shell:3000/index.html
+EOF
+```
+
 
 # TOOLs
 

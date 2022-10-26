@@ -89,12 +89,12 @@ docker run -it --entrypoint sh denoland/deno
 echo 'const resp = await fetch("http://info.cern.ch"); console.log(resp); console.log(await resp.text());' | deno run --allow-net -
 ```
 
-deno stdin and cat
+deno stdin
 
 ```sh
 docker run -it --entrypoint sh denoland/deno
 
-cat <<EOF | deno run --allow-net - 
+deno run --allow-net - <<\EOF
 const resp = await fetch("http://info.cern.ch"); 
 console.log(resp); 
 console.log(await resp.text());
