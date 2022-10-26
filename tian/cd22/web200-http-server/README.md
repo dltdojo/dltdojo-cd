@@ -2,11 +2,17 @@
 
 啟動極小 HTTP 服務，busybox httpd 約 720KB。
 
-- [busybox - Official Image | Docker Hub](https://hub.docker.com/_/busybox)
+[busybox - Official Image | Docker Hub](https://hub.docker.com/_/busybox)
+
 
 ```sh
-$ docker pull busybox:1.35.0
-$ docker run -i --init -p 8030:3000 busybox:1.35.0 /bin/sh <<\EOF
+docker pull busybox:1.35.0
+```
+
+start busybox httpd
+
+```sh
+docker run -i --init -p 8030:3000 busybox:1.35.0 /bin/sh <<\EOF
 echo http://Ghost-in-the-Shell.localhost:8030
 cat <<\EOOF > index.html
 <html>
@@ -16,8 +22,17 @@ cat <<\EOOF > index.html
 EOOF
 busybox httpd -f -v -p 3000 
 EOF
+```
 
-$ curl -sv http://Ghost-in-the-Shell.localhost:8030
+curl test
+
+```sh
+curl -sv http://Ghost-in-the-Shell.localhost:8030
+```
+
+curl result
+
+```sh
 *   Trying ::1:8030...
 * Connected to Ghost-in-the-Shell.localhost (::1) port 8030 (#0)
 > GET / HTTP/1.1
@@ -47,8 +62,15 @@ $ curl -sv http://Ghost-in-the-Shell.localhost:8030
 攻擊者通常會嘗試查找未修補的缺陷、常見端點或未受保護的文件和目錄，以獲取未經授權的訪問或系統知識。[API7:2019 Security Misconfiguration · OWASP/API-Security](https://github.com/OWASP/API-Security/blob/master/2019/en/src/0xa7-security-misconfiguration.md#api72019-security-misconfiguration)
 
 
+curl /etc/passwd
+
 ```sh
-$ curl -sv http://Ghost-in-the-Shell.localhost:8030/etc/passwd
+curl -sv http://Ghost-in-the-Shell.localhost:8030/etc/passwd
+```
+
+200 OK 
+
+```sh
 *   Trying ::1:8030...
 * Connected to Ghost-in-the-Shell.localhost (::1) port 8030 (#0)
 > GET /etc/passwd HTTP/1.1
@@ -91,8 +113,17 @@ cat <<\EOOF > index.html
 EOOF
 busybox httpd -f -v -p 3000 
 EOF
+```
 
-$ curl -sv http://Ghost-in-the-Shell.localhost:8030/etc/passwd
+curl /etc/passwd
+
+```sh
+curl -sv http://Ghost-in-the-Shell.localhost:8030/etc/passwd
+```
+
+404 Not Found
+
+```sh
 *   Trying ::1:8030...
 * Connected to Ghost-in-the-Shell.localhost (::1) port 8030 (#0)
 > GET /etc/passwd HTTP/1.1
