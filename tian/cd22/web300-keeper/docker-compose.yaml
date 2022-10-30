@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  we_do_not_trust_the_keepers_of_the_databases:
+    build: .
+    command: 
+      - /bin/sh
+      - -c 
+      - |
+        bitcoin-cli --version
+        bitcoind -regtest -daemon
+        sleep 3
+        bitcoin-cli -chain=regtest getnetworkinfo
+        sleep 3
+        
