@@ -1,0 +1,224 @@
+Attaching to bitcoin101-bitcoin-cli-1, bitcoin101-bitcoin-srv-1, bitcoin101-curl-1, bitcoin101-deno-1
+bitcoin101-bitcoin-cli-1  | 
+bitcoin101-bitcoin-srv-1  | 
+bitcoin101-bitcoin-srv-1  | Bitcoin Core RPC client version v23.0.0
+bitcoin101-bitcoin-srv-1  | Copyright (C) 2009-2022 The Bitcoin Core developers
+bitcoin101-bitcoin-srv-1  | 
+bitcoin101-bitcoin-srv-1  | Please contribute if you find Bitcoin Core useful. Visit
+bitcoin101-bitcoin-srv-1  | <https://bitcoincore.org/> for further information about the software.
+bitcoin101-bitcoin-srv-1  | The source code is available from <https://github.com/bitcoin/bitcoin>.
+bitcoin101-bitcoin-srv-1  | 
+bitcoin101-bitcoin-srv-1  | This is experimental software.
+bitcoin101-bitcoin-srv-1  | Distributed under the MIT software license, see the accompanying file COPYING
+bitcoin101-bitcoin-srv-1  | or <https://opensource.org/licenses/MIT>
+bitcoin101-bitcoin-srv-1  | Bitcoin Core starting
+bitcoin101-bitcoin-srv-1  | {
+bitcoin101-bitcoin-srv-1  |   "version": 230000,
+bitcoin101-bitcoin-srv-1  |   "subversion": "/Satoshi:23.0.0/",
+bitcoin101-bitcoin-srv-1  |   "protocolversion": 70016,
+bitcoin101-bitcoin-srv-1  |   "localservices": "0000000000000409",
+bitcoin101-bitcoin-srv-1  |   "localservicesnames": [
+bitcoin101-bitcoin-srv-1  |     "NETWORK",
+bitcoin101-bitcoin-srv-1  |     "WITNESS",
+bitcoin101-bitcoin-srv-1  |     "NETWORK_LIMITED"
+bitcoin101-bitcoin-srv-1  |   ],
+bitcoin101-bitcoin-srv-1  |   "localrelay": true,
+bitcoin101-bitcoin-srv-1  |   "timeoffset": 0,
+bitcoin101-bitcoin-srv-1  |   "networkactive": true,
+bitcoin101-bitcoin-srv-1  |   "connections": 0,
+bitcoin101-bitcoin-srv-1  |   "connections_in": 0,
+bitcoin101-bitcoin-srv-1  |   "connections_out": 0,
+bitcoin101-bitcoin-srv-1  |   "networks": [
+bitcoin101-bitcoin-srv-1  |     {
+bitcoin101-bitcoin-srv-1  |       "name": "ipv4",
+bitcoin101-bitcoin-srv-1  |       "limited": false,
+bitcoin101-bitcoin-srv-1  |       "reachable": true,
+bitcoin101-bitcoin-srv-1  |       "proxy": "",
+bitcoin101-bitcoin-srv-1  |       "proxy_randomize_credentials": false
+bitcoin101-bitcoin-srv-1  |     },
+bitcoin101-bitcoin-srv-1  |     {
+bitcoin101-bitcoin-srv-1  |       "name": "ipv6",
+bitcoin101-bitcoin-srv-1  |       "limited": false,
+bitcoin101-bitcoin-srv-1  |       "reachable": true,
+bitcoin101-bitcoin-srv-1  |       "proxy": "",
+bitcoin101-bitcoin-srv-1  |       "proxy_randomize_credentials": false
+bitcoin101-bitcoin-srv-1  |     },
+bitcoin101-bitcoin-srv-1  |     {
+bitcoin101-bitcoin-srv-1  |       "name": "onion",
+bitcoin101-bitcoin-srv-1  |       "limited": true,
+bitcoin101-bitcoin-srv-1  |       "reachable": false,
+bitcoin101-bitcoin-srv-1  |       "proxy": "",
+bitcoin101-bitcoin-srv-1  |       "proxy_randomize_credentials": false
+bitcoin101-bitcoin-srv-1  |     },
+bitcoin101-bitcoin-srv-1  |     {
+bitcoin101-bitcoin-srv-1  |       "name": "i2p",
+bitcoin101-bitcoin-srv-1  |       "limited": true,
+bitcoin101-bitcoin-srv-1  |       "reachable": false,
+bitcoin101-bitcoin-srv-1  |       "proxy": "",
+bitcoin101-bitcoin-srv-1  |       "proxy_randomize_credentials": false
+bitcoin101-bitcoin-srv-1  |     },
+bitcoin101-bitcoin-srv-1  |     {
+bitcoin101-bitcoin-srv-1  |       "name": "cjdns",
+bitcoin101-bitcoin-srv-1  |       "limited": true,
+bitcoin101-bitcoin-srv-1  |       "reachable": false,
+bitcoin101-bitcoin-srv-1  |       "proxy": "",
+bitcoin101-bitcoin-srv-1  |       "proxy_randomize_credentials": false
+bitcoin101-bitcoin-srv-1  |     }
+bitcoin101-bitcoin-srv-1  |   ],
+bitcoin101-bitcoin-srv-1  |   "relayfee": 0.00001000,
+bitcoin101-bitcoin-srv-1  |   "incrementalfee": 0.00001000,
+bitcoin101-bitcoin-srv-1  |   "localaddresses": [
+bitcoin101-bitcoin-srv-1  |   ],
+bitcoin101-bitcoin-srv-1  |   "warnings": ""
+bitcoin101-bitcoin-srv-1  | }
+bitcoin101-bitcoin-cli-1  | {
+bitcoin101-bitcoin-cli-1  |   "name": "wallet101",
+bitcoin101-bitcoin-cli-1  |   "warning": ""
+bitcoin101-bitcoin-cli-1  | }
+bitcoin101-bitcoin-cli-1  | [
+bitcoin101-bitcoin-cli-1  |   "481e4a98442baf8a3cc2e3d6361342bc4418ef25eaa26c5a08baceef048c56f3",
+bitcoin101-bitcoin-cli-1  |   "3c447d1ac29d2098de7334a8ea5e2d4e7bc6f20f8c031f45250a60e04d01122e",
+bitcoin101-bitcoin-cli-1  |   "230a65096585577d907c2177dda7948f85e2b487fe285f8cd3da38b14e8f3d49",
+bitcoin101-bitcoin-cli-1  |   "60ba21f9ad13bc5adc35fa7c29f773b04386dfcb1f54772242bc3933a0823f07",
+bitcoin101-bitcoin-cli-1  |   "0cc09626eb5edefafc9bc2ceea84a450257d6735005b9e76cac34d9b6ce846ae",
+bitcoin101-bitcoin-cli-1  |   "123b6d4d0a3f4c85a0137714641229e6e55478ab01c263176d8ac3ced729857e",
+bitcoin101-bitcoin-cli-1  |   "40cc1ebeb39cc268a6f8a2ff2e0da32d8b68cc6e3f84826c75fb51cb9dfe708a",
+bitcoin101-bitcoin-cli-1  |   "747ac1eb052b843948051d163a94daaa827cf4cefdf87e967ba1239b0b5f6bb2",
+bitcoin101-bitcoin-cli-1  |   "3a4ccda4689492f98643ff85c42ee22b51144bb30df985ee7743710cf81e7539",
+bitcoin101-bitcoin-cli-1  |   "66de4ee1b0971a6ee36b95dbef998062da0bd05f3aab1f649ba270131e70ebca",
+bitcoin101-bitcoin-cli-1  |   "2c31b2e6d606754fd5762c311ff60dfad65e30014822d0e7594f84c472e2e710",
+bitcoin101-bitcoin-cli-1  |   "63987a9fa7c33ad538bc2d0b27a460a5a4d17b796783909bfda2675ced05a300",
+bitcoin101-bitcoin-cli-1  |   "41c06192ab9e34d9e169c77408146ab7d8b9719d1a5904be52f43e1f2d698bad",
+bitcoin101-bitcoin-cli-1  |   "6073fd1527b418b004e2eeb81d9106f3e6926938d822a8ac85edd44c082ecf02",
+bitcoin101-bitcoin-cli-1  |   "165da9530a3cb30803820a40ce6b1720f99873374f80e9b81ca6173695136762",
+bitcoin101-bitcoin-cli-1  |   "15b872464be262ff65b6255b21f350df2fc274f3f9131e06e418c3cd0b214a69",
+bitcoin101-bitcoin-cli-1  |   "3cfd6875da79a5b5f24fac73d25df6a06bdb5a21199514d33e5fd8793be8dc9d",
+bitcoin101-bitcoin-cli-1  |   "7de823e9267325a843c9dd7ad4aceef37c841eea0fdfacaa819c9f12919e8fe1",
+bitcoin101-bitcoin-cli-1  |   "63cf72597c67751542392893cd98fdd1145f6b11345ab947b54523efb62114e3",
+bitcoin101-bitcoin-cli-1  |   "5d978b9ab88da026744554df973414352b0b262682aa5b03781bc9cf25390315",
+bitcoin101-bitcoin-cli-1  |   "7be73168e4856963fafca34c583649b89424ae8b115c06eabcca0b7eccc32925",
+bitcoin101-bitcoin-cli-1  |   "470e815d7423aa2f0b2d4426930355913abe5718cb0a0615b6a89184274ca782",
+bitcoin101-bitcoin-cli-1  |   "0e4742108be6570cda70178c21b936eb15fb08b8b18a4df4265a3923b15a0b8e",
+bitcoin101-bitcoin-cli-1  |   "5e0eaa4213fd7526060c2bc3f71924376e8c3a865c48d3fc9078a42c28369115",
+bitcoin101-bitcoin-cli-1  |   "4806eef1bd0890d5cd9a51d5bff6acc23fc332b146080da064e651e6d7c71639",
+bitcoin101-bitcoin-cli-1  |   "62edf46226008ff379becbcb7f143ba2647df435f8e4a7d598dbd992ceb1b520",
+bitcoin101-bitcoin-cli-1  |   "5735578bf1791a785b376c57f6cbfe207aed58a74a3edfc99aa44fbd37408bb7",
+bitcoin101-bitcoin-cli-1  |   "1b248acc60af5be8b9b4826ca8ede1f045cb54ff6560eef95399a9e97a2a28d2",
+bitcoin101-bitcoin-cli-1  |   "788e36c9a9fb16d827c5760f38b1a28019aab8f9429cf398fdba5ad58fd3ee25",
+bitcoin101-bitcoin-cli-1  |   "27fcfa79bc3c775432abaa825dc25d8dbe96bf150d347891a5bd3d7e68f60c02",
+bitcoin101-bitcoin-cli-1  |   "2ba8540404a72030727b8143b67b2acaf76e2ba15d93fffb34dab35d5e98d5d2",
+bitcoin101-bitcoin-cli-1  |   "11dc4aba7ce401ea35a35ab05ff66071ced705ac080eec4a05fbce51127b9f76",
+bitcoin101-bitcoin-cli-1  |   "69047884a4472633049a479a5aee3adadb301554a55da99f44cb4eb92ee80f1f",
+bitcoin101-bitcoin-cli-1  |   "36d992d7cc84f7562ae24d5d0bca59189070671f7edf5cc8bb983859f75ba323",
+bitcoin101-bitcoin-cli-1  |   "3f2223357ba408badd08730b153f46f4f51061a7eebd467e440e120d4d347330",
+bitcoin101-bitcoin-cli-1  |   "6c3b83f578019fff8346bb5b6f2bcf437ea3432a5db4b7219b8c61235849931f",
+bitcoin101-bitcoin-cli-1  |   "3fb4c71ffefcafea9a3ac8fe8ae00569fb6ff038d3a8dc542adb703a525b3a99",
+bitcoin101-bitcoin-cli-1  |   "59bd280bf446f96521af0c590b60bca48acf815560604bbe8897ce5eaa5a7c1c",
+bitcoin101-bitcoin-cli-1  |   "0d7316d171ee9f79c31dcbe9b5975d2aeac5335d02da1bf1ecf9a24bb9ef6a6e",
+bitcoin101-bitcoin-cli-1  |   "515b0c7e6f13b5b6a5aa3a94e4ea82fbbaefa2370523516299c9ad85b51cadf1",
+bitcoin101-bitcoin-cli-1  |   "3c85458cc8153ac88375d08a56b438df35328a51fbe8169a7eb8a2d346858b6b",
+bitcoin101-bitcoin-cli-1  |   "2a8cb5b7a7e3f9738c031fdc02a938329aa0fdcc15ebb3e3965f4b654d14fa1e",
+bitcoin101-bitcoin-cli-1  |   "0be405198e8225c3b6850242c9599edebf8d30591e31058406835bf4de35c1f2",
+bitcoin101-bitcoin-cli-1  |   "63a726d7e79a474236ee4b4bb538fbc667a6f5826e8998937ac8d14c2cbf6458",
+bitcoin101-bitcoin-cli-1  |   "46575116f27c41fec6346dbc85513e775420b329d3aea34642653c5e68d4f558",
+bitcoin101-bitcoin-cli-1  |   "247f6ee3f2e042440eff48fd79476a8236d9482aeb625c8e18d8c5f1f4011cf8",
+bitcoin101-bitcoin-cli-1  |   "549db085922e8b208e7dfb36147d0d622db2c124e653a9f5f5d4e0c63e4aca31",
+bitcoin101-bitcoin-cli-1  |   "5d05f7296f8a1e24660bd2c5d5f92f88f8ebb688bc4c1f81168dcd53149d9fdf",
+bitcoin101-bitcoin-cli-1  |   "08e15e18ccaa2995fd1f1c9b706c2665b48dac5776a03100b4da34b8d2b966bf",
+bitcoin101-bitcoin-cli-1  |   "429ac2b571335bff73b88502a1137f7ad1129968a5c6ccb79155a70df90f4d54",
+bitcoin101-bitcoin-cli-1  |   "3880f8531ace02b810759823119d325833a881821d6c0e508aa6a752704c86f1",
+bitcoin101-bitcoin-cli-1  |   "010fb98d0ed2013fb9e50ea97157eabcb7eab6756c4deee260039a7a7e8b9655",
+bitcoin101-bitcoin-cli-1  |   "28680192a40d20b4d1fee30c7cf44f6d898c569306b3abe38e7d5006c25818f6",
+bitcoin101-bitcoin-cli-1  |   "1fa6c026984201026db399b673075cd2d7cc188972616c928404f9b22fa0a3b3",
+bitcoin101-bitcoin-cli-1  |   "112d1ecef22fbc7b70a2ee36449e329eef21e62f8f2c56ef4d9001efbcbe984e",
+bitcoin101-bitcoin-cli-1  |   "33ec01f65fa708118771f1c2e319a51c778286c0a14d36562211d2e9abde916a",
+bitcoin101-bitcoin-cli-1  |   "16d0adc9a107493feb7cb0dff12b7ebcd1f0e1bf3f99fe2dcaa532d66dfb9170",
+bitcoin101-bitcoin-cli-1  |   "7202a1060134cea0d776888c1447771fd43bf1e44f6481ca1ba0057417401bdb",
+bitcoin101-bitcoin-cli-1  |   "5cc307b63381d44fc0d869f1c152a895e755dd03360efd1cb5aa6a383a6dc509",
+bitcoin101-bitcoin-cli-1  |   "022234fec45578d54b5f8a442b3037988545d67a8a8276f87ef844600d47e1f1",
+bitcoin101-bitcoin-cli-1  |   "453f50b98a18353ecbd08bff84bb7be1f88b7b3502f8a18ce6720c5e0812ee9f",
+bitcoin101-bitcoin-cli-1  |   "75abcfa4e88d5cac6f0d2e72055b898fa912d6fbf2faed59d82c6bc5aeb81cec",
+bitcoin101-bitcoin-cli-1  |   "4a5c19851d263abbe829c65f9d11c29e979a6fe021ba6edf79053d8d994ebc8c",
+bitcoin101-bitcoin-cli-1  |   "419c49e947ff46fa7994391cb9cac8640160c90318e988d57d4942a06c09c58b",
+bitcoin101-bitcoin-cli-1  |   "17d5897271f0c5a7f68a2735300cdc8019b94d36c643aea2999ead6006745375",
+bitcoin101-bitcoin-cli-1  |   "1163d7a7cc0220eeea5e9dbf38a88865c2a7e5b3a7cd711a33c91ebc7e4b6d74",
+bitcoin101-bitcoin-cli-1  |   "7c30e3aa58d20bc1f115e99d464b8313bbee5b99c2564be9e46c2845868f2469",
+bitcoin101-bitcoin-cli-1  |   "17b5042c7e01e46a48ef250a45bbd908bb9dfdc1c265d039ed31b865abc2936a",
+bitcoin101-bitcoin-cli-1  |   "391b28b6770efb024403c2ce87ff7a019707802f21c2bbb8f08d5bd9a101fc92",
+bitcoin101-bitcoin-cli-1  |   "17d3b592dec27ac92e54061d8b64ccf96a1eac6b89868dd70fc1b488d42679f7",
+bitcoin101-bitcoin-cli-1  |   "7f31dcaad8926b5cc88c3b9b33a0de6d24da96f8e18bd28b03162bbd5eabf973",
+bitcoin101-bitcoin-cli-1  |   "6c571f16c1aafa8cb593e461d17f5048802f2a656f52d046f6395f2efbc3a1d4",
+bitcoin101-bitcoin-cli-1  |   "61de4db695000ce4115de62f1222ab354ad2c95dba84d2148b5d6de3b40ef81e",
+bitcoin101-bitcoin-cli-1  |   "0e21f00883b12168077afb3f999a080cc9868c867d4ca981d10cac3f3cdf105f",
+bitcoin101-bitcoin-cli-1  |   "443baa744323773c9e91c2e5854214f689d5c69179807c5a51f4a7839b8a541c",
+bitcoin101-bitcoin-cli-1  |   "21f2850fdd44f6a5d1c14ca9441a7afcf9ffa5e0ba6404003f26c3186e80cfa7",
+bitcoin101-bitcoin-cli-1  |   "65290adb23afe9f70a77588f208cde4a17b95a3727b3d7e5b8b15d7619fe8677",
+bitcoin101-bitcoin-cli-1  |   "0e56b0517e0f39ab94ca25bb318c84bd48eea158e122c8a6245a7c288783847b",
+bitcoin101-bitcoin-cli-1  |   "570aefa31d1b4c65fc28ad13cbbbf1a3f2ddb808135915941d8894151ace49f9",
+bitcoin101-bitcoin-cli-1  |   "4cf428edddfdb61a126e4ced5486f6501bf3e7659619a3ed202627fddd9cb82e",
+bitcoin101-bitcoin-cli-1  |   "022a44db194ad5126ee5e574b5621645b9f40621c57900edd179136c346ce797",
+bitcoin101-bitcoin-cli-1  |   "4d1f0f90786db067a96dee95211e57d79e72a1c7f793d7919ccc54153ad41221",
+bitcoin101-bitcoin-cli-1  |   "2f6f22d7eded0c1bb720c840ba619bbbc339940c4fc51d029c7d6a785dddf8f1",
+bitcoin101-bitcoin-cli-1  |   "72af3ff012ef4c49d51b2b96682d25547ee40669ed0b4e720f50b87fef8af922",
+bitcoin101-bitcoin-cli-1  |   "3ae4712bf9dca3e64c6387ddb57d0abce0321bd302f3782cd4238271a185fc9b",
+bitcoin101-bitcoin-cli-1  |   "4096585df0704810de6c9acfd3434d394ca4be803ce2b683e1115f9199f5b4cf",
+bitcoin101-bitcoin-cli-1  |   "398c622981ec67104a538dd33efe8d57a472ab67788bfea7ba04ec94b7d8558d",
+bitcoin101-bitcoin-cli-1  |   "15362755b38456e7d74e8da73d148bb7a796a843108317baeae71071693a873f",
+bitcoin101-bitcoin-cli-1  |   "213c9db97cef0ec24b2548c7f97a25707d69d12a3ba782335afa9f5548c8028e",
+bitcoin101-bitcoin-cli-1  |   "18e1f812412ba8adca45b683109be119473e9d1c1540aeffcb18edb5ef7798d2",
+bitcoin101-bitcoin-cli-1  |   "3a19857c4c62207c2b803c53f7421993c4cb78422e30378f2ce7544d0f9d12f2",
+bitcoin101-bitcoin-cli-1  |   "29e552f3e94cdcc70b9623ec3318eb406458a7603ab8f9a38115ce43e3d8641b",
+bitcoin101-bitcoin-cli-1  |   "658ea3b5818ba995abe559045c344dd0d3143e68647b52984d7d6b6ad5730fdd",
+bitcoin101-bitcoin-cli-1  |   "5a705f51de1b48cd5edd7a601236009b58d995a54350e738f55173c57a49bc68",
+bitcoin101-bitcoin-cli-1  |   "14d9271f1b455a1e93291320e7de22635570172bea69716bbd91393c24c05d85",
+bitcoin101-bitcoin-cli-1  |   "4cdcb1a9414d029c42dc3a0bc244c724a3969bd9855f66941cd4b978f157a621",
+bitcoin101-bitcoin-cli-1  |   "580259bcc8e60d5babdf7bc4fdfb07782eeb1ed512cc85139e623c7ca2d88435",
+bitcoin101-bitcoin-cli-1  |   "445bce46ecb77087823c31e34be993db732f91570d1077365da79f3e5fda7e09",
+bitcoin101-bitcoin-cli-1  |   "11a6517bf3461d7951d2856491c1751c7b7769095d03e3a116dbb9db0d3ea56f",
+bitcoin101-bitcoin-cli-1  |   "1b9c40ea99cb39b81f29c57732c236f1fb8fd4b4623cee7aa75397e40ad33a4e",
+bitcoin101-bitcoin-cli-1  |   "7a5fc5dae4ca724086cec5306f8526b05976bb4fadc590ada525948eb3b6d091"
+bitcoin101-bitcoin-cli-1  | ]
+bitcoin101-bitcoin-cli-1  | 50.00000000
+bitcoin101-bitcoin-cli-1  | {
+bitcoin101-bitcoin-cli-1  |   "walletname": "wallet101",
+bitcoin101-bitcoin-cli-1  |   "walletversion": 169900,
+bitcoin101-bitcoin-cli-1  |   "format": "sqlite",
+bitcoin101-bitcoin-cli-1  |   "balance": 50.00000000,
+bitcoin101-bitcoin-cli-1  |   "unconfirmed_balance": 0.00000000,
+bitcoin101-bitcoin-cli-1  |   "immature_balance": 5000.00000000,
+bitcoin101-bitcoin-cli-1  |   "txcount": 101,
+bitcoin101-bitcoin-cli-1  |   "keypoolsize": 4000,
+bitcoin101-bitcoin-cli-1  |   "keypoolsize_hd_internal": 4000,
+bitcoin101-bitcoin-cli-1  |   "paytxfee": 0.00000000,
+bitcoin101-bitcoin-cli-1  |   "private_keys_enabled": true,
+bitcoin101-bitcoin-cli-1  |   "avoid_reuse": false,
+bitcoin101-bitcoin-cli-1  |   "scanning": false,
+bitcoin101-bitcoin-cli-1  |   "descriptors": true,
+bitcoin101-bitcoin-cli-1  |   "external_signer": false
+bitcoin101-bitcoin-cli-1  | }
+bitcoin101-bitcoin-cli-1 exited with code 0
+bitcoin101-curl-1         | *   Trying 172.22.0.5:18444...
+bitcoin101-curl-1         | * Connected to bitcoin-srv (172.22.0.5) port 18444 (#0)
+bitcoin101-curl-1         | * Server auth using Basic with user 'foo'
+bitcoin101-curl-1         | > POST / HTTP/1.1
+bitcoin101-curl-1         | > Host: bitcoin-srv:18444
+bitcoin101-curl-1         | > Authorization: Basic Zm9vOnFERFpkZVE1dnc5WFhGZVZuWFQ0UFotLXRHTjJ4TmpqUjRucnR5c3paeDA9
+bitcoin101-curl-1         | > User-Agent: curl/7.86.0-DEV
+bitcoin101-curl-1         | > Accept: */*
+bitcoin101-curl-1         | > content-type: text/plain;
+bitcoin101-curl-1         | > Content-Length: 80
+bitcoin101-curl-1         | > 
+bitcoin101-curl-1         | } [80 bytes data]
+bitcoin101-curl-1         | * Mark bundle as not supporting multiuse
+bitcoin101-curl-1         | < HTTP/1.1 200 OK
+bitcoin101-curl-1         | < Content-Type: application/json
+bitcoin101-curl-1         | < Date: Tue, 01 Nov 2022 09:21:44 GMT
+bitcoin101-curl-1         | < Content-Length: 52
+bitcoin101-curl-1         | < 
+bitcoin101-curl-1         | { [52 bytes data]
+bitcoin101-curl-1         | {"result":50.00000000,"error":null,"id":"curltest"}
+bitcoin101-curl-1         | * Connection #0 to host bitcoin-srv left intact
+bitcoin101-curl-1 exited with code 0
+bitcoin101-deno-1         | { result: 50, error: null, id: "5824" }
+bitcoin101-deno-1 exited with code 0
+Gracefully stopping... (press Ctrl+C again to force)
