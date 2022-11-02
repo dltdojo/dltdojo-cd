@@ -8,13 +8,18 @@ version: "3.8"
 services:
   bitcoin-srv:
     image: docker.io/ruimarinho/bitcoin-core:23
+    #
+    # https://github.com/ruimarinho/docker-bitcoin-core/issues/24
+    #
     command: 
       - /bin/sh
       - -c 
       - |
+        hostname -i
+        echo $(hostname -i)/16
         bitcoin-cli --version
         # bitcoind -regtest -daemon
-        bitcoind -printtoconsole -regtest -daemon -rpcport=18444 -rpcbind=0.0.0.0 -rpcallowip=172.0.0.0/8 -rpcauth='foo:7d9ba5ae63c3d4dc30583ff4fe65a67e$9e3634e81c11659e3de036d0bf88f89cd169c1039e6e09607562d54765c649cc'
+        bitcoind -printtoconsole -regtest -daemon -rpcport=18444 -rpcbind=0.0.0.0 -rpcallowip=$(hostname -i)/16 -rpcauth='foo:7d9ba5ae63c3d4dc30583ff4fe65a67e$9e3634e81c11659e3de036d0bf88f89cd169c1039e6e09607562d54765c649cc'
         sleep 3
         bitcoin-cli -regtest -rpcport=18444 -rpcuser=foo -rpcpassword="qDDZdeQ5vw9XXFeVnXT4PZ--tGN2xNjjR4nrtyszZx0=" getnetworkinfo
         sleep 300
@@ -54,22 +59,30 @@ services:
       - |
         sleep 20
         deno run --allow-net - <<\EOF
-        async function jsonrpc(id: string, url: string, method: string, params: unknown[]){
-            const data = { jsonrpc: '1.0', id, method , params};
+        export type JsonRpcRequest = { id: string; method: string; params: unknown[] }
+        export type JsonRpcResponse = { id: string; result: unknown; error: unknown }
+        const jsonrpc = async (url: string, v: JsonRpcRequest) : Promise<JsonRpcResponse> => {
+            const data = { jsonrpc: '1.0', ...v };
             const body = JSON.stringify(data);
-            const postOpt = { method: 'POST',body, 
+            const postOpt = {
+                method: 'POST', body,
                 headers: new Headers({
                     'Content-Type': 'application/json'
                 })
             }
-            const jsonResponse = await fetch(url, postOpt);
-            return await jsonResponse.json();
+            const result = await fetch(url, postOpt).then((res) => {
+                return res.json();
+            });
+            return result;
         }
-
-        const id = Math.floor(Math.random() * 10000).toString();
-        const url = "http://foo:qDDZdeQ5vw9XXFeVnXT4PZ--tGN2xNjjR4nrtyszZx0=@bitcoin-srv:18444/";
-        const result = await jsonrpc(id, url, "getbalance" , ["*", 6]);
-        console.log(result);
+        const url = "http://foo:qDDZdeQ5vw9XXFeVnXT4PZ--tGN2xNjjR4nrtyszZx0=@localhost:18444/";
+        const req = {
+            id: Math.floor(Math.random() * 10000).toString(),
+            method: 'getbalance',
+            params: ["*", 6]
+        }
+        const x = await jsonrpc(url, req);
+        console.log(x.result);
         EOF
 EOOF
 ```
