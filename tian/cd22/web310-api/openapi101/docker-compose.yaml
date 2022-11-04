@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  box101:
+    build:
+      context: .
+      target: BUSYBOX
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /opt/webroot/api-ui/
+        busybox httpd -f -v -p 3000
+    ports:
+      - "8300:3000"
+  deno101:
+    build:
+      context: .
+      target: DENO
+    command:
+      - /bin/sh
+      - -c
+      - |
+        env
+        sed -i "s|https://petstore.swagger.io/v2/swagger.json|spec-deno.json|g" /opt/webroot/api-ui/swagger-initializer.js
+        cd /opt/webroot/api-ui/
+        ls -al /usr/local/bin
+        deno run --allow-net --allow-env /tmp/api101.ts > /opt/webroot/api-ui/spec-deno.json
+        file_server .
+    ports:
+      - "8310:4507"

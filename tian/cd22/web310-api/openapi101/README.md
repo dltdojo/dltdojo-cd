@@ -24,7 +24,7 @@
 
 # Plantuml
 
-```
+```puml
 @startuml
 participant Bob
 actor Alice
