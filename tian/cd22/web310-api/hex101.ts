@@ -1,88 +1,3 @@
-// deno-lint-ignore no-unused-vars
-const DOC = `
-# hex story
-
-## bitcoin
-
-- https://github.com/search?l=TypeScript&q=org%3Abitcoinjs+hex&type=Code
-- @bitauth/libauth uses BigInt, WebAssembly, and es2017 features
-  - https://github.com/bitauth/libauth/search?l=TypeScript&q=hex
-  - https://github.com/bitauth/libauth/blob/b0ee146/src/lib/format/hex.ts#L37
-
-## ethereum
-
-- https://github.com/search?l=TypeScript&q=org%3Aethereum+hex&type=Code
-- https://github.com/ethereum/js-ethereum-cryptography/search?q=hex
-- https://github.com/search?q=org%3Aethereumjs+hex&type=code
-- noble-sepc256k1
-  - Switch to more secure & faster secp256k1 library, shave-off 90kb https://github.com/ethereum/js-ethereum-cryptography/issues/5
-  - https://github.com/paulmillr/noble-secp256k1/search?l=TypeScript&q=hex
-- https://github.com/search?l=TypeScript&q=org%3AOpenZeppelin+hex&type=Code
-- https://github.com/search?l=TypeScript&p=1&q=org%3Atrufflesuite+hex&type=Code
-- https://github.com/search?l=TypeScript&q=org%3ANomicFoundation+hex&type=Code
-- https://github.com/distributed-ledger-technology/web3/search?q=hex
-
-## polkadot
-
-- https://github.com/search?l=TypeScript&q=org%3Aparitytech+hex&type=Code
-- https://github.com/search?l=TypeScript&q=org%3Apolkadot-js+hex&type=Code
-- from @noble/secp256k1
-  - https://github.com/polkadot-js/common/blob/225c250634614e506cfd1bc8899284e6c7341862/packages/util-crypto/src/secp256k1/sign.ts#L31
-- capi
-  - https://deno.land/x/capi@v0.1.0-beta.17/util/hex.ts?s=encode
-
-
-## cosmos/line
-
-- https://github.com/search?l=TypeScript&q=org%3Acosmos+hex&type=code
-- https://github.com/search?l=JavaScript&q=org%3Aline+hex&type=Code
-
-## deno 
-
-- https://medium.com/deno-the-complete-reference/deno-nuggets-encode-decode-hex-string-ca990ce60217
-
-## google
-
-- https://github.com/search?l=TypeScript&q=org%3Agoogleapis+hex&type=Code
-- google-auth-library-nodejs
-  - non-exported crypto module https://github.com/googleapis/google-auth-library-nodejs/blob/883cf2596664b7de8159fb29a8f16705218a2ad4/src/index.ts
-  - fromArrayBufferToHex() https://github.com/googleapis/google-auth-library-nodejs/blob/883cf2596664b7de8159fb29a8f16705218a2ad4/src/crypto/crypto.ts#L96
-
-
-## microsoft azure
-
-- https://github.com/search?l=TypeScript&q=org%3AAzure+hex&type=Code
-- https://github.com/Azure/azure-sdk-for-js/blob/c0db437d6df024d945918983e55616a21fce207f/sdk/core/core-util/src/hex.ts#L9
-- https://github.com/Azure/azure-sdk-for-js/blob/8f72772736c27ae66120a71f1565b896f35bebf0/sdk/keyvault/keyvault-keys/test/public/utils/crypto.ts#L33
-
-## facebook
-
-- https://github.com/search?l=TypeScript&q=org%3Afacebook+hex&type=Code
-
-## twitter
-
-- https://github.com/search?q=org%3Atwitterdev+hex&type=code
-
-## amazon
-
-- https://github.com/search?l=TypeScript&q=org%3Aamzn+hex&type=Code
-
-## Shopify
-
-- https://github.com/search?l=TypeScript&q=org%3AShopify+hex&type=Code
-- https://github.com/discord/discord-interactions-js/blob/c86bf337a0589ec5d91ea58b33e4036baf89b7d5/src/index.ts#L82
-
-## discord
-
-- https://github.com/search?l=TypeScript&q=org%3Adiscord+hex&type=Code
-
-## solana
-
-- https://github.com/search?l=TypeScript&q=org%3Asolana-labs+hex&type=Code
-- https://github.com/solana-labs/solana-web3.js/search?q=hex
-
-
-`;
 //
 // deno
 // std/encoding/hex.ts
@@ -96,8 +11,9 @@ import chai from "https://esm.sh/chai@4.3.6";
 const te = (s: string) => new TextEncoder().encode(s),
   td = (d: Uint8Array) => new TextDecoder().decode(d);
 
-const data = "Dltdojo is awesome";
-const dataBuf = new Uint8Array([
+const TheStr = "Dltdojo is awesome";
+const TheHex = "446c74646f6a6f20697320617765736f6d65";
+const TheBuf = new Uint8Array([
   68,
   108,
   116,
@@ -117,10 +33,10 @@ const dataBuf = new Uint8Array([
   109,
   101,
 ]);
-const hexstrDenoStd = td(he(te(data)));
-assertEquals(hexstrDenoStd, "446c74646f6a6f20697320617765736f6d65");
-assertEquals(hd(te(hexstrDenoStd)), dataBuf);
-assertEquals(td(hd(te(hexstrDenoStd))), data);
+const hexstrDenoStd = td(he(te(TheStr)));
+assertEquals(hexstrDenoStd, TheHex);
+assertEquals(hd(te(hexstrDenoStd)), TheBuf);
+assertEquals(td(hd(te(hexstrDenoStd))), TheStr);
 
 //
 // polkadot-js/util/mod.ts
@@ -138,12 +54,17 @@ import {
   stringToHex,
 } from "https://deno.land/x/polkadot@0.2.13/util/mod.ts";
 
-const hexstrPolkadotJs = stringToHex(data);
+const hexstrPolkadotJs = stringToHex(TheStr);
 assertEquals(hexstrPolkadotJs, "0x446c74646f6a6f20697320617765736f6d65");
-assertEquals(hexToU8a(hexstrPolkadotJs), dataBuf);
+assertEquals(hexToU8a(hexstrPolkadotJs), TheBuf);
 const hexnum = numberToHex(1000);
 assertEquals(hexnum, "0x03e8");
 assertEquals(hexToNumber(hexnum), 1000);
+
+
+// 也可以直接匯入使用
+import {hexToU8a as hexToU8aDirect} from 'https://raw.githubusercontent.com/polkadot-js/build-deno.land/e52d6e8c5f5dbc912034db045e8470bf25838c96/util/hex/toU8a.ts';
+assertEquals(hexToU8aDirect(hexstrPolkadotJs), TheBuf);
 
 //
 // polkadot capi
@@ -155,12 +76,12 @@ import {
   encode as capiHexEncode,
 } from "https://deno.land/x/capi@v0.1.0-beta.17/util/hex.ts";
 chai.assert.equal(
-  capiHexEncode(dataBuf),
-  "446c74646f6a6f20697320617765736f6d65",
+  capiHexEncode(TheBuf),
+  TheHex,
 );
 chai.assert.deepEqual(
-  capiHexDecode("446c74646f6a6f20697320617765736f6d65"),
-  dataBuf,
+  capiHexDecode(TheHex),
+  TheBuf,
 );
 
 //
@@ -177,11 +98,11 @@ chai.assert.deepEqual(
 import Web3 from "https://deno.land/x/web3@v0.11.1/mod.ts";
 // https://www.chaijs.com/api/assert/
 // import chai from "https://cdn.skypack.dev/chai@4.3.4?dts";
-const hexstrEthWeb3 = Web3.utils.stringToHex(data);
+const hexstrEthWeb3 = Web3.utils.stringToHex(TheStr);
 chai.assert.equal(hexstrEthWeb3, "0x446c74646f6a6f20697320617765736f6d65");
 chai.assert.deepEqual(
   Web3.utils.hexToBytes(hexstrEthWeb3),
-  Array.from(dataBuf),
+  Array.from(TheBuf),
 );
 const hexnum3 = Web3.utils.numberToHex(1000);
 chai.assert.equal(hexnum3, "0x3e8");
@@ -196,6 +117,30 @@ import {
   hexToBin,
 } from "https://unpkg.com/@bitauth/libauth@1.19.1/build/module/index.js";
 
-const hexstrBitauth = binToHex(dataBuf);
-chai.assert.equal(hexstrBitauth, "446c74646f6a6f20697320617765736f6d65");
-chai.assert.deepEqual(hexToBin(hexstrBitauth), dataBuf);
+const hexstrBitauth = binToHex(TheBuf);
+chai.assert.equal(hexstrBitauth, TheHex);
+chai.assert.deepEqual(hexToBin(hexstrBitauth), TheBuf);
+
+import {hexToBin as hexToBinDirect} from 'https://raw.githubusercontent.com/bitauth/libauth/b0ee146ce4682f73307057d8109b3c76114381c2/src/lib/format/hex.ts';
+chai.assert.deepEqual(hexToBinDirect(TheHex), TheBuf);
+
+// cosmjs
+import { fromHex as fromHexCosmjs } from 'https://raw.githubusercontent.com/cosmos/cosmjs/2c3b27eeb3622a6108086267ba6faf3984251be3/packages/encoding/src/hex.ts';
+chai.assert.deepEqual(fromHexCosmjs(TheHex), TheBuf);
+
+// multiformats
+import {toHex as toHexMultiformats, fromString as fromStringMultiformats} from 'https://raw.githubusercontent.com/multiformats/js-multiformats/af663e114e44da1554bd13e5f3fb8d428fe79035/src/bytes.js';
+chai.assert.equal(toHexMultiformats(fromStringMultiformats(TheStr)), TheHex);
+
+
+//
+// microsoft azure-sdk-for-js
+// error: Expected a JavaScript or TypeScript module, but identified a Unknown module. Importing these types of modules is currently not supported.
+//
+// import {bufferToHex as bufferToHexAzure } from 'https://github.com/Azure/azure-sdk-for-js/blob/c0db437d6df024d945918983e55616a21fce207f/sdk/core/core-util/src/hex.ts';
+// chai.assert.deepEqual(bufferToHexAzure(dataBuf), hexdata);
+
+// 
+// uniswap
+// error Relative import path "cids" not prefixed with / or ./ or ../
+// import { hexToUint8Array } from 'https://raw.githubusercontent.com/Uniswap/widgets/526fb755a3da39b51c102e587a419da7c8298c10/src/utils/contenthashToUri.ts';

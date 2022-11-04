@@ -1,0 +1,13 @@
+@startuml
+hide footbox
+participant "Local\nBusybox" as Local
+participant "Local\nDeno" as Deno
+actor Alice
+participant "Online\nPetstore" as Petstore
+autonumber 10
+Local -> Alice : swagger-ui\nport:8300
+Alice <- Petstore : swagger.json\nport:80
+autonumber 20
+Deno -> Alice : swagger-ui\nport:8310
+Deno -> Alice : spec.json\nport:8310
+@enduml

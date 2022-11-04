@@ -1,7 +1,10 @@
 @startuml
-participant Bob
+hide footbox
+participant "Local\nBusybox" as Local
 actor Alice
-
-Bob -> Alice : hello
-Alice -> Bob : Is it ok?
+participant "Online\nPetstore" as Petstore
+autonumber 10
+Local -> Alice : swagger-ui
+autonumber 20
+Alice <- Petstore : swagger.json
 @enduml
