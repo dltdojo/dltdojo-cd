@@ -1,0 +1,26 @@
+version: 3
+endpoints:
+- endpoint: "/api-spec.json"
+  output_encoding: json
+  method: GET
+  backend:
+  - host:
+    - http://boxk8s1:3000
+    method: GET
+    url_pattern: "/swagger.json"
+extra_config:
+  security/cors:
+    allow_origins:
+    - "*"
+    allow_methods:
+    - GET
+    - HEAD
+    - POST
+    expose_headers:
+    - Content-Length
+    - Content-Type
+    allow_headers:
+    - Accept-Language
+    max_age: 12h
+    allow_credentials: false
+    debug: false

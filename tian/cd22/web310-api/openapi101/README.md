@@ -331,7 +331,11 @@ Deno -> Alice : spec.json\nport:8310
 
 目標本地輸出 kubernetes openapi 的設定。
 
-- Local Busybox http http://localhost:8300
+- Local Busybox1 http http://localhost:8300
+- Local Busybox2 http http://localhost:8310
+
+![img104](g104.svg)
+
 
 編譯鏡像後調度啟動服務
 
@@ -356,7 +360,7 @@ EOF
 
 cat > /tmp/api101/docker-compose.yaml <<\EOF
 services:
-  boxk8s:
+  boxk8s1:
     image: api101-k8sapi
     command:
       - /bin/sh
@@ -366,6 +370,172 @@ services:
         busybox httpd -f -v -p 3000
     ports:
       - "8300:3000"
+  boxk8s2:
+    image: api101-k8sapi
+    command:
+      - /bin/sh
+      - -c
+      - |
+        sed -i "s|swagger.json|http://localhost:8300/swagger.json|g" /opt/webroot/api-ui/swagger-initializer.js
+        cd /opt/webroot/api-ui/
+        busybox httpd -f -v -p 3000
+    ports:
+      - "8310:3000"
 EOF
 dcup
+```
+
+上面 boxk8s2 會出現一個 CORS 錯誤。不過 busybox http 是簡單的服務，並不支援設定，參考[How to set header with busybox httpd - Server Fault](https://serverfault.com/questions/918602/how-to-set-header-with-busybox-httpd)。
+
+```text
+Possible cross-origin (CORS) issue? The URL origin (http://localhost:8300) does 
+not match the page (http://localhost:8310). Check the server returns the correct
+ 'Access-Control-Allow-*' headers.
+```
+
+
+取得 kubernets openapi swagger json 也可於 busybox 啟動後進行，只是每次啟動都拉取一次沒效率。
+
+```puml
+@startuml
+hide footbox
+participant "Local\nboxk8s1" as Local
+participant "Local\nboxk8s2" as Local2
+actor Alice
+autonumber 10
+Local -> Alice : swagger-ui\nport:8300
+Alice <- Local : kubernetes/openapi-spec/swagger.json\nport:8300
+autonumber 20
+Local2 -> Alice : swagger-ui\nport:8310
+Alice <- Local : kubernetes/openapi-spec/swagger.json\nport:8300
+@enduml
+```
+
+# task105
+
+
+- Local Busybox1 http http://localhost:8300
+- Local Busybox2 http http://localhost:8310
+- Local APIGW http http://localhost:8320
+
+![img105](g105.svg)
+
+```sh
+cat > /tmp/api101/docker-compose.yaml <<\EOF
+services:
+  boxk8s1:
+    image: api101-k8sapi
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /opt/webroot/api-ui/
+        busybox httpd -f -v -p 3000
+    ports:
+      - "8300:3000"
+  boxk8s2:
+    image: api101-k8sapi
+    command:
+      - /bin/sh
+      - -c
+      - |
+        sed -i "s|swagger.json|http://localhost:8320/api-spec.json|g" /opt/webroot/api-ui/swagger-initializer.js
+        cd /opt/webroot/api-ui/
+        busybox httpd -f -v -p 3000
+    ports:
+      - "8310:3000"
+  krakend:
+    image: devopsfaith/krakend:2.1.2
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        cat > /tmp/krakend.yaml <<\EOOF
+        version: 3
+        endpoints:
+        - endpoint: "/api-spec.json"
+          output_encoding: json
+          method: GET
+          backend:
+          - host:
+            - http://boxk8s1:3000
+            method: GET
+            url_pattern: "/swagger.json"
+        extra_config:
+          security/cors:
+            allow_origins:
+            - "*"
+            allow_methods:
+            - GET
+            - HEAD
+            - POST
+            expose_headers:
+            - Content-Length
+            - Content-Type
+            allow_headers:
+            - Accept-Language
+            max_age: 12h
+            allow_credentials: false
+            debug: false
+        EOOF
+        /usr/bin/krakend run -c /tmp/krakend.yaml
+    ports:
+      - "8320:8080"
+EOF
+dcup
+```
+
+krakend yaml
+
+```yaml
+version: 3
+endpoints:
+- endpoint: "/api-spec.json"
+  output_encoding: json
+  method: GET
+  backend:
+  - host:
+    - http://boxk8s1:3000
+    method: GET
+    url_pattern: "/swagger.json"
+extra_config:
+  security/cors:
+    allow_origins:
+    - "*"
+    allow_methods:
+    - GET
+    - HEAD
+    - POST
+    expose_headers:
+    - Content-Length
+    - Content-Type
+    allow_headers:
+    - Accept-Language
+    max_age: 12h
+    allow_credentials: false
+    debug: false
+```
+
+puml
+
+```puml
+@startuml
+hide footbox
+participant "Local\nboxk8s1" as Local
+participant "Local\nboxk8s2" as Local2
+participant "Local\nAPI Gateway" as APIGW
+actor Alice
+autonumber 10
+Local -> Alice : swagger-ui\nport:8300
+Alice <- Local : kubernetes/openapi-spec/swagger.json\nport:8300
+autonumber 20
+Local2 -> Alice : swagger-ui\nport:8310
+Local -> APIGW : /swagger.json\nport:3000
+note right
+API Gateway/Proxy
+Enabling CORS 
+allow_origins: *
+end note
+APIGW -> Alice : api-spec.json\nport:8320
+@enduml
 ```

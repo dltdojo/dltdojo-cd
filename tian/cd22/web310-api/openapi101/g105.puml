@@ -1,0 +1,19 @@
+@startuml
+hide footbox
+participant "Local\nboxk8s1" as Local
+participant "Local\nboxk8s2" as Local2
+participant "Local\nAPI Gateway" as APIGW
+actor Alice
+autonumber 10
+Local -> Alice : swagger-ui\nport:8300
+Alice <- Local : kubernetes/openapi-spec/swagger.json\nport:8300
+autonumber 20
+Local2 -> Alice : swagger-ui\nport:8310
+Local -> APIGW : /swagger.json\nport:3000
+note right
+API Gateway/Proxy
+Enabling CORS 
+allow_origins: *
+end note
+APIGW -> Alice : api-spec.json\nport:8320
+@enduml

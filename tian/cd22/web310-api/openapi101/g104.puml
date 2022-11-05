@@ -1,0 +1,12 @@
+@startuml
+hide footbox
+participant "Local\nboxk8s1" as Local
+participant "Local\nboxk8s2" as Local2
+actor Alice
+autonumber 10
+Local -> Alice : swagger-ui\nport:8300
+Alice <- Local : kubernetes/openapi-spec/swagger.json\nport:8300
+autonumber 20
+Local2 -> Alice : swagger-ui\nport:8310
+Alice <- Local : kubernetes/openapi-spec/swagger.json\nport:8300
+@enduml
