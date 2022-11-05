@@ -413,12 +413,15 @@ Alice <- Local : kubernetes/openapi-spec/swagger.json\nport:8300
 
 # task105
 
+目標為無法更動原服務端的 CORS 配置下，新增一個中介的反向代理服務或 API Gateway 來設定後端服務加上 CORS 配置，將原無 CORS 配置服務轉成有配置對外輸出。常見配置選用 Nginx 但這裡使用 KrakenD。設定檔格式 KrakenD 比 Nginx 較明確容易編輯。
 
 - Local Busybox1 http http://localhost:8300
 - Local Busybox2 http http://localhost:8310
-- Local APIGW http http://localhost:8320
+- Local KrakenD(API Gateway) http http://localhost:8320
 
 ![img105](g105.svg)
+
+配置反向代理的服務並啟用 CORS 如下：
 
 ```sh
 cat > /tmp/api101/docker-compose.yaml <<\EOF
@@ -485,7 +488,7 @@ EOF
 dcup
 ```
 
-krakend yaml
+設定檔 krakend yaml 也可以用其他如 json 格式。
 
 ```yaml
 version: 3
@@ -516,7 +519,7 @@ extra_config:
     debug: false
 ```
 
-puml
+對接到內部上游 boxk8s1 服務。與上個任務類似但藉由中介反向代理增加設定來提供可用 CORS 設定。
 
 ```puml
 @startuml
@@ -539,3 +542,157 @@ end note
 APIGW -> Alice : api-spec.json\nport:8320
 @enduml
 ```
+
+
+# task106
+
+目標為只有單一 port 8300 對外服務。
+
+- Busybox1
+  - http://localhost:8320/box1/index.html
+  - http://box1.localhost:8320/index.html
+- Busybox2
+  - http://localhost:8320/box2/index.html
+  - http://box2.localhost:8320/index.html
+
+
+```sh
+cat > /tmp/api101/docker-compose.yaml <<\EOF
+services:
+  boxk8s1:
+    image: api101-k8sapi
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /opt/webroot/api-ui/
+        busybox httpd -f -v -p 3000
+    ports:
+      - "8300:3000"
+  boxk8s2:
+    image: api101-k8sapi
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /opt/webroot/api-ui/
+        busybox httpd -f -v -p 3000
+    ports:
+      - "8310:3000"
+  krakend:
+    image: devopsfaith/krakend:2.1.2
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        cat > /tmp/krakend.yaml <<\EOOF
+        version: 3
+        endpoints:
+        - endpoint: "/box1/{path1}"
+          output_encoding: no-op
+          method: GET
+          backend:
+          - host:
+            - http://boxk8s1:3000
+            method: GET
+            url_pattern: "/{path1}"
+            encoding: no-op
+        - endpoint: "/box2/{path1}"
+          output_encoding: no-op
+          method: GET
+          backend:
+          - host:
+            - http://boxk8s2:3000
+            method: GET
+            url_pattern: "/{path1}"
+            encoding: no-op
+        EOOF
+        /usr/bin/krakend run -c /tmp/krakend.yaml
+    ports:
+      - "8320:8080"
+EOF
+dcup
+```
+
+virtual host 為企業版功能。
+
+多數靜態檔案非其專用方式。
+
+```sh
+cat > /tmp/api101/docker-compose.yaml <<\EOF
+services:
+  boxk8s1:
+    image: api101-k8sapi
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /opt/webroot/api-ui/
+        busybox httpd -f -v -p 3000
+    ports:
+      - "8300:3000"
+  boxk8s2:
+    image: api101-k8sapi
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /opt/webroot/api-ui/
+        busybox httpd -f -v -p 3000
+    ports:
+      - "8310:3000"
+  krakend:
+    image: devopsfaith/krakend:2.1.2
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        cat > /tmp/krakend.yaml <<\EOOF
+        version: 3
+        plugin:
+          pattern: ".so"
+          folder: "/opt/krakend/plugins/"
+        extra_config:
+          plugin/http-server:
+            name:
+            - virtualhost
+            virtualhost:
+              hosts:
+              - box1.localhost
+              - box2.localhost
+        endpoints:
+        - endpoint: "/__virtual/box1.localhost/{path1}"
+          output_encoding: no-op
+          method: GET
+          backend:
+          - host:
+            - http://boxk8s1:3000
+            method: GET
+            url_pattern: "/{path1}"
+            encoding: no-op
+        - endpoint: "/__virtual/box2.localhost/{path1}"
+          output_encoding: no-op
+          method: GET
+          backend:
+          - host:
+            - http://boxk8s2:3000
+            method: GET
+            url_pattern: "/{path1}"
+            encoding: no-op
+        EOOF
+        /usr/bin/krakend run -c /tmp/krakend.yaml
+    ports:
+      - "8320:8080"
+EOF
+dcup
+```
+
+# TODOs
+
+- Traefik
+  - https://doc.traefik.io/traefik/v2.0/middlewares/headers/#cors-headers
+  - https://doc.traefik.io/traefik/user-guides/docker-compose/basic-example/
+- envoy
+  - [Getting Started with an Envoy Sidecar Proxy in 5 Minutes | Code Snippets](https://blog.krudewig-online.de/2021/04/18/envoy-in-5-minutes.html)
+  - https://github.com/chr1st1ank/blog/blob/main/code/2021-04-15-envoy-in-5-minutes/envoy.yaml
+
