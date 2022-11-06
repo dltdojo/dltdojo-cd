@@ -5,7 +5,7 @@ participant "Local\nboxk8s2" as Local2
 participant "Local\nAPI Gateway" as APIGW
 actor Alice
 autonumber 10
-Local -> Alice : swagger-ui\nport:8300
+Local -> Alice : swagger-ui\nport:3000
 Alice <- Local : kubernetes/openapi-spec/swagger.json\nport:8300
 autonumber 20
 Local2 -> Alice : swagger-ui\nport:8310

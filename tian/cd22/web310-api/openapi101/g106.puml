@@ -1,0 +1,14 @@
+@startuml
+participant "Local\nboxk8s1" as Local
+participant "Local\nboxk8s2" as Local2
+participant ReverseProxy #red
+actor Alice
+autonumber 10
+Alice -> ReverseProxy : box1 swagger-ui
+Local -> ReverseProxy : swagger-ui\nport:3000
+ReverseProxy -> Alice : swagger-ui\nport:8320
+autonumber 20
+Alice -> ReverseProxy : box2 swagger-ui
+Local2 -> ReverseProxy : swagger-ui\nport:3000
+ReverseProxy -> Alice : swagger-ui\nport:8320
+@enduml

@@ -413,7 +413,7 @@ Alice <- Local : kubernetes/openapi-spec/swagger.json\nport:8300
 
 # task105
 
-目標為無法更動原服務端的 CORS 配置下，新增一個中介的反向代理服務或 API Gateway 來設定後端服務加上 CORS 配置，將原無 CORS 配置服務轉成有配置對外輸出。常見配置選用 Nginx 但這裡使用 KrakenD。設定檔格式 KrakenD 比 Nginx 較明確容易編輯。
+目標為無法更動原服務端的 CORS 配置下，新增一個中介的反向代理服務或 API Gateway 來設定後端服務加上 CORS 配置，將原無 CORS 配置服務轉成有配置對外輸出。常見配置選用 Nginx 但這裡使用 KrakenD 測試。設定檔格式 KrakenD 比 Nginx 較明確容易編輯。
 
 - Local Busybox1 http http://localhost:8300
 - Local Busybox2 http http://localhost:8310
@@ -543,10 +543,9 @@ APIGW -> Alice : api-spec.json\nport:8320
 @enduml
 ```
 
-
 # task106
 
-目標為只有單一 port 8300 對外服務。
+單一檔案路徑的上游反向代理轉接加上 CORS 設定對於 KrankenD 這種 API Gateway 為主的專案實現容易，換成不特定路徑檔案資源而目標為只有單一 port 8300 對外服務的 Virtual Host 時候，KrakenD 專案需要使用商業版本功能。
 
 - Busybox1
   - http://localhost:8320/box1/index.html
@@ -555,6 +554,7 @@ APIGW -> Alice : api-spec.json\nport:8320
   - http://localhost:8320/box2/index.html
   - http://box2.localhost:8320/index.html
 
+![img106](g106.svg)
 
 ```sh
 cat > /tmp/api101/docker-compose.yaml <<\EOF
@@ -614,9 +614,7 @@ EOF
 dcup
 ```
 
-virtual host 為企業版功能。
-
-多數靜態檔案非其專用方式。
+上面為單一樣式資源```host/box1 to upstream_box1```轉接，但是支援 virtual host 為 KrakenD 企業版功能，多數靜態檔案但未知模式的資源轉接管理 ```virtual_host_box1 to upstream_box1``` 非其主要使用方式，下為無法完成的測試的配置，因為缺乏商業版的 plugin。
 
 ```sh
 cat > /tmp/api101/docker-compose.yaml <<\EOF
@@ -687,12 +685,80 @@ EOF
 dcup
 ```
 
+改用 Traefik 設定測試，原封不動整站台轉接路徑的設定比較簡單，只需檢視 host 無誤即可 /xxx 一對一轉 /xxx，但如下游 /xxx 轉上游 / 的情況，雖然也是一對一但不是原路徑轉，需要設定 StripPrefix 來處理轉接前去掉前頭 /xxx 部份。StripPrefix 是 middleware 之一，設定前先宣告設定後需要再掛到特定路由使其生效。參考 [Traefik StripPrefix Documentation - Traefik](https://doc.traefik.io/traefik/middlewares/http/stripprefix/)
+
+Traefik 設定方式與前述模式有個很大差異是設定值的位置在服務方不需修改 proxy 代理端設定，對於後端服務起起落落幾十個的時候，一直改代理端設定檔後重啟代理轉接服務使其生效的工作量很大。換句話說「被代理」這個設定從代理端中心化統一的設定檔改為分散到服務端打上需要「被代理」標籤來替代，而代理端於啟動前並不需要先知道並設定每一個「被代理」的服務。
+
+- Busybox1
+  - http://localhost:8320/box1/
+  - http://box1.localhost:8320
+- Busybox2
+  - http://localhost:8320/box2/
+  - http://box2.localhost:8320
+
+
+```sh
+cat > /tmp/api101/docker-compose.yaml <<\EOF
+version: "3.8"
+services:
+  traefik:
+    image: "traefik:v2.9"
+    container_name: "traefik"
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "8320:80"
+      - "8380:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  box1:
+    image: api101-k8sapi
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /opt/webroot/api-ui/
+        sed -i "s|<title>Swagger UI</title>|<title>Box1 Kubernetes Swagger UI</title>|g" index.html
+        busybox httpd -f -v -p 3000
+    ports:
+      - "8300:3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.box1.rule=Host(`box1.localhost`) || PathPrefix(`/box1`)"
+      - "traefik.http.routers.box1.entrypoints=web"
+      - "traefik.http.services.box1.loadbalancer.server.port=3000"
+      # define middleware box1-stripprefix
+      - "traefik.http.middlewares.box1-stripprefix.stripprefix.prefixes=/box1"
+      # apply middleware box1-stripprefix to routers.box1
+      - "traefik.http.routers.box1.middlewares=box1-stripprefix@docker"
+  box2:
+    image: api101-k8sapi
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /opt/webroot/api-ui/
+        sed -i "s|<title>Swagger UI</title>|<title>Box2 Kubernetes Swagger UI</title>|g" index.html
+        busybox httpd -f -v -p 3000
+    ports:
+      - "8310:3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.box2.rule=Host(`box2.localhost`)|| PathPrefix(`/box2`)"
+      - "traefik.http.routers.box2.entrypoints=web"
+      - "traefik.http.services.box2.loadbalancer.server.port=3000"
+      - "traefik.http.middlewares.box2-stripprefix.stripprefix.prefixes=/box2"
+      - "traefik.http.routers.box2.middlewares=box2-stripprefix@docker"
+EOF
+dcup
+```
+
+另外針對 enovy 可參考 [Getting Started with an Envoy Sidecar Proxy in 5 Minutes](https://github.com/chr1st1ank/blog/blob/main/code/2021-04-15-envoy-in-5-minutes/envoy.yaml) 作法當成練習。
+
 # TODOs
 
-- Traefik
-  - https://doc.traefik.io/traefik/v2.0/middlewares/headers/#cors-headers
-  - https://doc.traefik.io/traefik/user-guides/docker-compose/basic-example/
-- envoy
-  - [Getting Started with an Envoy Sidecar Proxy in 5 Minutes | Code Snippets](https://blog.krudewig-online.de/2021/04/18/envoy-in-5-minutes.html)
-  - https://github.com/chr1st1ank/blog/blob/main/code/2021-04-15-envoy-in-5-minutes/envoy.yaml
 

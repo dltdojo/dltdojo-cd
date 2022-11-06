@@ -1,0 +1,54 @@
+version: "3.8"
+services:
+  traefik:
+    image: "traefik:v2.9"
+    container_name: "traefik"
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "8320:80"
+      - "8380:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  box1:
+    image: api101-k8sapi
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /opt/webroot/api-ui/
+        sed -i "s|<title>Swagger UI</title>|<title>Box1 Kubernetes Swagger UI</title>|g" index.html
+        busybox httpd -f -v -p 3000
+    ports:
+      - "8300:3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.box1.rule=Host(`box1.localhost`) || PathPrefix(`/box1`)"
+      - "traefik.http.routers.box1.entrypoints=web"
+      - "traefik.http.services.box1.loadbalancer.server.port=3000"
+      # define middleware box1-stripprefix
+      - "traefik.http.middlewares.box1-stripprefix.stripprefix.prefixes=/box1"
+      # apply middleware box1-stripprefix to routers.box1
+      - "traefik.http.routers.box1.middlewares=box1-stripprefix@docker"
+  box2:
+    image: api101-k8sapi
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /opt/webroot/api-ui/
+        sed -i "s|<title>Swagger UI</title>|<title>Box2 Kubernetes Swagger UI</title>|g" index.html
+        busybox httpd -f -v -p 3000
+    ports:
+      - "8310:3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.box2.rule=Host(`box2.localhost`)|| PathPrefix(`/box2`)"
+      - "traefik.http.routers.box2.entrypoints=web"
+      - "traefik.http.services.box2.loadbalancer.server.port=3000"
+      - "traefik.http.middlewares.box2-stripprefix.stripprefix.prefixes=/box2"
+      - "traefik.http.routers.box2.middlewares=box2-stripprefix@docker"
