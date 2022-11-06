@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  boxk8s1:
+    image: api101-k8sapi
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /opt/webroot/api-ui/
+        busybox httpd -f -v -p 3000
+    ports:
+      - "8300:3000"
+  boxk8s2:
+    image: api101-k8sapi
+    command:
+      - /bin/sh
+      - -c
+      - |
+        sed -i "s|swagger.json|http://localhost:8300/swagger.json|g" /opt/webroot/api-ui/swagger-initializer.js
+        cd /opt/webroot/api-ui/
+        busybox httpd -f -v -p 3000
+    ports:
+      - "8310:3000"

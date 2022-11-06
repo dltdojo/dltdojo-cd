@@ -614,76 +614,7 @@ EOF
 dcup
 ```
 
-上面為單一樣式資源```host/box1 to upstream_box1```轉接，但是支援 virtual host 為 KrakenD 企業版功能，多數靜態檔案但未知模式的資源轉接管理 ```virtual_host_box1 to upstream_box1``` 非其主要使用方式，下為無法完成的測試的配置，因為缺乏商業版的 plugin。
-
-```sh
-cat > /tmp/api101/docker-compose.yaml <<\EOF
-services:
-  boxk8s1:
-    image: api101-k8sapi
-    command:
-      - /bin/sh
-      - -c
-      - |
-        cd /opt/webroot/api-ui/
-        busybox httpd -f -v -p 3000
-    ports:
-      - "8300:3000"
-  boxk8s2:
-    image: api101-k8sapi
-    command:
-      - /bin/sh
-      - -c
-      - |
-        cd /opt/webroot/api-ui/
-        busybox httpd -f -v -p 3000
-    ports:
-      - "8310:3000"
-  krakend:
-    image: devopsfaith/krakend:2.1.2
-    entrypoint: /bin/sh
-    command:
-      - -c
-      - |
-        cat > /tmp/krakend.yaml <<\EOOF
-        version: 3
-        plugin:
-          pattern: ".so"
-          folder: "/opt/krakend/plugins/"
-        extra_config:
-          plugin/http-server:
-            name:
-            - virtualhost
-            virtualhost:
-              hosts:
-              - box1.localhost
-              - box2.localhost
-        endpoints:
-        - endpoint: "/__virtual/box1.localhost/{path1}"
-          output_encoding: no-op
-          method: GET
-          backend:
-          - host:
-            - http://boxk8s1:3000
-            method: GET
-            url_pattern: "/{path1}"
-            encoding: no-op
-        - endpoint: "/__virtual/box2.localhost/{path1}"
-          output_encoding: no-op
-          method: GET
-          backend:
-          - host:
-            - http://boxk8s2:3000
-            method: GET
-            url_pattern: "/{path1}"
-            encoding: no-op
-        EOOF
-        /usr/bin/krakend run -c /tmp/krakend.yaml
-    ports:
-      - "8320:8080"
-EOF
-dcup
-```
+上面為單一樣式資源```host/box1 to upstream_box1```轉接，但是支援 virtual host 為 KrakenD 企業版功能，多數靜態檔案但未知模式的資源轉接管理 ```virtual_host_box1 to upstream_box1``` 非其主要使用方式，[krakend virtual host yaml](compose-106-krakend-host.yaml) 為無法完成的測試的配置，因為缺乏商業版的 plugin。
 
 改用 Traefik 設定測試，原封不動整站台轉接路徑的設定比較簡單，只需檢視 host 無誤即可 /xxx 一對一轉 /xxx，但如下游 /xxx 轉上游 / 的情況，雖然也是一對一但不是原路徑轉，需要設定 StripPrefix 來處理轉接前去掉前頭 /xxx 部份。StripPrefix 是 middleware 之一，設定前先宣告設定後需要再掛到特定路由使其生效。參考 [Traefik StripPrefix Documentation - Traefik](https://doc.traefik.io/traefik/middlewares/http/stripprefix/)
 

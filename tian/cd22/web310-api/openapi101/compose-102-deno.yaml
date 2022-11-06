@@ -7,7 +7,15 @@ services:
       - -c
       - |
         cd /opt/webroot/api-ui/
-        # sed -i "s|https://petstore.swagger.io/v2/swagger.json|spec-foo.json|g" /opt/webroot/api-ui/swagger-initializer.js
         busybox httpd -f -v -p 3000
     ports:
       - "8300:3000"
+  deno101:
+    image: api101-deno
+    command:
+      - /bin/sh
+      - -c
+      - |
+        file_server /opt/webroot/api-ui/ --port 4507
+    ports:
+      - "8310:4507"

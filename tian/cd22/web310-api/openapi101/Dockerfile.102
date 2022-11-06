@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.3-labs
-FROM busybox:1.35.0
+FROM busybox:1.35.0 AS stage1
 ARG SWAGGER_UI_VERSION="4.15.2"
 RUN <<\EOOF
   cd /tmp
@@ -8,3 +8,6 @@ RUN <<\EOOF
   mkdir -p /opt/webroot/api-ui
   cp -r "swagger-ui/swagger-ui-$SWAGGER_UI_VERSION/dist/." /opt/webroot/api-ui/
 EOOF
+FROM denoland/deno:1.27.1 AS stage2
+COPY --from=stage1 /opt/webroot/api-ui/ /opt/webroot/api-ui/
+RUN deno install --root=/usr/local --allow-net --allow-read https://deno.land/std@0.159.0/http/file_server.ts
