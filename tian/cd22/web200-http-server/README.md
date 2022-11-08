@@ -187,7 +187,62 @@ EOF
 
 ## Shell Script : Static Site Generation(SSG) v.s. Server-Side Rendering(SSR)
 
-apache cgi
+SSG, SSR and CSR 的 busybox httpd cgi 極簡概念展示版本，busybox 鏡像約 720 KB，下載與啟動超快。啟動後點擊 http://localhost:8030 測試。
+
+修改日期的位置如下：
+
+- SSG 在 ```TODAY=$(date)```
+- SSR 在 ```sed "s|_SSR_DATA_|$(date)|g" /www/index.html```
+- CSR 在 ```document.getElementById("csr101").innerHTML = new Date();```
+
+```sh
+docker run -i --init -p 8030:3000 busybox:1.35.0 <<\EOF
+mkdir /www /www/cgi-bin
+TODAY=$(date)
+cat <<EOOF > /www/index.html
+<html>
+<head>
+<title>SSG, SSR and CSR</title>
+ <style>
+  body {background-color: pink;}
+  div.container { align-items: center; justify-content: center }
+</style> 
+</head>
+<body onload="csr()">
+  <div class="container">
+  <h1>SSG/CSR Page: <a href="/index.html">index.html</a></h1>
+  <h1>SSG/SSR/CSR Page: <a href="/cgi-bin/index.sh">/cgi-bin/index.sh</a></h1>
+  <h3>Static Site Generation(SSG): $TODAY</h3>
+  <h3>Server-Side Rendering(SSR): _SSR_DATA_ </h3>
+  <h3>Client-Side Rendering(CSR): <span id="csr101">_CSR_DATA_</span></h3>
+  </div>
+  <script>
+  function csr() {
+    document.getElementById("csr101").innerHTML = new Date();
+  }
+</script>
+</body>
+</html>
+EOOF
+cat <<\EOOF > /www/cgi-bin/index.sh
+#!/bin/sh
+echo "Content-Type: text/html"
+echo ""
+sed "s|_SSR_DATA_|$(date)|g" /www/index.html
+echo ""
+EOOF
+chmod 700 /www/cgi-bin/index.sh
+cd /www
+busybox httpd -f -v -p 3000 
+EOF
+```
+
+refs
+
+- The new wave of Javascript web frameworks https://frontendmastery.com/posts/the-new-wave-of-javascript-web-frameworks/
+
+
+apache cgi version
 
 ```sh
 docker pull docker.io/docker/dockerfile:1.3-labs
