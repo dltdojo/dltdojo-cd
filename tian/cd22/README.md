@@ -1,6 +1,8 @@
 # 工具
 
-- docker
+```sh
+DOCKER_BUILDKIT=1 docker build -t foo101 --target=netcat101 .
+```
 
 # web100
 
