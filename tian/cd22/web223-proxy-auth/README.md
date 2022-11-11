@@ -1,0 +1,7 @@
+- [Traefik ForwardAuth Documentation - Traefik](https://doc.traefik.io/traefik/middlewares/http/forwardauth/)
+- box1
+  - 200 OK http://localhost:8700/box1/foo.html
+  - 403 http://localhost:8700/box1/
+- http://localhost:8700/box2/
+- http://box1.localhost:8700/
+- http://box2.localhost:8700/
