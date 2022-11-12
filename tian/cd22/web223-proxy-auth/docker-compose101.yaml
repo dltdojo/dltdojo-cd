@@ -1,0 +1,109 @@
+version: "3.8"
+services:
+  traefik:
+    image: "traefik:v2.9"
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "8700:80"
+      - "8780:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  deno1:
+    build:
+      context: .
+      target: deno101
+    entrypoint: sh
+    command:
+      - -c 
+      - |
+        cat <<\EOOF > webserver.ts
+        import { serve } from "https://deno.land/std@0.163.0/http/server.ts";
+        const port = 8080;
+        const handler = async (req: Request): Promise<Response> => {
+          console.log("Method:", req.method);
+          const url = new URL(req.url);
+          console.log("Path:", url.pathname);
+          console.log("Query parameters:", url.searchParams);
+          console.log("Headers:", req.headers);
+          if (req.body) {
+            const body = await req.text();
+            console.log("Body:", body);
+          }
+          console.log("value =  ",req.headers.get("x-forwarded-uri"))
+          return req.headers.get("x-forwarded-uri")==="/foo.html" ? new Response("OK") : new Response("Forbidden",{status:403})
+        };
+        console.log(`HTTP webserver running. Access it at: http://localhost:8080/`);
+        await serve(handler, { port });        
+        EOOF
+        deno run --allow-net webserver.ts
+    ports:
+      - "8303:8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.deno1.rule=Host(`deno1.localhost`)"
+      - "traefik.http.routers.deno1.entrypoints=web"
+      - "traefik.http.services.deno1.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.traefik-forward-auth.forwardauth.address=http://deno1:8080/auth"
+  box1:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /tmp
+        echo "<html><head><title>Box1 INDEX</title></head><body><h1>Box1 INDEX</h1></body></html>" > index.html
+        echo "<html><head><title>Box1 Foo</title></head><body><h1>Box1 Foo</h1></body></html>" > foo.html
+        echo "<html><head><title>Box1 Bar</title></head><body><h1>Box1 Bar</h1></body></html>" > bar.html
+        busybox httpd -f -v -p 3000
+    ports:
+      - "8301:3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.box1.rule=Host(`box1.localhost`) || PathPrefix(`/box1`)"
+      - "traefik.http.routers.box1.entrypoints=web"
+      - "traefik.http.services.box1.loadbalancer.server.port=3000"
+      # define middleware box1-stripprefix
+      - "traefik.http.middlewares.box1-stripprefix.stripprefix.prefixes=/box1"
+      # apply middleware box1-stripprefix to routers.box1
+      - "traefik.http.routers.box1.middlewares=box1-stripprefix@docker, traefik-forward-auth"
+  box2:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        # mkdir /www /www/cgi-bin
+        TODAY=$(date)
+        cat <<EOOF > /www/index.html
+        <html><head><title>Box2, SSG and SSR</title></head>
+        <body>
+          <h1>SSG Page: <a href="/index.html">index.html</a></h1>
+          <h3>Static Site Generation(SSG): $$TODAY</h3>
+          <h1>SSG/SSR Page: <a href="/cgi-bin/index.sh">/cgi-bin/index.sh</a></h1>
+          <h3>Server-Side Rendering(SSR): _SSR_DATA_ </h3>
+        </body></html>
+        EOOF
+        cat <<\EOOF > /www/cgi-bin/index.sh
+        #!/bin/sh
+        echo "Content-Type: text/html"
+        echo ""
+        sed "s|_SSR_DATA_|$(date)|g" /www/index.html
+        echo ""
+        EOOF
+        chmod 700 /www/cgi-bin/index.sh
+        cd /www
+        busybox httpd -f -v -p 3000
+    ports:
+      - "8302:3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.box2.rule=Host(`box2.localhost`)|| PathPrefix(`/box2`)"
+      - "traefik.http.routers.box2.entrypoints=web"
+      - "traefik.http.services.box2.loadbalancer.server.port=3000"
+      - "traefik.http.middlewares.box2-stripprefix.stripprefix.prefixes=/box2"
+      - "traefik.http.routers.box2.middlewares=box2-stripprefix@docker"
