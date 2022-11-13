@@ -1,23 +1,30 @@
 version: "3.8"
 services:
   opa101:
-    image: openpolicyagent/opa:0.46.1-debug
-    ports:
-    - 8181:8181
-    entrypoint: sh
+    build:
+      context: .
+      target: opa101
     command:
-    - -c
-    - |
-      cat <<EOF > /tmp/policy.rego
-      package httpapi.authz
-      # mapping to uri /v1/data/httpapi/authz
-      default allow = false
-      allow {
-          input.X_FORWARDED_URI == "/foo.html"
-          input.method == "GET"
-      }
-      EOF
-      opa run -s /tmp/policy.rego
+      - /bin/sh
+      - -c
+      - |
+        cd /tmp
+        cat <<EOOF > policy101.rego
+        package x103.authz
+        # mapping to uri /v1/data/x103/authz
+        default allow = false
+        allow {
+            input.X_FORWARDED_URI == "/foo.html"
+            input.method == "GET"
+        }
+        EOOF
+        # The output of a Wasm module built this way contain the result of evaluating the entrypoint rule. 
+        opa build -t wasm -e x103/authz/allow policy101.rego
+        tar zxvf bundle.tar.gz
+        ls -al /tmp
+        busybox httpd -f -v -p 3000
+    ports:
+      - "8103:3000"
   deno101:
     build:
       context: .
@@ -26,34 +33,7 @@ services:
     command:
       - -c 
       - |
-        cat <<\EOOF > webserver.ts
-        import { serve } from "https://deno.land/std@0.163.0/http/server.ts";
-        const handler = async (req: Request): Promise<Response> => {
-          const url = new URL(req.url);
-          const input = {
-            method: req.method,
-            path: url.pathname,
-            X_FORWARDED_URI: req.headers.get("x-forwarded-uri"),
-          };
-          console.log(input);
-          const body = JSON.stringify({input});
-          const resp = await fetch("http://opa101:8181/v1/data/httpapi/authz", {
-            method: "POST",
-            headers: {"Content-Type": "application/json",},
-            body,
-          });
-          let finalresp = new Response("Auth Error 201",{status:404});
-          if (resp.body) {
-            const r = await resp.json();
-            console.log("OPA Resp = ", r);
-            finalresp =  r.result["allow"] ? new Response("OK") : new Response("Auth Error 301",{status: 403});
-          }
-          console.log(finalresp);
-          return finalresp;
-        };
-        await serve(handler, { port:8080});
-        EOOF
-        deno run --allow-net webserver.ts
+        env
     ports:
       - "8303:8080"
   box1:

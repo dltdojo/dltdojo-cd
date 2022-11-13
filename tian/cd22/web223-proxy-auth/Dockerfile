@@ -1,4 +1,7 @@
 # syntax=docker/dockerfile:1.3-labs
+FROM busybox:1.35.0 AS opa101
+COPY --from=openpolicyagent/opa:0.46.1-static /opa /bin/opa
+
 
 # 121MB
 FROM denoland/deno:alpine-1.27.2 AS deno101
@@ -7,6 +10,7 @@ RUN <<EOOF
 cat > deps.ts <<\EOOOF
 export { serve } from "https://deno.land/std@0.163.0/http/server.ts";
 export { chai } from "https://esm.sh/chai@4.3.6";
+export { opa } from "https://unpkg.com/@open-policy-agent/opa-wasm@1.8.0/dist/opa-wasm-browser.esm.js";
 chai.config.truncateThreshold = 0;
 EOOOF
 deno cache deps.ts
