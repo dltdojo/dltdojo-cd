@@ -1,5 +1,6 @@
-import opa from "https://unpkg.com/@open-policy-agent/opa-wasm@1.8.0/dist/opa-wasm-browser.esm.js";
-import chai from "https://esm.sh/chai@4.3.6";
+//import opa from "https://unpkg.com/@open-policy-agent/opa-wasm@1.8.0/dist/opa-wasm-browser.esm.js";
+//import chai from "https://esm.sh/chai@4.3.6";
+import {opa, chai} from "./deps.ts";
 // docker compose up
 // read local policy.wasm
 //const file = await Deno.readFile("policy.wasm");

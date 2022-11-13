@@ -1,4 +1,4 @@
-# 101 ForwardAuth
+# 101 Traefik ForwardAuth
 
 使用 javascript 實做鑑別 Auth 服務來覆蓋到無鑑別 Auth 的兩個 http 服務，只鎖定 /foo.html 資源路徑，使用者鑑別無實做無檢查。
 
@@ -12,7 +12,7 @@
   - http://box2.localhost:8700/
 
 
-# 102 OPA
+# 102 Open Policy Agent(OPA) Server Mode
 
 授權決策如果每個服務不易實現一致的規範，可集中一處來管理這些權限的設定，好處是不須一個個服務修改設定。[open-policy-agent/opa: An open source, general-purpose policy engine.](https://github.com/open-policy-agent/opa) 提供這種功能，其政策語言針對輸入的資料物件來確認是否符合政策。
 
@@ -125,9 +125,17 @@ const resp = await fetch("http://opa101:8181/v1/data/httpapi/authz", {
 });
 ```
 
-# 103 OPA wasm
+# 103 OPA WebAssembly Mode
 
-相較於 102 將資料送出去等「遠端」檢查是否可通過，也可以「本地」執行確認下載政策來檢查，在 go library、rest service 與 WASM 三種政策檢核模式下，在 javascript 端執行可採用 WASM 模式。參考[npm-opa-wasm/examples/deno at main · open-policy-agent/npm-opa-wasm](https://github.com/open-policy-agent/npm-opa-wasm/tree/main/examples/deno)並改為雙遠端載入模式，一個是 opa 一個是自定義政策。
+相較於 102 方式將資料送出去等「遠端」檢查是否可通過查核符合政策，也可以在「本地」執行確認下載政策後本地查核，在 go library、rest service 與 WASM 三種政策檢核模式下，在 javascript 端執行可採用 WASM 模式。參考[npm-opa-wasm/examples/deno at main · open-policy-agent/npm-opa-wasm](https://github.com/open-policy-agent/npm-opa-wasm/tree/main/examples/deno)作法，並改為雙遠端載入模式，一個是 opa 一個是自定義政策都是遠端下載。
+
+# 104 Traefik ForwardAuth and OPA WASM
+
+將標籤打上去從外面確認只有 box1/foo.html 資源可讀取。
+
+- 200 OK http://localhost:8700/box1/foo.html
+- 403 Forbidden http://localhost:8700/box1/
+
 
 # TODO
 

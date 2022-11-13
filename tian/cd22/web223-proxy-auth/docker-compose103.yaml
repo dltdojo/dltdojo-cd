@@ -1,18 +1,5 @@
 version: "3.8"
 services:
-  traefik:
-    image: "traefik:v2.9"
-    command:
-      #- "--log.level=DEBUG"
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-    ports:
-      - "8700:80"
-      - "8780:8080"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
   opa101:
     build:
       context: .
@@ -47,7 +34,8 @@ services:
       - |
         sleep 5
         cat <<\EOOF > webserver.ts
-        import { serve, opa } from "./deps.ts";
+        import { serve } from "https://deno.land/std@0.163.0/http/server.ts";
+        import opa from "https://unpkg.com/@open-policy-agent/opa-wasm@1.8.0/dist/opa-wasm-browser.esm.js";
         const remoteResp = await fetch("http://opa101:3000/policy.wasm");
         const remoteArrayBuffer = await remoteResp.arrayBuffer();
         const policy = await opa.loadPolicy(remoteArrayBuffer);
@@ -72,10 +60,7 @@ services:
         deno run --allow-net webserver.ts
     ports:
       - "8303:8080"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.middlewares.traefik-forward-auth.forwardauth.address=http://deno101:8080/auth"
-  curl101:
+  box1:
     image: curlimages/curl:7.86.0
     command:
       - sh
@@ -84,6 +69,8 @@ services:
         sleep 10
         curl -sv http://deno101:8080
         curl -sv --header "x-forwarded-uri: /foo.html" http://deno101:8080
+    ports:
+      - "8301:3000"
   deno201:
     build:
       context: .
@@ -93,7 +80,7 @@ services:
       - -c 
       - |
         cat <<\EOOF > test.ts
-        import { chai } from "./deps.ts";
+        import chai from "https://esm.sh/chai@4.3.6";
         const resp1 = await fetch("http://deno101:8080", {
             method: "GET",
             headers: {"x-forwarded-uri": "/foo.html"}
@@ -104,23 +91,3 @@ services:
         EOOF
         sleep 15
         deno run --allow-net test.ts
-  box1:
-    image: busybox:1.35.0
-    command:
-      - /bin/sh
-      - -c
-      - |
-        cd /tmp
-        echo "<html><head><title>Box1 INDEX</title></head><body><h1>Box1 INDEX</h1></body></html>" > index.html
-        echo "<html><head><title>Box1 Foo</title></head><body><h1>Box1 Foo</h1></body></html>" > foo.html
-        echo "<html><head><title>Box1 Bar</title></head><body><h1>Box1 Bar</h1></body></html>" > bar.html
-        busybox httpd -f -v -p 3000
-    ports:
-      - "8301:3000"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.box1.rule=Host(`box1.localhost`) || PathPrefix(`/box1`)"
-      - "traefik.http.routers.box1.entrypoints=web"
-      - "traefik.http.services.box1.loadbalancer.server.port=3000"
-      - "traefik.http.middlewares.box1-stripprefix.stripprefix.prefixes=/box1"
-      - "traefik.http.routers.box1.middlewares=box1-stripprefix@docker, traefik-forward-auth"
