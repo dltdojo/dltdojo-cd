@@ -11,7 +11,6 @@ services:
         cd /tmp
         cat <<EOOF > policy101.rego
         package x103.authz
-        # mapping to uri /v1/data/x103/authz
         default allow = false
         allow {
             input.X_FORWARDED_URI == "/foo.html"
@@ -33,7 +32,32 @@ services:
     command:
       - -c 
       - |
-        env
+        sleep 5
+        cat <<\EOOF > webserver.ts
+        import { serve } from "https://deno.land/std@0.163.0/http/server.ts";
+        import opa from "https://unpkg.com/@open-policy-agent/opa-wasm@1.8.0/dist/opa-wasm-browser.esm.js";
+        const remoteResp = await fetch("http://opa101:3000/policy.wasm");
+        const remoteArrayBuffer = await remoteResp.arrayBuffer();
+        const policy = await opa.loadPolicy(remoteArrayBuffer);
+        const handler = async (req: Request): Promise<Response> => {
+          const url = new URL(req.url);
+          const req101 = {
+            method: req.method,
+            path: url.pathname,
+            X_FORWARDED_URI: req.headers.get("x-forwarded-uri"),
+          };
+          console.log(req101);
+          const evalResult = policy.evaluate(req101);
+          let finalresp = new Response("Auth Error 201",{status:404});
+          if (evalResult) {
+            finalresp =  evalResult[0].result ? new Response("OK") : new Response("Auth Error 301",{status: 403});
+          }
+          console.log(finalresp);
+          return finalresp;
+        };
+        await serve(handler, { port:8080});
+        EOOF
+        deno run --allow-net webserver.ts
     ports:
       - "8303:8080"
   box1:
@@ -42,7 +66,7 @@ services:
       - sh
       - -c
       - |
-        sleep 5
+        sleep 10
         curl -sv http://deno101:8080
         curl -sv --header "x-forwarded-uri: /foo.html" http://deno101:8080
     ports:
@@ -65,5 +89,5 @@ services:
         const resp2 = await fetch("http://deno101:8080");
         chai.assert.equal(403, resp2.status);
         EOOF
-        sleep 10
+        sleep 15
         deno run --allow-net test.ts

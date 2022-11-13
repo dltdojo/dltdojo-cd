@@ -107,7 +107,7 @@ OPA 不是專為 HTTP 設計所以沒有辦法應用到 HTTP header 區都是需
 
 經過 deno101 這一轉效率比不上 envoy-grpc-opa 因為 envoy 與 opa 之間可以走 grpc，不過要加上 envoy 相對複雜。
 
-要使用遠端查符合政策需要注意與直接 ```opa eval``` 差異。遠端的endpoint所在位置與寫的rego內的package有關，而且還需要前置版本等，說明的文件位置不是很清楚。再來是回傳的 json 格式與 opa eval 也有點差異，回傳會放在 result 下。
+要使用遠端查符合政策需要注意與直接 ```opa eval``` 差異。遠端的endpoint所在位置與寫的rego內的package有關，而且還需要前置版本等，說明的文件位置不是很清楚。再來是回傳的 json 格式與 opa eval 也有點差異，回傳會放在 result 下。另外傳到 /v1/data/xxx/yyy 轉成字串的 JSON 裡面要 key 加上 input，否則格式不對都是查核不過，這個輸入格式部份與使用 opa eval 或是 opa-wasm 有差異。
 
 參考 HTTP POST 查詢合規[格式與過程的python](https://github.com/open-policy-agent/contrib/blob/1ca4e5400e0697f85cab799eaef8db6d87ebd2b7/api_authz/docker/echo_server.py#L20)，改成 js 格式如下。
 
@@ -127,13 +127,7 @@ const resp = await fetch("http://opa101:8181/v1/data/httpapi/authz", {
 
 # 103 OPA wasm
 
-相較於 102 將資料送出去等「遠端」檢查是否可通過，也可以「本地」執行確認下載政策來檢查，在 go library、rest service 與 WASM 三種政策檢核模式下，在 javascript 端執行可採用 WASM 模式。
-
-```sh
-BUILDKIT_PROGRESS=plain DOCKER_BUILDKIT=1 docker build --no-cache -t foo --target opa101 .
-```
-
-- [npm-opa-wasm/examples/deno at main · open-policy-agent/npm-opa-wasm](https://github.com/open-policy-agent/npm-opa-wasm/tree/main/examples/deno)
+相較於 102 將資料送出去等「遠端」檢查是否可通過，也可以「本地」執行確認下載政策來檢查，在 go library、rest service 與 WASM 三種政策檢核模式下，在 javascript 端執行可採用 WASM 模式。參考[npm-opa-wasm/examples/deno at main · open-policy-agent/npm-opa-wasm](https://github.com/open-policy-agent/npm-opa-wasm/tree/main/examples/deno)並改為雙遠端載入模式，一個是 opa 一個是自定義政策。
 
 # TODO
 
