@@ -4,7 +4,7 @@ COPY --from=openpolicyagent/opa:0.46.1-static /opa /bin/opa
 
 
 # 121MB
-FROM denoland/deno:alpine-1.27.2 AS deno101
+FROM denoland/deno:alpine-1.28.0 AS deno101
 WORKDIR /app
 RUN <<EOOF
 cat > deps.ts <<\EOOOF
