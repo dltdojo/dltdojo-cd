@@ -4,7 +4,7 @@
 
 Cryptoeconomics, Token Design, and Incentives in DeFi - Tim Roughgarden - YouTube https://www.youtube.com/watch?v=_LjYvQGfxOk
 
-# 101 GameOfEtcPasswd 找優勢策略或均衡的坑
+# 🌵 101 GameOfEtcPasswd 找優勢策略或均衡的坑
 
 http://localhost:8300/etc/passwd
 
@@ -22,7 +22,7 @@ busybox httpd -fv -p 3000
 EOF
 ```
 
-# 102 GameOfEtcPasswd 找優勢策略或均衡的坑
+# 🌶️ 102 GameOfEtcPasswd 找優勢策略或均衡的坑
 
 Inverse EtcPasswdGameTheory 挖會形成優勢策略或均衡的坑
 
@@ -56,9 +56,11 @@ busybox httpd -fv -p 3000
 EOF
 ```
 
-# 103 curl testing
+# 🍇 103 curl testing
 
 兩個並一起觀察並加上啟用 curl 容器來檢查不須開瀏覽器。新增開發體驗優化，採用檔案編輯自動更新重起的[watchexec](https://github.com/watchexec/watchexec)。不使用 watchexec 只要執行後面指令就好。
+
+另外因為 curl 無法依照 HTML meta 來轉，故新增轉位址的第二種模式 302 Redirect，要讓瀏覽器轉與 curl 文字界面工具轉地址作法不一樣，這兩種作法除了客戶端是否解析之外，在協定回應訊息的位置也不同，上述　102 放在 HTML meta 中是 HTTP 協定 Response 回應訊息的 Body 體區 [Response.body - Web APIs | MDN](https://developer.mozilla.org/en-US/docs/Web/API/Response/body)，這個 HTTP Response.body 與 HTML body 不同，但是口語常說 body 容易聽錯位置，至於 HTTP Code 302 則是放在 HTTP 協定 Response 訊息頭區 [Response.headers - Web APIs | MDN](https://developer.mozilla.org/en-US/docs/Web/API/Response/headers) 。
 
 - http://localhost:8301/etc/passwd
 - http://localhost:8302/etc/passwd.html
@@ -67,11 +69,15 @@ EOF
 
 ```sh
 docker compose -f docker-compose.103.yaml up
+```
 
+watchexec 的作法
+
+```sh
 watchexec -e yaml -r 'docker compose -f docker-compose.103.yaml up'
 ```
 
-# 104 grafana k6 testing
+# 🍉 104 grafana k6 testing
 
 對回傳進一步分析與測試，相較 103 不須人工逐一檢視結果，只要觀察最後輸出結果。k6 javascript api 與 Web APIs 有點差異，例如沒有 Request 只有 Response，而且 Response 也有點差異。
 
