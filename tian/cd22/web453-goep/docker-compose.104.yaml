@@ -1,0 +1,117 @@
+version: "3.8"
+services:
+  box1:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cat <<\EOOF > index.html
+        <html>
+        <head><title>GoEP-IGoEP 2022</title></head>
+        <body><p>HELLO Busybox Httpd</p></body>
+        </html>
+        EOOF
+        # 找優勢策略或均衡的坑
+        busybox httpd -fv -p 3000
+    ports:
+      - "8301:3000"
+  box2:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        mkdir /www /www/cgi-bin /www/etc
+        cat <<\EOOF > /www/etc/passwd.html
+        <html>
+        <head>
+        <title>GoEP-IGoEP 2022</title>
+        <meta http-equiv="Refresh" content="0; url=/cgi-bin/index.sh?path=/etc/passwd" />
+        </head>
+        <body>挖形成優勢策略或均衡的坑</body>
+        </html>
+        EOOF
+        # 
+        # NOTE: $$ to escape the $ dollar sign in a docker compose file
+        # 
+        cat <<\EOOF > /www/cgi-bin/index.sh
+        #!/bin/sh
+        echo "Content-Type: text/html"
+        echo ""
+        echo "$$QUERY_STRING"
+        THEPATH=$(echo "$$QUERY_STRING" | cut -d "=" -f 2)
+        echo "$$THEPATH"
+        cat "$$THEPATH"
+        EOOF
+        cat <<\EOOF > /www/cgi-bin/foo.sh
+        #!/bin/sh
+        echo "Status: 302 Redirect"
+        echo "Location: /cgi-bin/index.sh?path=/etc/passwd"
+        echo
+        echo ""
+        EOOF
+        chmod 700 /www/cgi-bin/*.sh
+        cd /www
+        busybox httpd -fv -p 3000
+    ports:
+      - "8302:3000"
+  curl101:
+    image: curlimages/curl:7.86.0
+    command:
+      - sh
+      - -c
+      - |
+        curl -sv --retry 5 --retry-all-errors http://box1:3000/etc/passwd
+        #
+        # browser and curl diff  http://box2:3000/etc/passwd.html
+        # 
+        curl -sv --retry 5 --retry-all-errors http://box2:3000/etc/passwd.html
+        curl -sv http://box2:3000/cgi-bin/index.sh?path=/etc/passwd
+        curl -svL http://box2:3000/cgi-bin/foo.sh
+  k6:
+    image: grafana/k6:0.41.0
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        cat <<EOF > test.js
+        import http from 'k6/http';
+        import { sleep, check, group } from 'k6';
+
+        export default function () {
+          group('test101', _ => {
+            const r1 = http.get('http://box1:3000/etc/passwd');
+            check(r1, {
+              'box1 is 200 ok': r => r.status == 200,
+              'box1 is /etc/passwd present': r => r.body.includes("root:x:0:0:root:/root:/bin/sh"),
+            });
+            const r2 = http.get('http://box2:3000/cgi-bin/index.sh?path=/etc/passwd');
+            check(r2, {
+              'box2 is 200 ok': r => r.status == 200,
+              'box2 is /etc/passwd present': r => r.body.includes("root:x:0:0:root:/root:/bin/sh"),
+            });
+            const r3 = http.get('http://box2:3000/etc/passwd.html');
+            check(r3, {
+              'box2/etc/passwd.html is 200 ok': r => r.status == 200,
+              'box2/etc/passwd.html is meta http-requiv present': r => r.body.includes("meta http-equiv"),
+            });
+            const r4 = http.get('http://box2:3000/cgi-bin/foo.sh');
+            // https://github.com/grafana/k6/blob/a33b054344416f32a5034732be1da06018a682bc/samples/redirects.js
+            // 注意與 curl 行為不同，curl 要加上 L 才會轉，k6.http.get 直接可轉到五次
+            check(r4, {
+              'box2 foo.sh is 200 OK': r => r.status == 200,
+              'box2 foo.sh redirect to index.sh': r => r.body.includes("root:x:0:0:root:/root:/bin/sh"),
+            });
+            const r5 = http.get('http://box2:3000/cgi-bin/foo.sh',  {redirects: 1});
+            console.log(r5.url);
+            check(r5, {
+              'box2 foo.sh is 302 Redirect': r => r.status == 200,
+              "box2 foo.sh 302 url is correct": r => r.url === "http://box2:3000/cgi-bin/index.sh?path=/etc/passwd",
+            });
+            sleep(1);
+          })
+        }
+        EOF
+        env
+        k6 run test.js

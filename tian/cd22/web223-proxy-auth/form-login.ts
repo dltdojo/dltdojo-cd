@@ -31,7 +31,6 @@ const handlerFoo = (_req: Request): Response => {
 const authUeser = (_username: string, _password: string) => {
   return { authn: true, token: "blahblah"}
 };
-
 const handlerBar = async (req: Request): Promise<Response> => {
   console.log(req);
   const form = await req.formData();

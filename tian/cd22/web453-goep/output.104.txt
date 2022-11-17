@@ -1,0 +1,183 @@
+web453-goep-curl101-1  | *   Trying 172.27.0.4:3000...
+web453-goep-curl101-1  | * Connected to box1 (172.27.0.4) port 3000 (#0)
+web453-goep-curl101-1  | > GET /etc/passwd HTTP/1.1
+web453-goep-curl101-1  | > Host: box1:3000
+web453-goep-curl101-1  | > User-Agent: curl/7.86.0-DEV
+web453-goep-curl101-1  | > Accept: */*
+web453-goep-curl101-1  | > 
+web453-goep-box1-1     | [::ffff:172.27.0.3]:58422: response:200
+web453-goep-curl101-1  | root:x:0:0:root:/root:/bin/sh
+web453-goep-curl101-1  | daemon:x:1:1:daemon:/usr/sbin:/bin/false
+web453-goep-curl101-1  | bin:x:2:2:bin:/bin:/bin/false
+web453-goep-curl101-1  | sys:x:3:3:sys:/dev:/bin/false
+web453-goep-curl101-1  | sync:x:4:100:sync:/bin:/bin/sync
+web453-goep-curl101-1  | mail:x:8:8:mail:/var/spool/mail:/bin/false
+web453-goep-curl101-1  | www-data:x:33:33:www-data:/var/www:/bin/false
+web453-goep-curl101-1  | operator:x:37:37:Operator:/var:/bin/false
+web453-goep-curl101-1  | nobody:x:65534:65534:nobody:/home:/bin/false
+web453-goep-curl101-1  | * Mark bundle as not supporting multiuse
+web453-goep-curl101-1  | < HTTP/1.1 200 OK
+web453-goep-curl101-1  | < Date: Thu, 17 Nov 2022 13:19:57 GMT
+web453-goep-curl101-1  | < Connection: close
+web453-goep-curl101-1  | < Accept-Ranges: bytes
+web453-goep-curl101-1  | < Last-Modified: Sun, 02 Oct 2022 21:21:57 GMT
+web453-goep-curl101-1  | < ETag: "633a00f5-154"
+web453-goep-curl101-1  | < Content-Length: 340
+web453-goep-curl101-1  | < 
+web453-goep-curl101-1  | { [340 bytes data]
+web453-goep-curl101-1  | * Closing connection 0
+web453-goep-k6-1       | HOSTNAME=201aea6a2884
+web453-goep-k6-1       | SHLVL=1
+web453-goep-k6-1       | HOME=/home/k6
+web453-goep-k6-1       | PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+web453-goep-k6-1       | PWD=/home/k6
+web453-goep-box2-1     | [::ffff:172.27.0.3]:41560: response:200
+web453-goep-curl101-1  | *   Trying 172.27.0.2:3000...
+web453-goep-curl101-1  | * Connected to box2 (172.27.0.2) port 3000 (#0)
+web453-goep-curl101-1  | > GET /etc/passwd.html HTTP/1.1
+web453-goep-curl101-1  | > Host: box2:3000
+web453-goep-curl101-1  | > User-Agent: curl/7.86.0-DEV
+web453-goep-curl101-1  | > Accept: */*
+web453-goep-curl101-1  | > 
+web453-goep-curl101-1  | <html>
+web453-goep-curl101-1  | <head>
+web453-goep-curl101-1  | <title>GoEP-IGoEP 2022</title>
+web453-goep-curl101-1  | <meta http-equiv="Refresh" content="0; url=/cgi-bin/index.sh?path=/etc/passwd" />
+web453-goep-curl101-1  | </head>
+web453-goep-curl101-1  | <body>挖形成優勢策略或均衡的坑</body>
+web453-goep-curl101-1  | </html>
+web453-goep-curl101-1  | * Mark bundle as not supporting multiuse
+web453-goep-curl101-1  | < HTTP/1.1 200 OK
+web453-goep-curl101-1  | < Date: Thu, 17 Nov 2022 13:19:57 GMT
+web453-goep-curl101-1  | < Connection: close
+web453-goep-curl101-1  | < Content-type: text/html
+web453-goep-curl101-1  | < Accept-Ranges: bytes
+web453-goep-curl101-1  | < Last-Modified: Thu, 17 Nov 2022 13:19:56 GMT
+web453-goep-curl101-1  | < ETag: "637634fc-c1"
+web453-goep-curl101-1  | < Content-Length: 193
+web453-goep-curl101-1  | < 
+web453-goep-curl101-1  | { [193 bytes data]
+web453-goep-curl101-1  | * Closing connection 0
+web453-goep-k6-1       | 
+web453-goep-k6-1       |           /\      |‾‾| /‾‾/   /‾‾/   
+web453-goep-k6-1       |      /\  /  \     |  |/  /   /  /    
+web453-goep-k6-1       |     /  \/    \    |     (   /   ‾‾\  
+web453-goep-k6-1       |    /          \   |  |\  \ |  (‾)  | 
+web453-goep-k6-1       |   / __________ \  |__| \__\ \_____/ .io
+web453-goep-k6-1       | 
+web453-goep-curl101-1  | *   Trying 172.27.0.2:3000...
+web453-goep-curl101-1  | * Connected to box2 (172.27.0.2) port 3000 (#0)
+web453-goep-curl101-1  | > GET /cgi-bin/index.sh?path=/etc/passwd HTTP/1.1
+web453-goep-curl101-1  | > Host: box2:3000
+web453-goep-curl101-1  | > User-Agent: curl/7.86.0-DEV
+web453-goep-curl101-1  | > Accept: */*
+web453-goep-curl101-1  | > 
+web453-goep-curl101-1  | path=/etc/passwd
+web453-goep-curl101-1  | * Mark bundle as not supporting multiuse
+web453-goep-curl101-1  | < HTTP/1.1 200 OK
+web453-goep-curl101-1  | < Content-Type: text/html
+web453-goep-curl101-1  | * no chunk, no close, no size. Assume close to signal end
+web453-goep-curl101-1  | < 
+web453-goep-curl101-1  | { [17 bytes data]
+web453-goep-curl101-1  | * Closing connection 0
+web453-goep-curl101-1  | /etc/passwd
+web453-goep-curl101-1  | root:x:0:0:root:/root:/bin/sh
+web453-goep-curl101-1  | daemon:x:1:1:daemon:/usr/sbin:/bin/false
+web453-goep-curl101-1  | bin:x:2:2:bin:/bin:/bin/false
+web453-goep-curl101-1  | sys:x:3:3:sys:/dev:/bin/false
+web453-goep-curl101-1  | sync:x:4:100:sync:/bin:/bin/sync
+web453-goep-curl101-1  | mail:x:8:8:mail:/var/spool/mail:/bin/false
+web453-goep-curl101-1  | www-data:x:33:33:www-data:/var/www:/bin/false
+web453-goep-curl101-1  | operator:x:37:37:Operator:/var:/bin/false
+web453-goep-curl101-1  | nobody:x:65534:65534:nobody:/home:/bin/false
+web453-goep-curl101-1  | *   Trying 172.27.0.2:3000...
+web453-goep-curl101-1  | * Connected to box2 (172.27.0.2) port 3000 (#0)
+web453-goep-curl101-1  | > GET /cgi-bin/foo.sh HTTP/1.1
+web453-goep-curl101-1  | > Host: box2:3000
+web453-goep-curl101-1  | > User-Agent: curl/7.86.0-DEV
+web453-goep-curl101-1  | > Accept: */*
+web453-goep-curl101-1  | > 
+web453-goep-curl101-1  | * Mark bundle as not supporting multiuse
+web453-goep-curl101-1  | < HTTP/1.1 302 Redirect
+web453-goep-curl101-1  | < Location: /cgi-bin/index.sh?path=/etc/passwd
+web453-goep-curl101-1  | * no chunk, no close, no size. Assume close to signal end
+web453-goep-curl101-1  | < 
+web453-goep-curl101-1  | * Closing connection 0
+web453-goep-curl101-1  | * Issue another request to this URL: 'http://box2:3000/cgi-bin/index.sh?path=/etc/passwd'
+web453-goep-curl101-1  | * Hostname box2 was found in DNS cache
+web453-goep-curl101-1  | *   Trying 172.27.0.2:3000...
+web453-goep-curl101-1  | * Connected to box2 (172.27.0.2) port 3000 (#1)
+web453-goep-curl101-1  | > GET /cgi-bin/index.sh?path=/etc/passwd HTTP/1.1
+web453-goep-curl101-1  | > Host: box2:3000
+web453-goep-curl101-1  | > User-Agent: curl/7.86.0-DEV
+web453-goep-curl101-1  | > Accept: */*
+web453-goep-curl101-1  | > 
+web453-goep-curl101-1  | path=/etc/passwd
+web453-goep-curl101-1  | * Mark bundle as not supporting multiuse
+web453-goep-curl101-1  | < HTTP/1.1 200 OK
+web453-goep-curl101-1  | < Content-Type: text/html
+web453-goep-curl101-1  | * no chunk, no close, no size. Assume close to signal end
+web453-goep-curl101-1  | < 
+web453-goep-curl101-1  | { [17 bytes data]
+web453-goep-curl101-1  | * Closing connection 1
+web453-goep-curl101-1  | /etc/passwd
+web453-goep-curl101-1  | root:x:0:0:root:/root:/bin/sh
+web453-goep-curl101-1  | daemon:x:1:1:daemon:/usr/sbin:/bin/false
+web453-goep-curl101-1  | bin:x:2:2:bin:/bin:/bin/false
+web453-goep-curl101-1  | sys:x:3:3:sys:/dev:/bin/false
+web453-goep-curl101-1  | sync:x:4:100:sync:/bin:/bin/sync
+web453-goep-curl101-1  | mail:x:8:8:mail:/var/spool/mail:/bin/false
+web453-goep-curl101-1  | www-data:x:33:33:www-data:/var/www:/bin/false
+web453-goep-curl101-1  | operator:x:37:37:Operator:/var:/bin/false
+web453-goep-curl101-1  | nobody:x:65534:65534:nobody:/home:/bin/false
+web453-goep-curl101-1 exited with code 0
+web453-goep-k6-1       |   execution: local
+web453-goep-k6-1       |      script: test.js
+web453-goep-k6-1       |      output: -
+web453-goep-k6-1       | 
+web453-goep-k6-1       |   scenarios: (100.00%) 1 scenario, 1 max VUs, 10m30s max duration (incl. graceful stop):
+web453-goep-k6-1       |            * default: 1 iterations for each of 1 VUs (maxDuration: 10m0s, gracefulStop: 30s)
+web453-goep-k6-1       | 
+web453-goep-box1-1     | [::ffff:172.27.0.5]:33368: response:200
+web453-goep-box2-1     | [::ffff:172.27.0.5]:54760: response:200
+web453-goep-k6-1       | time="2022-11-17T13:19:57Z" level=info msg="http://box2:3000/cgi-bin/index.sh?path=/etc/passwd" source=console
+web453-goep-k6-1       | 
+web453-goep-k6-1       | running (00m01.0s), 1/1 VUs, 0 complete and 0 interrupted iterations
+web453-goep-k6-1       | default   [   0% ] 1 VUs  00m01.0s/10m0s  0/1 iters, 1 per VU
+web453-goep-k6-1       | 
+web453-goep-k6-1       | running (00m01.0s), 0/1 VUs, 1 complete and 0 interrupted iterations
+web453-goep-k6-1       | default ✓ [ 100% ] 1 VUs  00m01.0s/10m0s  1/1 iters, 1 per VU
+web453-goep-k6-1       | 
+web453-goep-k6-1       |      █ test101
+web453-goep-k6-1       | 
+web453-goep-k6-1       |        ✓ box1 is 200 ok
+web453-goep-k6-1       |        ✓ box1 is /etc/passwd present
+web453-goep-k6-1       |        ✓ box2 is 200 ok
+web453-goep-k6-1       |        ✓ box2 is /etc/passwd present
+web453-goep-k6-1       |        ✓ box2/etc/passwd.html is 200 ok
+web453-goep-k6-1       |        ✓ box2/etc/passwd.html is meta http-requiv present
+web453-goep-k6-1       |        ✓ box2 foo.sh is 200 OK
+web453-goep-k6-1       |        ✓ box2 foo.sh redirect to index.sh
+web453-goep-k6-1       |        ✓ box2 foo.sh is 302 Redirect
+web453-goep-k6-1       |        ✓ foo.sh 302 url is correct
+web453-goep-k6-1       | 
+web453-goep-k6-1       |      checks.........................: 100.00% ✓ 10       ✗ 0  
+web453-goep-k6-1       |      data_received..................: 2.3 kB  2.3 kB/s
+web453-goep-k6-1       |      data_sent......................: 761 B   753 B/s
+web453-goep-k6-1       |      group_duration.................: avg=1.01s    min=1.01s    med=1.01s    max=1.01s    p(90)=1.01s    p(95)=1.01s   
+web453-goep-k6-1       |      http_req_blocked...............: avg=250.28µs min=128.77µs med=170.75µs max=524.21µs p(90)=453.35µs p(95)=488.78µs
+web453-goep-k6-1       |      http_req_connecting............: avg=124.06µs min=71.17µs  med=110.35µs max=220.13µs p(90)=177.99µs p(95)=199.06µs
+web453-goep-k6-1       |      http_req_duration..............: avg=927.69µs min=343.29µs med=457.35µs max=2.36ms   p(90)=1.78ms   p(95)=2.07ms  
+web453-goep-k6-1       |        { expected_response:true }...: avg=927.69µs min=343.29µs med=457.35µs max=2.36ms   p(90)=1.78ms   p(95)=2.07ms  
+web453-goep-k6-1       |      http_req_failed................: 0.00%   ✓ 0        ✗ 7  
+web453-goep-k6-1       |      http_req_receiving.............: avg=620.48µs min=89.96µs  med=169.27µs max=2.05ms   p(90)=1.4ms    p(95)=1.72ms  
+web453-goep-k6-1       |      http_req_sending...............: avg=47.34µs  min=34.58µs  med=44.59µs  max=75.84µs  p(90)=62.32µs  p(95)=69.08µs 
+web453-goep-k6-1       |      http_req_tls_handshaking.......: avg=0s       min=0s       med=0s       max=0s       p(90)=0s       p(95)=0s      
+web453-goep-k6-1       |      http_req_waiting...............: avg=259.85µs min=156.26µs med=272.2µs  max=369.54µs p(90)=352.15µs p(95)=360.84µs
+web453-goep-k6-1       |      http_reqs......................: 7       6.924064/s
+web453-goep-k6-1       |      iteration_duration.............: avg=1.01s    min=1.01s    med=1.01s    max=1.01s    p(90)=1.01s    p(95)=1.01s   
+web453-goep-k6-1       |      iterations.....................: 1       0.989152/s
+web453-goep-k6-1       |      vus............................: 1       min=1      max=1
+web453-goep-k6-1       |      vus_max........................: 1       min=1      max=1
+web453-goep-k6-1       | 
+web453-goep-k6-1 exited with code 0
