@@ -1,6 +1,6 @@
-# GameOfEtcPasswd (GoEP) v.s. InverseGameOfEtcPasswd (IGoEP)
+# 🔍 GameOfEtcPasswd (GoEP) v.s. 🪤 InverseGameOfEtcPasswd (IGoEP)
 
-找坑（市勢）與造坑（市勢）
+🔍找坑（市勢）與🪤造坑（市勢）
 
 Cryptoeconomics, Token Design, and Incentives in DeFi - Tim Roughgarden - YouTube https://www.youtube.com/watch?v=_LjYvQGfxOk
 

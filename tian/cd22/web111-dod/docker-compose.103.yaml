@@ -1,0 +1,31 @@
+version: "3.8"
+services:
+  box1:
+    build: .
+    command:
+      - /bin/sh
+      - -c
+      - |
+        env
+        docker run hello-world
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  box2:
+    build: .
+    command:
+      - /bin/sh
+      - -c
+      - |
+        env
+        docker run -i --init --rm -p 8300:3000 --rm busybox:1.35.0 <<EOF
+        cat <<\EOOF > index.html
+        <html>
+        <head><title>busybox</title></head>
+        <body><p>Busybox Httpd</p></body>
+        </html>
+        EOOF
+        env
+        busybox httpd -fv -p 3000
+        EOF
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
