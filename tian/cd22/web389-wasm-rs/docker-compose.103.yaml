@@ -1,0 +1,73 @@
+version: "3.8"
+services:
+  rustbuilder1:
+    build:
+      context: .
+      target: builder101
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /app/hello-wasm
+        cat <<EOOF > src/lib.rs
+        use wasm_bindgen::prelude::*;
+        use bip39::{Language, Mnemonic, Seed};
+        #[wasm_bindgen]
+        pub fn seed(phrase: &str) -> Box<[u8]> {
+          let mnemonic = Mnemonic::from_phrase(phrase, Language::ChineseTraditional).unwrap();
+          let seed = Seed::new(&mnemonic, "");
+          let seed_bytes: &[u8] = seed.as_bytes();
+          seed_bytes.to_vec().into_boxed_slice()
+        }
+        EOOF
+        cat <<EOOF > Cargo.toml
+        [package]
+        name = "hello-wasm"
+        version = "0.1.0"
+        edition = "2021"
+        [lib]
+        crate-type = ["cdylib"]
+        [dependencies]
+        wasm-bindgen = "0.2.83"
+        tiny-bip39 = "1.0.0"
+        getrandom = { version = "0.2", features = ["js"] }
+        EOOF
+        wasm-pack build --target web
+    volumes:
+      - shared-volume:/app/hello-wasm/pkg
+  box1:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cat <<EOOF > /www/index.html
+        <!DOCTYPE html>
+        <html lang="en-US">
+          <head>
+            <meta charset="utf-8" />
+            <title>bip39 example</title>
+          </head>
+          <body>
+            <h1>BIP39</h1>
+            <script type="module">
+              import init, { seed } from "/pkg/hello_wasm.js";
+              init().then(() => {
+                console.log(seed("狀 姜 幾 叛 客 參 鑽 搞 筒 冬 明 滲 等 零 願 由 改 儀"));
+              });
+            </script>
+          </body>
+        </html>
+        EOOF
+        cat <<EOOF > /etc/httpd2.conf
+        .wasm:application/wasm
+        EOOF
+        cat /etc/httpd2.conf
+        for var in `seq 1 4`; do echo "Wait...."; sleep 5; done
+        busybox httpd -fv -p 3000 -c /etc/httpd2.conf -h /www
+    volumes:
+      - shared-volume:/www/pkg
+    ports:
+      - "8300:3000"
+volumes:
+  shared-volume:
