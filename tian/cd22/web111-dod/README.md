@@ -36,3 +36,11 @@ EOF
 ```sh
 docker compose -f docker-compose.103.yaml up
 ```
+
+# 🍒 104 DCoDC
+
+內部生成的 docker compose yaml 的容器要手動一個個關掉。
+
+```sh
+docker compose -f docker-compose.104.yaml up
+```

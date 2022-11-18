@@ -1,0 +1,74 @@
+version: "3.8"
+services:
+  dod101:
+    build: .
+    command:
+      - /bin/sh
+      - -c
+      - |
+        echo DoD101
+        env
+        docker run hello-world
+        docker compose -h
+        for var in `seq 1 4`; do echo "Wait...."; sleep 3; done
+        docker ps
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  dod201:
+    build: .
+    command:
+      - /bin/sh
+      - -c
+      - |
+        echo DoD201
+        env
+        docker run -i --init --rm -p 8300:3000 --rm busybox:1.35.0 <<EOF
+        cat <<\EOOF > index.html
+        <html>
+        <head><title>busybox</title></head>
+        <body><p>Busybox Httpd</p></body>
+        </html>
+        EOOF
+        env
+        busybox httpd -fv -p 3000
+        EOF
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  dcodc:
+    build: .
+    command:
+      - /bin/sh
+      - -c
+      - |
+        echo DCoDC
+        docker compose -f - up <<\EOF
+        version: "3.8"
+        services:
+          dcodc901:
+            image: busybox:1.34.1
+            command:
+              - /bin/sh
+              - -c
+              - |
+                echo DCoDC901
+                env
+          dcodc902:
+            image: busybox:1.34.1
+            command:
+              - /bin/sh
+              - -c
+              - |
+                echo DCoDC902
+                env
+                cat <<\EOOF > index.html
+                <html>
+                <head><title>busybox</title></head>
+                <body><p>Busybox Httpd</p></body>
+                </html>
+                EOOF
+                busybox httpd -fv -p 3000
+            ports:
+              - "8930:3000"
+        EOF
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
