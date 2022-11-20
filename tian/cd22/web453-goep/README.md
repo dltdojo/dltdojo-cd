@@ -62,6 +62,8 @@ EOF
 
 另外因為 curl 無法依照 HTML meta 來轉，故新增轉位址的第二種模式 302 Redirect，要讓瀏覽器轉與 curl 文字界面工具轉地址作法不一樣，這兩種作法除了客戶端是否解析之外，在協定回應訊息的位置也不同，上述　102 放在 HTML meta 中是 HTTP 協定 Response 回應訊息的 Body 體區 [Response.body - Web APIs | MDN](https://developer.mozilla.org/en-US/docs/Web/API/Response/body)，這個 HTTP Response.body 與 HTML body 不同，但是口語常說 body 容易聽錯位置，至於 HTTP Code 302 則是放在 HTTP 協定 Response 訊息頭區 [Response.headers - Web APIs | MDN](https://developer.mozilla.org/en-US/docs/Web/API/Response/headers) 。
 
+瀏覽器端除了 html meta refresh 之外，還有使用 ```<script>history.replaceState(null, "","/new/url.html");</script>``` 的作法，參考[edgeworkers-examples/edgecompute/examples/traffic-routing/redirect-liquidator](https://github.com/akamai/edgeworkers-examples/tree/master/edgecompute/examples/traffic-routing/redirect-liquidator)。不過這個要求相對更高，不只是支援 HTML 還必須支援 JavaScript。而這兩個都不是純 HTTP 客戶端如 curl 可以處理，如必須要無圖形界面環境測試需要引入無頭瀏覽器來支援 HTML+JavaScript 。
+
 - http://localhost:8301/etc/passwd
 - http://localhost:8302/etc/passwd.html
 - http://localhost:8302/cgi-bin/index.sh?path=/etc/passwd
@@ -111,4 +113,5 @@ web453-goep-k6-1       |        ✓ foo.sh 302 url is correct
 
 # TODO
 
+- javascript redirect [edgeworkers-examples/edgecompute/examples/traffic-routing/redirect-liquidator](https://github.com/akamai/edgeworkers-examples/tree/master/edgecompute/examples/traffic-routing/redirect-liquidator)
 - 2x2 games
