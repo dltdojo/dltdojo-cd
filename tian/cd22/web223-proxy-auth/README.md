@@ -137,11 +137,36 @@ const resp = await fetch("http://opa101:8181/v1/data/httpapi/authz", {
 
 內部分成兩種確認方式，一種是直接找檢核的 deno101 看是否有通，另一種找內部的 traefik 來模擬代理行為，只是後面的作法需要加上適當的 Host 來模擬從外面環境存取的瀏覽器發送之 http header。
 
-# 🍖 105 TLS
+```sh
+docker compose -f docker-compose.104.yaml up
+```
 
-104 將 busybox httpd 的資源管制切分到 traefik 的 forwaredauth 功能結合 opa，這個範例使用代理的外部 https 來轉接進入裡面的 http 服務。 
+# 🐝 105 k6 testing
 
-# 🍔 TODO
+k601 與 deno201 都是做測試，差別在 k6 是專門作測試用工具。切分更多微服務也會衍生更多的微服務測試。
+
+[k6 JavaScript API](https://k6.io/docs/javascript-api/)
+
+```sh
+docker compose -f docker-compose.105.yaml up
+```
+
+# 🐓 106 HTML login form
+
+```sh
+docker compose -f docker-compose.106.yaml up
+```
+
+
+# 🍖 10x TLS
+
+104 將 busybox httpd 的資源管制切分到 traefik 的 forwaredauth 功能結合 opa，這個範例使用代理的外部 https 來轉接進入裡面的 http 服務。
+
+
+
+
+
+# 🍔🐐🐑🐒🐓🐔🐕🐖🐗🐘🐙🐚🐛🐜🐝 TODO
 
 # Valut Auth Token
 

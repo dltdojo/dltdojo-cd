@@ -1,0 +1,173 @@
+version: "3.8"
+services:
+  traefik:
+    image: "traefik:v2.9"
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "8700:80"
+      - "8780:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  opa101:
+    build:
+      context: .
+      target: opa101
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /tmp
+        cat <<EOOF > policy101.rego
+        package x103.authz
+        default allow = false
+        allow {
+            input.X_FORWARDED_URI == "/foo.html"
+            input.method == "GET"
+        }
+        EOOF
+        # The output of a Wasm module built this way contain the result of evaluating the entrypoint rule. 
+        opa build -t wasm -e x103/authz/allow policy101.rego
+        tar zxvf bundle.tar.gz
+        ls -al /tmp
+        busybox httpd -f -v -p 3000
+    ports:
+      - "8103:3000"
+  deno101:
+    build:
+      context: .
+      target: deno101
+    entrypoint: sh
+    command:
+      - -c 
+      - |
+        sleep 5
+        cat <<\EOOF > webserver.ts
+        import { serve, opa } from "./deps.ts";
+        const remoteResp = await fetch("http://opa101:3000/policy.wasm");
+        const remoteArrayBuffer = await remoteResp.arrayBuffer();
+        const policy = await opa.loadPolicy(remoteArrayBuffer);
+        const handler = async (req: Request): Promise<Response> => {
+          const url = new URL(req.url);
+          const req101 = {
+            method: req.method,
+            path: url.pathname,
+            X_FORWARDED_URI: req.headers.get("x-forwarded-uri"),
+          };
+          console.log(req101);
+          const evalResult = policy.evaluate(req101);
+          let finalresp = new Response("Auth Error 201",{status:404});
+          if (evalResult) {
+            finalresp =  evalResult[0].result ? new Response("OK") : new Response("Auth Error 301",{status: 403});
+          }
+          console.log(finalresp);
+          return finalresp;
+        };
+        await serve(handler, { port:8080});
+        EOOF
+        deno run --allow-net webserver.ts
+    ports:
+      - "8303:8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.traefik-forward-auth.forwardauth.address=http://deno101:8080/auth"
+  curl101:
+    image: curlimages/curl:7.86.0
+    command:
+      - sh
+      - -c
+      - |
+        sleep 10
+        curl -sv -H "x-testid: 1001" http://deno101:8080
+        curl -sv -H "x-testid: 2001" -H "x-forwarded-uri: /foo.html" http://deno101:8080
+        curl -sv -H "x-testid: 3001" -H 'Host: box1.localhost' http://traefik:80
+        curl -sv -H "x-testid: 4001" -H 'Host: box1.localhost' http://traefik:80/foo.html
+  k601:
+    image: grafana/k6:0.41.0
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        sleep 12
+        cat <<EOF > test.js
+        import http from 'k6/http';
+        import { sleep, check, group } from 'k6';
+        export default function () {
+          group('test101', _ => {
+            const r1 = http.get('http://deno101:8080');
+            check(r1, {
+              'test1001 without header is status 403': r => r.status == 403,
+            });
+            const r2 = http.get('http://deno101:8080', { 
+              headers: {
+                "x-forwarded-uri":"/foo.html"
+              }
+            });
+            check(r2, {
+              'test2001 with header is status 200': r => r.status == 200,
+            });
+            const r3001 = http.get('http://traefik:80', { 
+              headers: {
+                "Host":"box1.localhost"
+              }
+            });
+            check(r3001, {
+              'test3001 box1.localhost/ is status 403': r => r.status == 403,
+            });
+            const r4001 = http.get('http://traefik:80/foo.html', { 
+              headers: {
+                "Host":"box1.localhost"
+              }
+            });
+            check(r4001, {
+              'test4001 box1.localhost/foo.html is status 200': r => r.status == 200,
+            });
+          })
+        }
+        EOF
+        env
+        k6 run test.js
+  deno201:
+    build:
+      context: .
+      target: deno101
+    entrypoint: sh
+    command:
+      - -c 
+      - |
+        cat <<\EOOF > test.ts
+        import { chai } from "./deps.ts";
+        const resp1 = await fetch("http://deno101:8080", {
+            method: "GET",
+            headers: {"x-forwarded-uri": "/foo.html"}
+          });
+        chai.assert.equal(200, resp1.status);
+        const resp2 = await fetch("http://deno101:8080");
+        chai.assert.equal(403, resp2.status);
+        EOOF
+        sleep 15
+        deno run --allow-net test.ts
+  box1:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /tmp
+        echo "<html><head><title>Box1 INDEX</title></head><body><h1>Box1 INDEX</h1></body></html>" > index.html
+        echo "<html><head><title>Box1 Foo</title></head><body><h1>Box1 Foo</h1></body></html>" > foo.html
+        echo "<html><head><title>Box1 Bar</title></head><body><h1>Box1 Bar</h1></body></html>" > bar.html
+        busybox httpd -f -v -p 3000
+    ports:
+      - "8301:3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.box1.rule=Host(`box1.localhost`) || PathPrefix(`/box1`)"
+      - "traefik.http.routers.box1.entrypoints=web"
+      - "traefik.http.services.box1.loadbalancer.server.port=3000"
+      - "traefik.http.middlewares.box1-stripprefix.stripprefix.prefixes=/box1"
+      - "traefik.http.routers.box1.middlewares=box1-stripprefix@docker, traefik-forward-auth"
