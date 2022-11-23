@@ -10,6 +10,6 @@ DOCKER_BUILDKIT=1 docker build -t foo101 --target=netcat101 .
 - [web101-http-client: busybox+ash+printf+nc](web101-http-client/README.md)
 
 
-# TODOs
+# 🍔🐐🐑🐒🐓🐕🐖🐗🐘🐙🐚🐛🐜🐝 TODOs
 
 - async web3 

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Miden WebAssembly</title>
+    <script type="module">
+        import init, { miden_prove } from './pkg/zk101.js';
+        await init();
+        let r = await miden_prove();
+        console.log(r);
+        //console.log("outputs:", r.outputs);
+        //console.log("proof:", r.proof);
+    </script>
+</head>
+<body>
+    <h1>Miden VM Testing</h1>
+</body>
+</html>

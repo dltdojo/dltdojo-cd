@@ -166,7 +166,7 @@ docker compose -f docker-compose.106.yaml up
 
 
 
-# 🍔🐐🐑🐒🐓🐕🐖🐗🐘🐙🐚🐛🐜🐝 TODO
+# TODO
 
 # Valut Auth Token
 
