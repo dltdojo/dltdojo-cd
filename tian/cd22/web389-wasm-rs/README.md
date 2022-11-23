@@ -74,3 +74,38 @@ EOF
 ```sh
 docker compose -f docker-compose.103.yaml up
 ```
+
+# 🐔 104 zk-STARKs cairo-rs-wasm
+
+- [lambdaclass/cairo-rs-wasm](https://github.com/lambdaclass/cairo-rs-wasm)
+- size 917MB [cypress/included - Docker Image | Docker Hub](https://hub.docker.com/r/cypress/included)
+- [Check console logs | Cypress examples (v9.7.0)](https://glebbahmutov.com/cypress-examples/9.7.0/recipes/check-console-logs.html#check-at-the-end-of-the-test)
+- [Using Cypress | Cypress Documentation](https://docs.cypress.io/faq/questions/using-cypress-faq#How-do-I-spy-on-console-log)
+
+cairo-rs-wasm 的自動化測試需檢視 browser console log，需要設定大容量的內建瀏覽器的網頁測試工具 cypress 。
+
+build
+
+```sh
+git clone https://github.com/lambdaclass/cairo-rs-wasm
+cd cairo-rs-wasm
+wasm-pack build --target=web
+```
+
+running
+
+```sh
+docker run -i --init -p 8300:3000 --rm -v $PWD:/home:ro busybox:1.35.0 <<EOF
+echo http://localhost:8300
+cat <<EOOF > /etc/httpd.conf
+.wasm:application/wasm
+EOOF
+busybox httpd -fv -p 3000 -c /etc/httpd.conf -h /home
+EOF
+```
+
+running http service and cypress testing
+
+```
+docker compose -f docker-compose.104.yaml up
+```

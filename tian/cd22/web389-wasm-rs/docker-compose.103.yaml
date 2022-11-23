@@ -59,12 +59,12 @@ services:
           </body>
         </html>
         EOOF
-        cat <<EOOF > /etc/httpd2.conf
+        cat <<EOOF > /etc/httpd.conf
         .wasm:application/wasm
         EOOF
-        cat /etc/httpd2.conf
+        cat /etc/httpd.conf
         for var in `seq 1 4`; do echo "Wait...."; sleep 5; done
-        busybox httpd -fv -p 3000 -c /etc/httpd2.conf -h /www
+        busybox httpd -fv -p 3000 -c /etc/httpd.conf -h /www
     volumes:
       - shared-volume:/www/pkg
     ports:
