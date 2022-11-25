@@ -6,10 +6,10 @@
     <script type="module">
         import init, { miden_prove } from './pkg/zk101.js';
         await init();
-        let r = await miden_prove();
-        console.log(r);
-        //console.log("outputs:", r.outputs);
-        //console.log("proof:", r.proof);
+        let r = await miden_prove("begin push.6 push.5 add end");
+        console.log("code:", r.code);
+        console.log("proof:", r.proof);
+        console.log("outputs[0]=", r.outputs[0]);
     </script>
 </head>
 <body>

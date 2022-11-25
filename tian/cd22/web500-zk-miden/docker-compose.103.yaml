@@ -1,0 +1,123 @@
+version: "3.8"
+services:
+  rustbuilder1:
+    build:
+      context: .
+      target: builder101
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /app/hello-wasm
+        cat <<EOOF > src/lib.rs
+        use wasm_bindgen::prelude::*;
+        use miden_prover::{prove, ProgramInputs, ProofOptions};
+        use miden_assembly::Assembler;
+        #[wasm_bindgen(getter_with_clone)]
+        pub struct ProveResult {
+            pub outputs: Box<[u64]>,
+            pub proof: Box<[u8]>,
+            pub code: String,
+        }
+        #[wasm_bindgen]
+        pub fn miden_prove(assembly_code: &str) -> ProveResult {
+            console_error_panic_hook::set_once();
+            let assembler = Assembler::default();
+            //let program = assembler.compile("begin push.3 push.5 add end").unwrap();
+            let program = assembler.compile(assembly_code).unwrap();
+            let (outputs, proof) = prove(
+                &program,
+                &ProgramInputs::none(),   
+                &ProofOptions::default(),
+            )
+            .unwrap();
+            // println!("Program output: {:?}", outputs.stack_outputs(num_outputs));
+            // assert_eq!(vec![8], outputs.stack_outputs(1));
+            ProveResult {
+                outputs: outputs.stack_outputs(1).to_vec().into_boxed_slice(),
+                proof: proof.to_bytes().to_vec().into_boxed_slice(),
+                code: assembly_code.to_string(),
+            }
+        }
+        EOOF
+        rm /app/hello-wasm/pkg/done
+        wasm-pack build --target web
+        echo done > /app/hello-wasm/pkg/done
+    volumes:
+      - shared-volume:/app/hello-wasm/pkg
+  box101:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cat <<EOOF > /www/index.html
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Miden WebAssembly</title>
+            <script type="module">
+                import init, { miden_prove } from './pkg/hello_wasm.js';
+                await init();
+                let r = await miden_prove("begin push.6 push.9 add end");
+                console.log("code:", r.code);
+                console.log("proof:", r.proof);
+                console.log("outputs[0]=", r.outputs[0]);
+            </script>
+        </head>
+        <body>
+            <h1>Miden VM Testing</h1>
+        </body>
+        </html>
+        EOOF
+        cat <<EOOF > /etc/httpd.conf
+        .wasm:application/wasm
+        EOOF
+        cat /etc/httpd.conf
+        sleep 5
+        ls -alh /www/pkg
+        # for var in `seq 1 5`; do echo "Wait...."; sleep 3; done
+        while [ ! -f /www/pkg/done ]; do sleep 2; done; ls -alh /www/pkg
+        echo http://localhost:8300
+        busybox httpd -fv -p 3000 -c /etc/httpd.conf -h /www
+    volumes:
+      - shared-volume:/www/pkg
+    ports:
+      - "8300:3000"
+  cypress101:
+    image: cypress/included:11.2.0
+    entrypoint: /bin/sh
+    environment:
+      - CYPRESS_VIDEO=false
+    command:
+      - -c
+      - |
+        cat <<\EOF > /tmp/cypress.config.js
+        const { defineConfig } = require('cypress')
+        module.exports = defineConfig({
+          e2e: {
+            baseUrl: 'http://box101:3000',
+            supportFile: false,
+            specPattern: '/tmp/*.cy.{js,jsx,ts,tsx}'
+          }
+        })
+        EOF
+        cat <<\EOF > /tmp/spec.cy.js
+        it('loads page', () => {
+          cy.visit('/',{
+            onBeforeLoad(win) {
+              cy.stub(win.console, 'log').as('consoleLog')
+            },
+          })
+          cy.get('@consoleLog').should('be.calledWith', 'outputs[0]=',15n)
+        })
+        EOF
+        cypress info
+        sleep 5
+        while [ ! -f /tmp/pkg/done ]; do sleep 5; done; ls -alh /tmp/pkg
+        cypress run --browser firefox --config-file /tmp/cypress.config.js --spec "/tmp/spec.cy.js"
+        cypress run --browser chrome --config-file /tmp/cypress.config.js --spec "/tmp/spec.cy.js"
+    volumes:
+      - shared-volume:/tmp/pkg
+volumes:
+  shared-volume:
