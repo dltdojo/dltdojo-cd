@@ -12,4 +12,10 @@ DOCKER_BUILDKIT=1 docker build -t foo101 --target=netcat101 .
 
 # 🍔🐐🐑🐒🐓🐕🐖🐗🐘🐙🐚🐛🐜🐝 TODOs
 
+🍅 🍆 🍇 🍈 🍉 🍊 🍋 🍌 🍍 🍎 🍏
+🍐 🍑 🍒 🍓 🍔 🍕 🍖 🍗 🍘 🍙 🍚 🍛 🍜 🍝 	🍞 	🍟
+🍠 🍡 🍢 🍣 🍤 🍥 🍦 🍧 🍨 🍩 🍪 🍫 🍬 🍭 	🍮 	🍯
+🍰 🍱 🍲 🍳 🍴 🍵 🍶 🍷 🍸 🍹 🍺 🍻 🍼 🍽️ 	🍾 	🍿
+🎀 🎁 🎂 🎃 🎄
+
 - async web3 

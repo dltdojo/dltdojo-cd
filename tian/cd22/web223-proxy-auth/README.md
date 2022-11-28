@@ -157,6 +157,10 @@ docker compose -f docker-compose.105.yaml up
 docker compose -f docker-compose.106.yaml up
 ```
 
+# 🍮 10x From monoliths to microservices
+
+busybox httpd
+
 
 # 🍖 10x TLS
 

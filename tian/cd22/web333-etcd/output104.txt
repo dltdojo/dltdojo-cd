@@ -1,0 +1,125 @@
+docker compose -f docker-compose.104.yaml up
+
+[+] Running 4/4
+ ⠿ Container web333-etcd-etcd101-1    Created                                                                                                                           0.0s
+ ⠿ Container web333-etcd-etcd201-1    Created                                                                                                                           0.0s
+ ⠿ Container web333-etcd-node101-1    Created                                                                                                                           0.0s
+ ⠿ Container web333-etcd-golang101-1  Recreated                                                                                                                         0.2s
+Attaching to web333-etcd-etcd101-1, web333-etcd-etcd201-1, web333-etcd-golang101-1, web333-etcd-node101-1
+web333-etcd-golang101-1  | HOSTNAME=4e4720f5c916
+web333-etcd-golang101-1  | HOME=/root
+web333-etcd-golang101-1  | PATH=/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+web333-etcd-golang101-1  | GOPATH=/go
+web333-etcd-golang101-1  | PWD=/go
+web333-etcd-golang101-1  | GOLANG_VERSION=1.19.3
+web333-etcd-golang101-1  | go: creating new go.mod: module main
+web333-etcd-golang101-1  | go: to add module requirements and sums:
+web333-etcd-golang101-1  |      go mod tidy
+web333-etcd-golang101-1  | go: finding module for package go.etcd.io/etcd/client/v3
+web333-etcd-etcd201-1    | HOSTNAME=69a67e0943bc
+web333-etcd-etcd201-1    | HOME=/root
+web333-etcd-etcd201-1    | PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+web333-etcd-etcd201-1    | PWD=/
+web333-etcd-etcd101-1    | HOSTNAME=ff56f6912128
+web333-etcd-etcd101-1    | HOME=/root
+web333-etcd-etcd101-1    | PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+web333-etcd-etcd101-1    | PWD=/
+web333-etcd-node101-1    | NODE_VERSION=18.12.1
+web333-etcd-node101-1    | HOSTNAME=b22d1e944002
+web333-etcd-node101-1    | YARN_VERSION=1.22.19
+web333-etcd-node101-1    | SHLVL=2
+web333-etcd-node101-1    | HOME=/root
+web333-etcd-node101-1    | PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+web333-etcd-node101-1    | PWD=/
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.364Z","caller":"etcdmain/etcd.go:73","msg":"Running: ","args":["etcd","--advertise-client-urls=http://etcd101:2379","--listen-client-urls=http://0.0.0.0:2379"]}
+web333-etcd-etcd101-1    | {"level":"warn","ts":"2022-11-28T14:26:35.364Z","caller":"etcdmain/etcd.go:105","msg":"'data-dir' was empty; using default","data-dir":"default.etcd"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.364Z","caller":"etcdmain/etcd.go:116","msg":"server has been already initialized","data-dir":"default.etcd","dir-type":"member"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.364Z","caller":"embed/etcd.go:124","msg":"configuring peer listeners","listen-peer-urls":["http://localhost:2380"]}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.365Z","caller":"embed/etcd.go:132","msg":"configuring client listeners","listen-client-urls":["http://0.0.0.0:2379"]}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.366Z","caller":"embed/etcd.go:306","msg":"starting an etcd server","etcd-version":"3.5.6","git-sha":"cecbe35ce","go-version":"go1.16.15","go-os":"linux","go-arch":"amd64","max-cpu-set":8,"max-cpu-available":8,"member-initialized":true,"name":"default","data-dir":"default.etcd","wal-dir":"","wal-dir-dedicated":"","member-dir":"default.etcd/member","force-new-cluster":false,"heartbeat-interval":"100ms","election-timeout":"1s","initial-election-tick-advance":true,"snapshot-count":100000,"max-wals":5,"max-snapshots":5,"snapshot-catchup-entries":5000,"initial-advertise-peer-urls":["http://localhost:2380"],"listen-peer-urls":["http://localhost:2380"],"advertise-client-urls":["http://etcd101:2379"],"listen-client-urls":["http://0.0.0.0:2379"],"listen-metrics-urls":[],"cors":["*"],"host-whitelist":["*"],"initial-cluster":"","initial-cluster-state":"new","initial-cluster-token":"","quota-backend-bytes":2147483648,"max-request-bytes":1572864,"max-concurrent-streams":4294967295,"pre-vote":true,"initial-corrupt-check":false,"corrupt-check-time-interval":"0s","compact-check-time-enabled":false,"compact-check-time-interval":"1m0s","auto-compaction-mode":"periodic","auto-compaction-retention":"0s","auto-compaction-interval":"0s","discovery-url":"","discovery-proxy":"","downgrade-check-interval":"5s"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.366Z","caller":"etcdserver/backend.go:81","msg":"opened backend db","path":"default.etcd/member/snap/db","took":"177.372µs"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.366Z","caller":"etcdserver/server.go:530","msg":"No snapshot found. Recovering WAL from scratch!"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.367Z","caller":"etcdserver/raft.go:529","msg":"restarting local member","cluster-id":"cdf818194e3a8c32","local-member-id":"8e9e05c52164694d","commit-index":24}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.367Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"8e9e05c52164694d switched to configuration voters=()"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.367Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"8e9e05c52164694d became follower at term 4"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.367Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"newRaft 8e9e05c52164694d [peers: [], term: 4, commit: 24, applied: 0, lastindex: 24, lastterm: 4]"}
+web333-etcd-etcd101-1    | {"level":"warn","ts":"2022-11-28T14:26:35.367Z","caller":"auth/store.go:1234","msg":"simple token is not cryptographically signed"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.370Z","caller":"mvcc/kvstore.go:393","msg":"kvstore restored","current-rev":17}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.370Z","caller":"etcdserver/quota.go:94","msg":"enabled backend quota with default value","quota-name":"v3-applier","quota-size-bytes":2147483648,"quota-size":"2.1 GB"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.371Z","caller":"etcdserver/server.go:854","msg":"starting etcd server","local-member-id":"8e9e05c52164694d","local-server-version":"3.5.6","cluster-version":"to_be_decided"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.371Z","caller":"etcdserver/server.go:754","msg":"starting initial election tick advance","election-ticks":10}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.371Z","caller":"fileutil/purge.go:44","msg":"started to purge file","dir":"default.etcd/member/snap","suffix":"snap.db","max":5,"interval":"30s"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.371Z","caller":"fileutil/purge.go:44","msg":"started to purge file","dir":"default.etcd/member/snap","suffix":"snap","max":5,"interval":"30s"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.371Z","caller":"fileutil/purge.go:44","msg":"started to purge file","dir":"default.etcd/member/wal","suffix":"wal","max":5,"interval":"30s"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.372Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"8e9e05c52164694d switched to configuration voters=(10276657743932975437)"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.372Z","caller":"membership/cluster.go:421","msg":"added member","cluster-id":"cdf818194e3a8c32","local-member-id":"8e9e05c52164694d","added-peer-id":"8e9e05c52164694d","added-peer-peer-urls":["http://localhost:2380"]}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.372Z","caller":"membership/cluster.go:584","msg":"set initial cluster version","cluster-id":"cdf818194e3a8c32","local-member-id":"8e9e05c52164694d","cluster-version":"3.5"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.372Z","caller":"api/capability.go:75","msg":"enabled capabilities for version","cluster-version":"3.5"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.373Z","caller":"embed/etcd.go:275","msg":"now serving peer/client/metrics","local-member-id":"8e9e05c52164694d","initial-advertise-peer-urls":["http://localhost:2380"],"listen-peer-urls":["http://localhost:2380"],"advertise-client-urls":["http://etcd101:2379"],"listen-client-urls":["http://0.0.0.0:2379"],"listen-metrics-urls":[]}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.374Z","caller":"embed/etcd.go:586","msg":"serving peer traffic","address":"127.0.0.1:2380"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:35.374Z","caller":"embed/etcd.go:558","msg":"cmux::serve","address":"127.0.0.1:2380"}
+web333-etcd-golang101-1  | go: downloading go.etcd.io/etcd/client/v3 v3.5.6
+web333-etcd-golang101-1  | go: downloading go.etcd.io/etcd v3.3.27+incompatible
+web333-etcd-node101-1    | 
+web333-etcd-node101-1    | up to date, audited 40 packages in 796ms
+web333-etcd-node101-1    | 
+web333-etcd-node101-1    | 2 packages are looking for funding
+web333-etcd-node101-1    |   run `npm fund` for details
+web333-etcd-node101-1    | 
+web333-etcd-node101-1    | found 0 vulnerabilities
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:36.468Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"8e9e05c52164694d is starting a new election at term 4"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:36.468Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"8e9e05c52164694d became pre-candidate at term 4"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:36.468Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"8e9e05c52164694d received MsgPreVoteResp from 8e9e05c52164694d at term 4"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:36.468Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"8e9e05c52164694d became candidate at term 5"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:36.468Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"8e9e05c52164694d received MsgVoteResp from 8e9e05c52164694d at term 5"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:36.468Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"8e9e05c52164694d became leader at term 5"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:36.468Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"raft.node: 8e9e05c52164694d elected leader 8e9e05c52164694d at term 5"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:36.470Z","caller":"embed/serve.go:100","msg":"ready to serve client requests"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:36.470Z","caller":"etcdserver/server.go:2054","msg":"published local member to cluster through raft","local-member-id":"8e9e05c52164694d","local-member-attributes":"{Name:default ClientURLs:[http://etcd101:2379]}","request-path":"/0/members/8e9e05c52164694d/attributes","cluster-id":"cdf818194e3a8c32","publish-timeout":"7s"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:36.470Z","caller":"etcdmain/main.go:44","msg":"notifying init daemon"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:36.470Z","caller":"etcdmain/main.go:50","msg":"successfully notified init daemon"}
+web333-etcd-etcd101-1    | {"level":"info","ts":"2022-11-28T14:26:36.470Z","caller":"embed/serve.go:146","msg":"serving client traffic insecurely; this is strongly discouraged!","address":"[::]:2379"}
+web333-etcd-golang101-1  | go: found go.etcd.io/etcd/client/v3 in go.etcd.io/etcd/client/v3 v3.5.6
+web333-etcd-etcd201-1    | OK
+web333-etcd-golang101-1  | go: downloading go.etcd.io/etcd/api/v3 v3.5.6
+web333-etcd-golang101-1  | go: downloading go.etcd.io/etcd/client/pkg/v3 v3.5.6
+web333-etcd-golang101-1  | go: downloading go.uber.org/zap v1.17.0
+web333-etcd-golang101-1  | go: downloading google.golang.org/grpc v1.41.0
+web333-etcd-golang101-1  | go: downloading github.com/gogo/protobuf v1.3.2
+web333-etcd-golang101-1  | go: downloading github.com/golang/protobuf v1.5.2
+web333-etcd-golang101-1  | go: downloading google.golang.org/genproto v0.0.0-20210602131652-f16073e35f0c
+web333-etcd-golang101-1  | go: downloading github.com/coreos/go-semver v0.3.0
+web333-etcd-golang101-1  | go: downloading github.com/coreos/go-systemd/v22 v22.3.2
+web333-etcd-golang101-1  | go: downloading go.uber.org/atomic v1.7.0
+web333-etcd-golang101-1  | go: downloading go.uber.org/multierr v1.6.0
+web333-etcd-golang101-1  | go: downloading github.com/pkg/errors v0.9.1
+web333-etcd-golang101-1  | go: downloading github.com/stretchr/testify v1.7.0
+web333-etcd-golang101-1  | go: downloading gopkg.in/yaml.v2 v2.4.0
+web333-etcd-golang101-1  | go: downloading golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4
+web333-etcd-golang101-1  | go: downloading github.com/google/go-cmp v0.5.5
+web333-etcd-node101-1    | foo is: bar
+web333-etcd-node101-1    | all keys starting with "f" { foo: 'bar', foo123: 'bar123' }
+web333-etcd-etcd201-1    | DELETE
+web333-etcd-etcd201-1    | key101
+web333-etcd-etcd201-1    | 
+web333-etcd-etcd201-1    | ====> Key101 Updated
+web333-etcd-golang101-1  | go: downloading google.golang.org/protobuf v1.26.0
+web333-etcd-etcd201-1    | PUT
+web333-etcd-etcd201-1    | key101
+web333-etcd-etcd201-1    | value101
+web333-etcd-etcd101-1    | OK
+web333-etcd-etcd201-1    | ====> Key101 Updated
+web333-etcd-node101-1    | key101 got set to: value101
+web333-etcd-golang101-1  | go: downloading golang.org/x/sys v0.0.0-20210603081109-ebe580a85c40
+web333-etcd-golang101-1  | go: downloading github.com/pmezard/go-difflib v1.0.0
+web333-etcd-golang101-1  | go: downloading github.com/davecgh/go-spew v1.1.1
+web333-etcd-golang101-1  | go: downloading gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
+web333-etcd-golang101-1  | go: downloading golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
+web333-etcd-golang101-1  | go: downloading golang.org/x/text v0.3.5
+web333-etcd-etcd101-1    | {"header":{"cluster_id":14841639068965178418,"member_id":10276657743932975437,"revision":22,"raft_term":5},"kvs":[{"key":"a2V5MTAx","create_revision":22,"mod_revision":22,"version":1,"value":"dmFsdWUxMDE="}],"count":1}
+web333-etcd-etcd201-1    | PUT
+web333-etcd-etcd201-1    | key101
+web333-etcd-etcd201-1    | value101-golang101
+web333-etcd-golang101-1  | Hello, World
+web333-etcd-etcd201-1    | ====> Key101 Updated
+web333-etcd-node101-1    | key101 got set to: value101-golang101

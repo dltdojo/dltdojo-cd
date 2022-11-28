@@ -1,0 +1,32 @@
+version: "3.8"
+# https://github.com/guessi/docker-compose-etcd/blob/master/docker-compose.yml
+# https://hub.docker.com/r/bitnami/etcd
+# WatchBuilder | etcd3 https://microsoft.github.io/etcd3/classes/watchbuilder.html
+services:
+  etcd101:
+    image: quay.io/coreos/etcd:v3.5.6
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        etcdctl -h
+        etcd --advertise-client-urls=http://etcd101:2379 --listen-client-urls=http://0.0.0.0:2379 &
+        sleep 8
+        etcdctl put key101 value101
+        sleep 2
+        etcdctl get -w json key101 
+        wait
+    ports:
+      - 2379:2379
+  etcd201:
+    image: quay.io/coreos/etcd:v3.5.6
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        env
+        etcdctl -h
+        sleep 2
+        etcdctl --endpoints=http://etcd101:2379 put key201 value201
+        sleep 2
+        etcdctl --endpoints=http://etcd101:2379 watch key101 -- echo "====> Key101 Updated"

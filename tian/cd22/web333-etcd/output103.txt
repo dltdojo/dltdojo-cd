@@ -1,0 +1,86 @@
+docker compose -f docker-compose.103.yaml up
+
+[+] Running 3/0
+ ⠿ Container web333-etcd-etcd101-1  Created                                                                                                                             0.0s
+ ⠿ Container web333-etcd-node101-1  Recreated                                                                                                                           0.1s
+ ⠿ Container web333-etcd-etcd201-1  Created                                                                                                                             0.0s
+Attaching to web333-etcd-etcd101-1, web333-etcd-etcd201-1, web333-etcd-node101-1
+web333-etcd-etcd201-1  | HOSTNAME=69a67e0943bc
+web333-etcd-etcd201-1  | HOME=/root
+web333-etcd-etcd201-1  | PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+web333-etcd-etcd201-1  | PWD=/
+web333-etcd-etcd101-1  | HOSTNAME=ff56f6912128
+web333-etcd-etcd101-1  | HOME=/root
+web333-etcd-etcd101-1  | PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+web333-etcd-etcd101-1  | PWD=/
+web333-etcd-node101-1  | NODE_VERSION=18.12.1
+web333-etcd-node101-1  | HOSTNAME=b22d1e944002
+web333-etcd-node101-1  | YARN_VERSION=1.22.19
+web333-etcd-node101-1  | SHLVL=2
+web333-etcd-node101-1  | HOME=/root
+web333-etcd-node101-1  | PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+web333-etcd-node101-1  | PWD=/
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:02.984Z","caller":"etcdmain/etcd.go:73","msg":"Running: ","args":["etcd","--advertise-client-urls=http://etcd101:2379","--listen-client-urls=http://0.0.0.0:2379"]}
+web333-etcd-etcd101-1  | {"level":"warn","ts":"2022-11-28T14:22:02.985Z","caller":"etcdmain/etcd.go:105","msg":"'data-dir' was empty; using default","data-dir":"default.etcd"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:02.985Z","caller":"etcdmain/etcd.go:116","msg":"server has been already initialized","data-dir":"default.etcd","dir-type":"member"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:02.985Z","caller":"embed/etcd.go:124","msg":"configuring peer listeners","listen-peer-urls":["http://localhost:2380"]}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:02.988Z","caller":"embed/etcd.go:132","msg":"configuring client listeners","listen-client-urls":["http://0.0.0.0:2379"]}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:02.989Z","caller":"embed/etcd.go:306","msg":"starting an etcd server","etcd-version":"3.5.6","git-sha":"cecbe35ce","go-version":"go1.16.15","go-os":"linux","go-arch":"amd64","max-cpu-set":8,"max-cpu-available":8,"member-initialized":true,"name":"default","data-dir":"default.etcd","wal-dir":"","wal-dir-dedicated":"","member-dir":"default.etcd/member","force-new-cluster":false,"heartbeat-interval":"100ms","election-timeout":"1s","initial-election-tick-advance":true,"snapshot-count":100000,"max-wals":5,"max-snapshots":5,"snapshot-catchup-entries":5000,"initial-advertise-peer-urls":["http://localhost:2380"],"listen-peer-urls":["http://localhost:2380"],"advertise-client-urls":["http://etcd101:2379"],"listen-client-urls":["http://0.0.0.0:2379"],"listen-metrics-urls":[],"cors":["*"],"host-whitelist":["*"],"initial-cluster":"","initial-cluster-state":"new","initial-cluster-token":"","quota-backend-bytes":2147483648,"max-request-bytes":1572864,"max-concurrent-streams":4294967295,"pre-vote":true,"initial-corrupt-check":false,"corrupt-check-time-interval":"0s","compact-check-time-enabled":false,"compact-check-time-interval":"1m0s","auto-compaction-mode":"periodic","auto-compaction-retention":"0s","auto-compaction-interval":"0s","discovery-url":"","discovery-proxy":"","downgrade-check-interval":"5s"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:02.990Z","caller":"etcdserver/backend.go:81","msg":"opened backend db","path":"default.etcd/member/snap/db","took":"368.59µs"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:02.993Z","caller":"etcdserver/server.go:530","msg":"No snapshot found. Recovering WAL from scratch!"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:02.994Z","caller":"etcdserver/raft.go:529","msg":"restarting local member","cluster-id":"cdf818194e3a8c32","local-member-id":"8e9e05c52164694d","commit-index":9}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:02.994Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"8e9e05c52164694d switched to configuration voters=()"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:02.995Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"8e9e05c52164694d became follower at term 2"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:02.995Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"newRaft 8e9e05c52164694d [peers: [], term: 2, commit: 9, applied: 0, lastindex: 9, lastterm: 2]"}
+web333-etcd-etcd101-1  | {"level":"warn","ts":"2022-11-28T14:22:02.995Z","caller":"auth/store.go:1234","msg":"simple token is not cryptographically signed"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:02.997Z","caller":"mvcc/kvstore.go:393","msg":"kvstore restored","current-rev":6}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:02.998Z","caller":"etcdserver/quota.go:94","msg":"enabled backend quota with default value","quota-name":"v3-applier","quota-size-bytes":2147483648,"quota-size":"2.1 GB"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:02.999Z","caller":"etcdserver/server.go:854","msg":"starting etcd server","local-member-id":"8e9e05c52164694d","local-server-version":"3.5.6","cluster-version":"to_be_decided"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:02.999Z","caller":"etcdserver/server.go:754","msg":"starting initial election tick advance","election-ticks":10}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:02.999Z","caller":"fileutil/purge.go:44","msg":"started to purge file","dir":"default.etcd/member/snap","suffix":"snap.db","max":5,"interval":"30s"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:03.000Z","caller":"fileutil/purge.go:44","msg":"started to purge file","dir":"default.etcd/member/snap","suffix":"snap","max":5,"interval":"30s"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:03.000Z","caller":"fileutil/purge.go:44","msg":"started to purge file","dir":"default.etcd/member/wal","suffix":"wal","max":5,"interval":"30s"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:03.000Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"8e9e05c52164694d switched to configuration voters=(10276657743932975437)"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:03.000Z","caller":"membership/cluster.go:421","msg":"added member","cluster-id":"cdf818194e3a8c32","local-member-id":"8e9e05c52164694d","added-peer-id":"8e9e05c52164694d","added-peer-peer-urls":["http://localhost:2380"]}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:03.001Z","caller":"membership/cluster.go:584","msg":"set initial cluster version","cluster-id":"cdf818194e3a8c32","local-member-id":"8e9e05c52164694d","cluster-version":"3.5"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:03.001Z","caller":"api/capability.go:75","msg":"enabled capabilities for version","cluster-version":"3.5"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:03.002Z","caller":"embed/etcd.go:586","msg":"serving peer traffic","address":"127.0.0.1:2380"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:03.002Z","caller":"embed/etcd.go:275","msg":"now serving peer/client/metrics","local-member-id":"8e9e05c52164694d","initial-advertise-peer-urls":["http://localhost:2380"],"listen-peer-urls":["http://localhost:2380"],"advertise-client-urls":["http://etcd101:2379"],"listen-client-urls":["http://0.0.0.0:2379"],"listen-metrics-urls":[]}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:03.002Z","caller":"embed/etcd.go:558","msg":"cmux::serve","address":"127.0.0.1:2380"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:04.796Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"8e9e05c52164694d is starting a new election at term 2"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:04.796Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"8e9e05c52164694d became pre-candidate at term 2"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:04.796Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"8e9e05c52164694d received MsgPreVoteResp from 8e9e05c52164694d at term 2"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:04.796Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"8e9e05c52164694d became candidate at term 3"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:04.796Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"8e9e05c52164694d received MsgVoteResp from 8e9e05c52164694d at term 3"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:04.796Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"8e9e05c52164694d became leader at term 3"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:04.796Z","logger":"raft","caller":"etcdserver/zap_raft.go:77","msg":"raft.node: 8e9e05c52164694d elected leader 8e9e05c52164694d at term 3"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:04.798Z","caller":"etcdserver/server.go:2054","msg":"published local member to cluster through raft","local-member-id":"8e9e05c52164694d","local-member-attributes":"{Name:default ClientURLs:[http://etcd101:2379]}","request-path":"/0/members/8e9e05c52164694d/attributes","cluster-id":"cdf818194e3a8c32","publish-timeout":"7s"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:04.798Z","caller":"embed/serve.go:100","msg":"ready to serve client requests"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:04.798Z","caller":"etcdmain/main.go:44","msg":"notifying init daemon"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:04.798Z","caller":"etcdmain/main.go:50","msg":"successfully notified init daemon"}
+web333-etcd-etcd101-1  | {"level":"info","ts":"2022-11-28T14:22:04.799Z","caller":"embed/serve.go:146","msg":"serving client traffic insecurely; this is strongly discouraged!","address":"[::]:2379"}
+web333-etcd-etcd201-1  | OK
+web333-etcd-etcd201-1  | PUT
+web333-etcd-etcd201-1  | key101
+web333-etcd-etcd201-1  | value101
+web333-etcd-etcd101-1  | OK
+web333-etcd-etcd201-1  | ====> Key101 Updated
+web333-etcd-etcd101-1  | {"header":{"cluster_id":14841639068965178418,"member_id":10276657743932975437,"revision":8,"raft_term":3},"kvs":[{"key":"a2V5MTAx","create_revision":8,"mod_revision":8,"version":1,"value":"dmFsdWUxMDE="}],"count":1}
+web333-etcd-node101-1  | 
+web333-etcd-node101-1  | added 39 packages, and audited 40 packages in 10s
+web333-etcd-node101-1  | 
+web333-etcd-node101-1  | 2 packages are looking for funding
+web333-etcd-node101-1  |   run `npm fund` for details
+web333-etcd-node101-1  | 
+web333-etcd-node101-1  | found 0 vulnerabilities
+web333-etcd-node101-1  | npm notice 
+web333-etcd-node101-1  | npm notice New major version of npm available! 8.19.2 -> 9.1.2
+web333-etcd-node101-1  | npm notice Changelog: <https://github.com/npm/cli/releases/tag/v9.1.2>
+web333-etcd-node101-1  | npm notice Run `npm install -g npm@9.1.2` to update!
+web333-etcd-node101-1  | npm notice 
+web333-etcd-node101-1  | foo is: bar
+web333-etcd-node101-1  | all keys starting with "f" { foo: 'bar', foo123: 'bar123' }
+web333-etcd-etcd201-1  | DELETE
+web333-etcd-etcd201-1  | key101
+web333-etcd-etcd201-1  | 
+web333-etcd-etcd201-1  | ====> Key101 Updated

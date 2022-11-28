@@ -1,0 +1,106 @@
+version: "3.8"
+# https://github.com/guessi/docker-compose-etcd/blob/master/docker-compose.yml
+# https://hub.docker.com/r/bitnami/etcd
+# WatchBuilder | etcd3 https://microsoft.github.io/etcd3/classes/watchbuilder.html
+services:
+  etcd101:
+    image: quay.io/coreos/etcd:v3.5.6
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        env
+        etcd --advertise-client-urls=http://etcd101:2379 --listen-client-urls=http://0.0.0.0:2379 &
+        sleep 8
+        etcdctl put key101 value101
+        sleep 2
+        etcdctl get -w json key101 
+        wait
+    ports:
+      - 2379:2379
+  etcd201:
+    image: quay.io/coreos/etcd:v3.5.6
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        env
+        sleep 2
+        etcdctl --endpoints=http://etcd101:2379 put key201 value201
+        sleep 2
+        etcdctl --endpoints=http://etcd101:2379 watch key101 -- echo "====> Key101 Updated"
+  node101:
+    # 
+    # https://github.com/microsoft/etcd3
+    # deno issue: unable to install npm:etcd3
+    # 
+    image: node:18.12-alpine3.16
+    command:
+      - /bin/sh
+      - -c
+      - |
+        env
+        cd /tmp
+        npm install --save etcd3
+        cat <<EOF > foo.js
+        const { Etcd3 } = require("etcd3");
+        const client = new Etcd3({ hosts: "http://etcd101:2379" });
+        (async () => {
+          await client.put("foo").value("bar");
+          await client.put("foo123").value("bar123");
+          console.log("foo is:", await client.get("foo").string());
+          const keys = await client.getAll().prefix("f").strings();
+          console.log('all keys starting with "f"', keys);
+          await client.delete().all();
+          client.watch()
+          .key('key101')
+          .create()
+          .then(watcher => {
+            watcher
+              .on('disconnected', () => console.log('disconnected...'))
+              .on('connected', () => console.log('successfully reconnected!'))
+              .on('put', res => console.log('key101 got set to:', res.value.toString()));
+          });
+        })();
+        EOF
+        sleep 5
+        node foo.js
+  golang101:
+    # https://github.com/etcd-io/etcd/tree/main/client/v3
+    image: golang:1.19.3
+    command:
+      - /bin/sh
+      - -c
+      - |
+        env
+        cd /go/src
+        cat <<EOF > main.go
+        package main
+        import (
+          "context"
+          "time"
+          "fmt"
+          "log"
+          clientv3 "go.etcd.io/etcd/client/v3"
+        )
+        func main() {
+          cli, err := clientv3.New(clientv3.Config{
+            Endpoints:   []string{"etcd101:2379"},
+          })
+          if err != nil {
+            // handle error!
+          }
+          defer cli.Close()
+
+          ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
+          _, err = cli.Put(ctx, "key101", "value101-golang101")
+          cancel()
+          if err != nil {
+            log.Fatal(err)
+          }
+          fmt.Println("Hello, World")
+        }
+        EOF
+        go mod init main
+        go mod tidy
+        go run main.go
