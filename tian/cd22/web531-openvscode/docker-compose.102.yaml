@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+  vscode101:
+    build:
+      context: .
+      target: openvscode102
+    ports:
+      - 3000:3000

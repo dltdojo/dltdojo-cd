@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+  vscode101:
+    build:
+      context: .
+      target: openvscode103
+    user: "1000:${GID}"
+    environment:
+      - DOCKER_HOST_GID=${GID}
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        env
+        cat /etc/group
+        sudo groupadd --gid $$DOCKER_HOST_GID docker
+        sudo usermod -aG docker openvscode-server
+        newgrp docker
+        cat /etc/group
+        id
+        /home/.openvscode-server/bin/openvscode-server --host 0.0.0.0 --without-connection-token
+    ports:
+      - 3000:3000
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"

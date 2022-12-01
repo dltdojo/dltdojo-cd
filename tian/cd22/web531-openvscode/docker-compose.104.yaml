@@ -1,0 +1,37 @@
+version: "3.8"
+services:
+  vscode101:
+    build:
+      context: .
+      target: openvscode104
+    network_mode: "host"
+    user: "1000:${GID}"
+    environment:
+      - DOCKER_HOST_GID=${GID}
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        # docker cli setup
+        sudo groupadd --gid $$DOCKER_HOST_GID docker
+        sudo usermod -aG docker openvscode-server
+        newgrp docker
+        # kubectl setup
+        mkdir /tmp/.kube && cp /.kube/config /tmp/.kube/config
+        export KUBEHOME="/tmp/.kube"
+        export KUBECONFIG=/tmp/.kube/config
+        env
+        kubectl version --short
+        echo 'alias k=kubectl' >> /home/workspace/.bashrc
+        mkdir /home/workspace/foo
+        echo hello-world-2022 > /home/workspace/foo/README.md
+        /home/.openvscode-server/bin/openvscode-server --host 0.0.0.0 --without-connection-token &
+        sleep 5
+        echo "open http://localhost:3000/?folder=/home/workspace/foo"
+        wait
+    ports:
+      - 3000:3000
+    volumes:
+      - ${HOME}/.kube/config:/.kube/config:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # - .:/home/workspace:cached
