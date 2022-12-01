@@ -1,0 +1,39 @@
+version: "3.8"
+services:
+  kubectl101:
+    image: alpine/k8s:1.25.4
+    network_mode: "host"
+    entrypoint: sh
+    volumes:
+      - ${HOME}/.kube/config:/.kube/config:ro
+    command:
+      - -c
+      - |
+        ls -al /.kube
+        export KUBEHOME="/.kube"
+        export KUBECONFIG=$$KUBEHOME/config
+        kubectl config set current-context k3d-foo2021
+        kubectl version && kubectl config view && kubectl config current-context
+        kubectl run nginx101 --image nginx
+        sleep 10
+        kubectl get pods
+        sleep 10
+        kubectl delete pods nginx101
+  kubectl102:
+    image: alpine/k8s:1.25.4
+    network_mode: "host"
+    entrypoint: sh
+    volumes:
+      - ${HOME}/.kube/config:/.kube/config:ro
+    command:
+      - -c
+      - |
+        ls -al /.kube
+        export KUBEHOME="/.kube"
+        export KUBECONFIG=$$KUBEHOME/config
+        kubectl config set current-context k3d-foo2021
+        sleep 10
+        kubectl get nodes
+        kubectl get pods -A
+        sleep 15
+        kubectl get pods -A

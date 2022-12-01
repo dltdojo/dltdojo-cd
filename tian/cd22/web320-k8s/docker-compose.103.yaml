@@ -1,0 +1,47 @@
+version: "3.8"
+services:
+  kubectl101:
+    image: alpine/k8s:1.25.4
+    network_mode: "host"
+    entrypoint: sh
+    volumes:
+      - ${HOME}/.kube/config:/.kube/config:ro
+    command:
+      - -c
+      - |
+        ls -al /.kube
+        export KUBEHOME="/.kube"
+        export KUBECONFIG=/.kube/config
+        kubectl config set current-context k3d-foo2021
+        cat <<\EOF | kubectl create -f -
+        apiVersion: v1
+        kind: Pod
+        metadata:
+          name: myapp101-pod
+          labels:
+            app: myapp
+        spec:
+          containers:
+            - name: nginx-container
+              image: nginx
+        EOF
+  kubectl102:
+    image: alpine/k8s:1.25.4
+    network_mode: "host"
+    entrypoint: sh
+    volumes:
+      - ${HOME}/.kube/config:/.kube/config:ro
+    command:
+      - -c
+      - |
+        export KUBEHOME="/.kube"
+        export KUBECONFIG=/.kube/config
+        kubectl config set current-context k3d-foo2021
+        sleep 10
+        kubectl get nodes
+        kubectl get pods -A
+        kubectl describe pod myapp101-pod
+        sleep 3
+        kubectl delete pod myapp101-pod
+        sleep 3
+        kubectl get pods -A

@@ -1,0 +1,57 @@
+version: "3.8"
+services:
+  kubectl101:
+    image: alpine/k8s:1.25.4
+    network_mode: "host"
+    entrypoint: sh
+    volumes:
+      - ${HOME}/.kube/config:/.kube/config:ro
+    command:
+      - -c
+      - |
+        ls -al /.kube
+        export KUBEHOME="/.kube"
+        export KUBECONFIG=/.kube/config
+        kubectl config set current-context k3d-foo2021
+        cat <<\EOF | kubectl create -f -
+        apiVersion: apps/v1
+        kind: ReplicaSet
+        metadata:
+          name: myapp101-rs
+          labels:
+            app: myapp
+        spec:
+          replicas: 3
+          selector:
+            matchLabels:
+              app: myapp301
+          template:
+            metadata:
+              name: myapp-pod
+              labels:
+                app: myapp301
+            spec:
+              containers:
+                - name: nginx-container
+                  image: nginx
+        EOF
+  kubectl102:
+    image: alpine/k8s:1.25.4
+    network_mode: "host"
+    entrypoint: sh
+    volumes:
+      - ${HOME}/.kube/config:/.kube/config:ro
+    command:
+      - -c
+      - |
+        export KUBEHOME="/.kube"
+        export KUBECONFIG=/.kube/config
+        kubectl config set current-context k3d-foo2021
+        sleep 10
+        kubectl get nodes
+        kubectl get pods -A
+        kubectl get rs
+        sleep 3
+        kubectl delete rs myapp101-rs
+        sleep 5
+        kubectl get pods -A
