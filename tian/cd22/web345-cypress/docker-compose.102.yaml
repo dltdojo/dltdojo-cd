@@ -1,0 +1,62 @@
+version: "3.8"
+services:
+  box101:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cat <<EOOF > /home/index.html
+        <html>
+        <head>
+        <title>Crypress Testing</title>
+        <script>
+          window.onload = () => {
+            document.getElementById("demo").innerHTML = "Hello JavaScript!";
+            console.log("HELLO CRYPRESS 456");
+          }
+        </script> 
+        </head>
+        <body><h1 id="demo">HELLO CRYPRESS 123</h1></body>
+        </html>
+        EOOF
+        cat <<EOOF > /etc/httpd.conf
+        .wasm:application/wasm
+        EOOF
+        busybox httpd -fv -p 3000 -c /etc/httpd.conf -h /home
+    ports:
+      - "8300:3000"
+  cypress101:
+    image: cypress/included:11.2.0
+    entrypoint: /bin/sh
+    environment:
+      - CYPRESS_VIDEO=false
+    command:
+      - -c
+      - |
+        cat <<\EOF > /tmp/cypress.config.js
+        const { defineConfig } = require('cypress')
+        module.exports = defineConfig({
+          e2e: {
+            baseUrl: 'http://box101:3000',
+            supportFile: false,
+            specPattern: '/tmp/*.cy.{js,jsx,ts,tsx}'
+          }
+        })
+        EOF
+        cat <<\EOF > /tmp/spec.cy.js
+        it('loads page', () => {
+          cy.visit('/',{
+            onBeforeLoad(win) {
+              // Stub your functions here
+              cy.stub(win.console, 'log').as('consoleLog')
+            },
+          })
+          // cy.contains('HELLO CRYPRESS 123')
+          cy.contains('Hello JavaScript!')
+          cy.get('@consoleLog').should('be.calledWith', 'HELLO CRYPRESS 456')
+        })
+        EOF
+        cypress info
+        cypress run --browser firefox --config-file /tmp/cypress.config.js --spec "/tmp/spec.cy.js"
+        cypress run --browser chrome --config-file /tmp/cypress.config.js --spec "/tmp/spec.cy.js"

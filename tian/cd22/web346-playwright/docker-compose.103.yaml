@@ -1,0 +1,47 @@
+version: "3.8"
+services:
+  box101:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cat <<EOOF > /home/index.html
+        <!DOCTYPE html>
+        <html>
+        <head><title>Playwright Testing</title>
+        <script>
+          window.onload = () => {
+            document.getElementById("demo").innerHTML = "Hello JavaScript!";
+            console.log("HELLO Playwright789");
+          }
+        </script> 
+        </head>
+        <body><h1 id="demo">HELLO Playwright123</h1></body>
+        </html>
+        EOOF
+        busybox httpd -fv -p 3000 -h /home
+    ports:
+      - "8300:3000"
+  playwright101:
+    build: .
+    ipc: host
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        env
+        cd app
+        cat <<EOF > tests/foo.spec.ts
+        import { test, expect } from '@playwright/test';
+        test('homepage javascript work', async ({ page }) => {
+          const messages = [];
+          page.on('console', msg => messages.push(msg.text()));
+          await page.goto('/');
+          // Expect a title "to contain" a substring.
+          await expect(page).toHaveTitle(/Playwright/);
+          await expect(page.locator('h1#demo')).toContainText('Hello JavaScript!');
+          expect(messages).toStrictEqual(["HELLO Playwright789"]);
+        });
+        EOF
+        npx playwright test
