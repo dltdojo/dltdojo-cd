@@ -1,0 +1,61 @@
+version: "3.8"
+services:
+  kubectl101:
+    image: alpine/k8s:1.25.4
+    network_mode: "host"
+    entrypoint: sh
+    volumes:
+      - ${HOME}/.kube/config:/.kube/config:ro
+    command:
+      - -c
+      - |
+        # Exposing Services - k3d https://k3d.io/v5.4.6/usage/exposing_services/
+        # k3d cluster create foo2021 -p "8082:30080@agent:0" --agents 2
+        ls -al /.kube
+        export KUBEHOME="/.kube"
+        export KUBECONFIG=/.kube/config
+        kubectl config set current-context k3d-foo2021
+        kubectl create deployment nginx106 --image=nginx --replicas=2
+        # labels app: nginx106
+        kubectl get deployment nginx106 -o yaml
+        cat <<EOF | kubectl create -f -
+        apiVersion: v1
+        kind: Service
+        metadata:
+          labels:
+            app: nginx
+          name: nginx106
+        spec:
+          ports:
+          - name: 80-80
+            nodePort: 30080
+            port: 80
+            protocol: TCP
+            targetPort: 80
+          selector:
+            app: nginx106
+          type: NodePort
+        EOF
+  kubectl102:
+    image: alpine/k8s:1.25.4
+    network_mode: "host"
+    entrypoint: sh
+    volumes:
+      - ${HOME}/.kube/config:/.kube/config:ro
+    command:
+      - -c
+      - |
+        export KUBEHOME="/.kube"
+        export KUBECONFIG=/.kube/config
+        kubectl config set current-context k3d-foo2021
+        sleep 15
+        kubectl get all
+        # 
+        # https://k3d.io/v5.4.6/usage/exposing_services/
+        # k3d cluster create foo2021 -p "8082:30080@agent:0" --agents 2
+        # docker network mode host mapping localhost to docker host's localhost
+        #
+        curl -sv http://localhost:8082
+        sleep 10
+        kubectl delete deployment nginx106
+        kubectl delete svc nginx106

@@ -1,0 +1,126 @@
+version: "3.8"
+services:
+  kubectl101:
+    image: alpine/k8s:1.25.4
+    network_mode: "host"
+    entrypoint: sh
+    volumes:
+      - ${HOME}/.kube/config:/.kube/config:ro
+    command:
+      - -c
+      - |
+        # k3d cluster create foo2021 -p "8082:30080@agent:0" --agents 2
+        ls -al /.kube
+        export KUBEHOME="/.kube"
+        export KUBECONFIG=/.kube/config
+        kubectl config set current-context k3d-foo2021
+        kubectl create deployment whoami107a --image=traefik/whoami --replicas=3
+        kubectl create deployment nginx107b --image=nginx --replicas=2
+        kubectl get deployment whoami107a -o yaml
+        cat <<EOF | kubectl create -f -
+        apiVersion: v1
+        kind: Service
+        metadata:
+          labels:
+            app: whoami
+          name: whoami107a
+        spec:
+          ports:
+          - port: 80
+            protocol: TCP
+            targetPort: 80
+          selector:
+            app: whoami107a
+        ---
+        apiVersion: v1
+        kind: Service
+        metadata:
+          labels:
+            app: nginx
+          name: nginx107b
+        spec:
+          ports:
+          - port: 80
+            protocol: TCP
+            targetPort: 80
+          selector:
+            app: nginx107b
+        ---
+        # Middleware
+        # https://doc.traefik.io/traefik/middlewares/http/stripprefix/
+        # Strip prefix /107a and /107b
+        apiVersion: traefik.containo.us/v1alpha1
+        kind: Middleware
+        metadata:
+          name: strip-prefix
+          namespace: default
+        spec:
+          stripPrefix:
+            forceSlash: false
+            prefixes:
+              - /107a
+              - /107b
+        ---
+        # https://doc.traefik.io/traefik/v2.0/providers/kubernetes-ingress/
+        # https://doc.traefik.io/traefik/routing/providers/kubernetes-ingress/
+        apiVersion: networking.k8s.io/v1
+        kind: Ingress
+        metadata:
+          name: ingress107
+          annotations:
+            ingress.kubernetes.io/ssl-redirect: "false"
+            kubernetes.io/ingress.class: traefik
+            traefik.ingress.kubernetes.io/router.middlewares: default-strip-prefix@kubernetescrd
+        spec:
+          rules:
+            - http:
+                paths:
+                  - path: /107a
+                    pathType: Prefix
+                    backend:
+                      service:
+                        name: whoami107a
+                        port:
+                          number: 80
+                  - path: /107b
+                    pathType: Prefix
+                    backend:
+                      service:
+                        name: nginx107b
+                        port:
+                          number: 80
+        EOF
+  kubectl102:
+    image: alpine/k8s:1.25.4
+    network_mode: "host"
+    entrypoint: sh
+    volumes:
+      - ${HOME}/.kube/config:/.kube/config:ro
+    command:
+      - -c
+      - |
+        export KUBEHOME="/.kube"
+        export KUBECONFIG=/.kube/config
+        kubectl config set current-context k3d-foo2021
+        sleep 10
+        kubectl get all
+        # 
+        # https://k3d.io/v5.4.6/usage/exposing_services/
+        # k3d cluster create --api-port 6550 -p "8081:80@loadbalancer" --agents 2
+        # docker network mode host mapping localhost to docker host's localhost
+        #
+        echo "==="
+        curl -sv http://localhost:8081
+        echo "==="
+        curl -sv http://localhost:8081/107a/
+        echo "==="
+        curl -sv http://localhost:8081/107b/
+        echo "==="
+        curl -sv http://localhost:8081/107a/
+        sleep 2
+        kubectl delete deployment whoami107a
+        kubectl delete deployment nginx107b
+        kubectl delete svc whoami107a
+        kubectl delete svc nginx107b
+        kubectl delete ingress ingress107
+        kubectl delete middlewares.traefik.containo.us strip-prefix

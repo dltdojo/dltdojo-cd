@@ -1,0 +1,134 @@
+docker compose -f docker-compose.106.yaml up
+[+] Running 2/2
+ ⠿ Container web320-k8s-kubectl102-1  Recreated                                                                                    0.1s
+ ⠿ Container web320-k8s-kubectl101-1  Recreated                                                                                    0.1s
+Attaching to web320-k8s-kubectl101-1, web320-k8s-kubectl102-1
+web320-k8s-kubectl101-1  | total 16
+web320-k8s-kubectl101-1  | drwxr-xr-x    2 root     root          4096 Dec  3 09:17 .
+web320-k8s-kubectl101-1  | drwxr-xr-x    1 root     root          4096 Dec  3 09:17 ..
+web320-k8s-kubectl101-1  | -rw-------    1 1000     1000          5905 Dec  3 09:16 config
+web320-k8s-kubectl101-1  | Property "current-context" set.
+web320-k8s-kubectl102-1  | Property "current-context" set.
+web320-k8s-kubectl101-1  | deployment.apps/nginx106 created
+web320-k8s-kubectl101-1  | apiVersion: apps/v1
+web320-k8s-kubectl101-1  | kind: Deployment
+web320-k8s-kubectl101-1  | metadata:
+web320-k8s-kubectl101-1  |   annotations:
+web320-k8s-kubectl101-1  |     deployment.kubernetes.io/revision: "1"
+web320-k8s-kubectl101-1  |   creationTimestamp: "2022-12-03T09:17:11Z"
+web320-k8s-kubectl101-1  |   generation: 1
+web320-k8s-kubectl101-1  |   labels:
+web320-k8s-kubectl101-1  |     app: nginx106
+web320-k8s-kubectl101-1  |   name: nginx106
+web320-k8s-kubectl101-1  |   namespace: default
+web320-k8s-kubectl101-1  |   resourceVersion: "762"
+web320-k8s-kubectl101-1  |   uid: cbf03e8f-493f-4b5e-85d9-fb141c2261f7
+web320-k8s-kubectl101-1  | spec:
+web320-k8s-kubectl101-1  |   progressDeadlineSeconds: 600
+web320-k8s-kubectl101-1  |   replicas: 2
+web320-k8s-kubectl101-1  |   revisionHistoryLimit: 10
+web320-k8s-kubectl101-1  |   selector:
+web320-k8s-kubectl101-1  |     matchLabels:
+web320-k8s-kubectl101-1  |       app: nginx106
+web320-k8s-kubectl101-1  |   strategy:
+web320-k8s-kubectl101-1  |     rollingUpdate:
+web320-k8s-kubectl101-1  |       maxSurge: 25%
+web320-k8s-kubectl101-1  |       maxUnavailable: 25%
+web320-k8s-kubectl101-1  |     type: RollingUpdate
+web320-k8s-kubectl101-1  |   template:
+web320-k8s-kubectl101-1  |     metadata:
+web320-k8s-kubectl101-1  |       creationTimestamp: null
+web320-k8s-kubectl101-1  |       labels:
+web320-k8s-kubectl101-1  |         app: nginx106
+web320-k8s-kubectl101-1  |     spec:
+web320-k8s-kubectl101-1  |       containers:
+web320-k8s-kubectl101-1  |       - image: nginx
+web320-k8s-kubectl101-1  |         imagePullPolicy: Always
+web320-k8s-kubectl101-1  |         name: nginx
+web320-k8s-kubectl101-1  |         resources: {}
+web320-k8s-kubectl101-1  |         terminationMessagePath: /dev/termination-log
+web320-k8s-kubectl101-1  |         terminationMessagePolicy: File
+web320-k8s-kubectl101-1  |       dnsPolicy: ClusterFirst
+web320-k8s-kubectl101-1  |       restartPolicy: Always
+web320-k8s-kubectl101-1  |       schedulerName: default-scheduler
+web320-k8s-kubectl101-1  |       securityContext: {}
+web320-k8s-kubectl101-1  |       terminationGracePeriodSeconds: 30
+web320-k8s-kubectl101-1  | status:
+web320-k8s-kubectl101-1  |   conditions:
+web320-k8s-kubectl101-1  |   - lastTransitionTime: "2022-12-03T09:17:11Z"
+web320-k8s-kubectl101-1  |     lastUpdateTime: "2022-12-03T09:17:11Z"
+web320-k8s-kubectl101-1  |     message: Deployment does not have minimum availability.
+web320-k8s-kubectl101-1  |     reason: MinimumReplicasUnavailable
+web320-k8s-kubectl101-1  |     status: "False"
+web320-k8s-kubectl101-1  |     type: Available
+web320-k8s-kubectl101-1  |   - lastTransitionTime: "2022-12-03T09:17:11Z"
+web320-k8s-kubectl101-1  |     lastUpdateTime: "2022-12-03T09:17:11Z"
+web320-k8s-kubectl101-1  |     message: ReplicaSet "nginx106-5d587874cf" is progressing.
+web320-k8s-kubectl101-1  |     reason: ReplicaSetUpdated
+web320-k8s-kubectl101-1  |     status: "True"
+web320-k8s-kubectl101-1  |     type: Progressing
+web320-k8s-kubectl101-1  |   observedGeneration: 1
+web320-k8s-kubectl101-1  |   replicas: 2
+web320-k8s-kubectl101-1  |   unavailableReplicas: 2
+web320-k8s-kubectl101-1  |   updatedReplicas: 2
+web320-k8s-kubectl101-1  | service/nginx106 created
+web320-k8s-kubectl101-1 exited with code 0
+web320-k8s-kubectl102-1  | NAME                            READY   STATUS              RESTARTS   AGE
+web320-k8s-kubectl102-1  | pod/nginx106-5d587874cf-mpghs   0/1     ContainerCreating   0          15s
+web320-k8s-kubectl102-1  | pod/nginx106-5d587874cf-mpd5z   1/1     Running             0          15s
+web320-k8s-kubectl102-1  | 
+web320-k8s-kubectl102-1  | NAME                 TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)        AGE
+web320-k8s-kubectl102-1  | service/kubernetes   ClusterIP   10.43.0.1     <none>        443/TCP        77s
+web320-k8s-kubectl102-1  | service/nginx106     NodePort    10.43.34.53   <none>        80:30080/TCP   15s
+web320-k8s-kubectl102-1  | 
+web320-k8s-kubectl102-1  | NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
+web320-k8s-kubectl102-1  | deployment.apps/nginx106   1/2     2            1           15s
+web320-k8s-kubectl102-1  | 
+web320-k8s-kubectl102-1  | NAME                                  DESIRED   CURRENT   READY   AGE
+web320-k8s-kubectl102-1  | replicaset.apps/nginx106-5d587874cf   2         2         1       15s
+web320-k8s-kubectl102-1  | *   Trying 127.0.0.1:8082...
+web320-k8s-kubectl102-1  | * Connected to localhost (127.0.0.1) port 8082 (#0)
+web320-k8s-kubectl102-1  | > GET / HTTP/1.1
+web320-k8s-kubectl102-1  | > Host: localhost:8082
+web320-k8s-kubectl102-1  | > User-Agent: curl/7.83.1
+web320-k8s-kubectl102-1  | > Accept: */*
+web320-k8s-kubectl102-1  | > 
+web320-k8s-kubectl102-1  | <!DOCTYPE html>
+web320-k8s-kubectl102-1  | <html>
+web320-k8s-kubectl102-1  | <head>
+web320-k8s-kubectl102-1  | <title>Welcome to nginx!</title>
+web320-k8s-kubectl102-1  | <style>
+web320-k8s-kubectl102-1  | html { color-scheme: light dark; }
+web320-k8s-kubectl102-1  | body { width: 35em; margin: 0 auto;
+web320-k8s-kubectl102-1  | font-family: Tahoma, Verdana, Arial, sans-serif; }
+web320-k8s-kubectl102-1  | </style>
+web320-k8s-kubectl102-1  | </head>
+web320-k8s-kubectl102-1  | <body>
+web320-k8s-kubectl102-1  | <h1>Welcome to nginx!</h1>
+web320-k8s-kubectl102-1  | <p>If you see this page, the nginx web server is successfully installed and
+web320-k8s-kubectl102-1  | working. Further configuration is required.</p>
+web320-k8s-kubectl102-1  | 
+web320-k8s-kubectl102-1  | <p>For online documentation and support please refer to
+web320-k8s-kubectl102-1  | <a href="http://nginx.org/">nginx.org</a>.<br/>
+web320-k8s-kubectl102-1  | Commercial support is available at
+web320-k8s-kubectl102-1  | <a href="http://nginx.com/">nginx.com</a>.</p>
+web320-k8s-kubectl102-1  | 
+web320-k8s-kubectl102-1  | <p><em>Thank you for using nginx.</em></p>
+web320-k8s-kubectl102-1  | </body>
+web320-k8s-kubectl102-1  | </html>
+web320-k8s-kubectl102-1  | * Mark bundle as not supporting multiuse
+web320-k8s-kubectl102-1  | < HTTP/1.1 200 OK
+web320-k8s-kubectl102-1  | < Server: nginx/1.23.2
+web320-k8s-kubectl102-1  | < Date: Sat, 03 Dec 2022 09:17:26 GMT
+web320-k8s-kubectl102-1  | < Content-Type: text/html
+web320-k8s-kubectl102-1  | < Content-Length: 615
+web320-k8s-kubectl102-1  | < Last-Modified: Wed, 19 Oct 2022 07:56:21 GMT
+web320-k8s-kubectl102-1  | < Connection: keep-alive
+web320-k8s-kubectl102-1  | < ETag: "634fada5-267"
+web320-k8s-kubectl102-1  | < Accept-Ranges: bytes
+web320-k8s-kubectl102-1  | < 
+web320-k8s-kubectl102-1  | { [615 bytes data]
+web320-k8s-kubectl102-1  | * Connection #0 to host localhost left intact
+web320-k8s-kubectl102-1  | deployment.apps "nginx106" deleted
+web320-k8s-kubectl102-1  | service "nginx106" deleted
+web320-k8s-kubectl102-1 exited with code 0

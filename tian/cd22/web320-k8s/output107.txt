@@ -1,0 +1,211 @@
+docker compose -f docker-compose.107.yaml up
+[+] Running 2/2
+ ⠿ Container web320-k8s-kubectl102-1  Recreated                                                                                    0.1s
+ ⠿ Container web320-k8s-kubectl101-1  Recreated                                                                                    0.1s
+Attaching to web320-k8s-kubectl101-1, web320-k8s-kubectl102-1
+web320-k8s-kubectl101-1  | total 16
+web320-k8s-kubectl101-1  | drwxr-xr-x    2 root     root          4096 Dec  3 09:20 .
+web320-k8s-kubectl101-1  | drwxr-xr-x    1 root     root          4096 Dec  3 09:20 ..
+web320-k8s-kubectl101-1  | -rw-------    1 1000     1000          5893 Dec  3 09:19 config
+web320-k8s-kubectl102-1  | Property "current-context" set.
+web320-k8s-kubectl101-1  | Property "current-context" set.
+web320-k8s-kubectl101-1  | deployment.apps/whoami107a created
+web320-k8s-kubectl101-1  | deployment.apps/nginx107b created
+web320-k8s-kubectl101-1  | apiVersion: apps/v1
+web320-k8s-kubectl101-1  | kind: Deployment
+web320-k8s-kubectl101-1  | metadata:
+web320-k8s-kubectl101-1  |   annotations:
+web320-k8s-kubectl101-1  |     deployment.kubernetes.io/revision: "1"
+web320-k8s-kubectl101-1  |   creationTimestamp: "2022-12-03T09:20:22Z"
+web320-k8s-kubectl101-1  |   generation: 1
+web320-k8s-kubectl101-1  |   labels:
+web320-k8s-kubectl101-1  |     app: whoami107a
+web320-k8s-kubectl101-1  |   name: whoami107a
+web320-k8s-kubectl101-1  |   namespace: default
+web320-k8s-kubectl101-1  |   resourceVersion: "765"
+web320-k8s-kubectl101-1  |   uid: 03b31291-d300-43ee-ab7f-22deadc1decd
+web320-k8s-kubectl101-1  | spec:
+web320-k8s-kubectl101-1  |   progressDeadlineSeconds: 600
+web320-k8s-kubectl101-1  |   replicas: 3
+web320-k8s-kubectl101-1  |   revisionHistoryLimit: 10
+web320-k8s-kubectl101-1  |   selector:
+web320-k8s-kubectl101-1  |     matchLabels:
+web320-k8s-kubectl101-1  |       app: whoami107a
+web320-k8s-kubectl101-1  |   strategy:
+web320-k8s-kubectl101-1  |     rollingUpdate:
+web320-k8s-kubectl101-1  |       maxSurge: 25%
+web320-k8s-kubectl101-1  |       maxUnavailable: 25%
+web320-k8s-kubectl101-1  |     type: RollingUpdate
+web320-k8s-kubectl101-1  |   template:
+web320-k8s-kubectl101-1  |     metadata:
+web320-k8s-kubectl101-1  |       creationTimestamp: null
+web320-k8s-kubectl101-1  |       labels:
+web320-k8s-kubectl101-1  |         app: whoami107a
+web320-k8s-kubectl101-1  |     spec:
+web320-k8s-kubectl101-1  |       containers:
+web320-k8s-kubectl101-1  |       - image: traefik/whoami
+web320-k8s-kubectl101-1  |         imagePullPolicy: Always
+web320-k8s-kubectl101-1  |         name: whoami
+web320-k8s-kubectl101-1  |         resources: {}
+web320-k8s-kubectl101-1  |         terminationMessagePath: /dev/termination-log
+web320-k8s-kubectl101-1  |         terminationMessagePolicy: File
+web320-k8s-kubectl101-1  |       dnsPolicy: ClusterFirst
+web320-k8s-kubectl101-1  |       restartPolicy: Always
+web320-k8s-kubectl101-1  |       schedulerName: default-scheduler
+web320-k8s-kubectl101-1  |       securityContext: {}
+web320-k8s-kubectl101-1  |       terminationGracePeriodSeconds: 30
+web320-k8s-kubectl101-1  | status:
+web320-k8s-kubectl101-1  |   conditions:
+web320-k8s-kubectl101-1  |   - lastTransitionTime: "2022-12-03T09:20:22Z"
+web320-k8s-kubectl101-1  |     lastUpdateTime: "2022-12-03T09:20:22Z"
+web320-k8s-kubectl101-1  |     message: Deployment does not have minimum availability.
+web320-k8s-kubectl101-1  |     reason: MinimumReplicasUnavailable
+web320-k8s-kubectl101-1  |     status: "False"
+web320-k8s-kubectl101-1  |     type: Available
+web320-k8s-kubectl101-1  |   - lastTransitionTime: "2022-12-03T09:20:22Z"
+web320-k8s-kubectl101-1  |     lastUpdateTime: "2022-12-03T09:20:22Z"
+web320-k8s-kubectl101-1  |     message: ReplicaSet "whoami107a-66b59c97dc" is progressing.
+web320-k8s-kubectl101-1  |     reason: ReplicaSetUpdated
+web320-k8s-kubectl101-1  |     status: "True"
+web320-k8s-kubectl101-1  |     type: Progressing
+web320-k8s-kubectl101-1  |   observedGeneration: 1
+web320-k8s-kubectl101-1  |   replicas: 3
+web320-k8s-kubectl101-1  |   unavailableReplicas: 3
+web320-k8s-kubectl101-1  |   updatedReplicas: 3
+web320-k8s-kubectl101-1  | service/whoami107a created
+web320-k8s-kubectl101-1  | service/nginx107b created
+web320-k8s-kubectl101-1  | middleware.traefik.containo.us/strip-prefix created
+web320-k8s-kubectl101-1  | ingress.networking.k8s.io/ingress107 created
+web320-k8s-kubectl101-1 exited with code 0
+web320-k8s-kubectl102-1  | NAME                              READY   STATUS              RESTARTS   AGE
+web320-k8s-kubectl102-1  | pod/nginx107b-779dbddd6d-65vsh    0/1     ContainerCreating   0          10s
+web320-k8s-kubectl102-1  | pod/nginx107b-779dbddd6d-z5p4d    0/1     ContainerCreating   0          10s
+web320-k8s-kubectl102-1  | pod/whoami107a-66b59c97dc-mblxt   1/1     Running             0          10s
+web320-k8s-kubectl102-1  | pod/whoami107a-66b59c97dc-pl479   1/1     Running             0          10s
+web320-k8s-kubectl102-1  | pod/whoami107a-66b59c97dc-r47tr   1/1     Running             0          10s
+web320-k8s-kubectl102-1  | 
+web320-k8s-kubectl102-1  | NAME                 TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+web320-k8s-kubectl102-1  | service/kubernetes   ClusterIP   10.43.0.1       <none>        443/TCP   82s
+web320-k8s-kubectl102-1  | service/whoami107a   ClusterIP   10.43.104.139   <none>        80/TCP    9s
+web320-k8s-kubectl102-1  | service/nginx107b    ClusterIP   10.43.143.31    <none>        80/TCP    9s
+web320-k8s-kubectl102-1  | 
+web320-k8s-kubectl102-1  | NAME                         READY   UP-TO-DATE   AVAILABLE   AGE
+web320-k8s-kubectl102-1  | deployment.apps/nginx107b    0/2     2            0           10s
+web320-k8s-kubectl102-1  | deployment.apps/whoami107a   3/3     3            3           10s
+web320-k8s-kubectl102-1  | 
+web320-k8s-kubectl102-1  | NAME                                    DESIRED   CURRENT   READY   AGE
+web320-k8s-kubectl102-1  | replicaset.apps/nginx107b-779dbddd6d    2         2         0       10s
+web320-k8s-kubectl102-1  | replicaset.apps/whoami107a-66b59c97dc   3         3         3       10s
+web320-k8s-kubectl102-1  | ===
+web320-k8s-kubectl102-1  | *   Trying 127.0.0.1:8081...
+web320-k8s-kubectl102-1  | * Connected to localhost (127.0.0.1) port 8081 (#0)
+web320-k8s-kubectl102-1  | > GET / HTTP/1.1
+web320-k8s-kubectl102-1  | > Host: localhost:8081
+web320-k8s-kubectl102-1  | > User-Agent: curl/7.83.1
+web320-k8s-kubectl102-1  | > Accept: */*
+web320-k8s-kubectl102-1  | > 
+web320-k8s-kubectl102-1  | * Mark bundle as not supporting multiuse
+web320-k8s-kubectl102-1  | < HTTP/1.1 404 Not Found
+web320-k8s-kubectl102-1  | < Content-Type: text/plain; charset=utf-8
+web320-k8s-kubectl102-1  | < X-Content-Type-Options: nosniff
+web320-k8s-kubectl102-1  | < Date: Sat, 03 Dec 2022 09:20:32 GMT
+web320-k8s-kubectl102-1  | < Content-Length: 19
+web320-k8s-kubectl102-1  | < 
+web320-k8s-kubectl102-1  | { [19 bytes data]
+web320-k8s-kubectl102-1  | * Connection #0 to host localhost left intact
+web320-k8s-kubectl102-1  | 404 page not found
+web320-k8s-kubectl102-1  | ===
+web320-k8s-kubectl102-1  | *   Trying 127.0.0.1:8081...
+web320-k8s-kubectl102-1  | * Connected to localhost (127.0.0.1) port 8081 (#0)
+web320-k8s-kubectl102-1  | > GET /107a/ HTTP/1.1
+web320-k8s-kubectl102-1  | > Host: localhost:8081
+web320-k8s-kubectl102-1  | > User-Agent: curl/7.83.1
+web320-k8s-kubectl102-1  | > Accept: */*
+web320-k8s-kubectl102-1  | > 
+web320-k8s-kubectl102-1  | * Mark bundle as not supporting multiuse
+web320-k8s-kubectl102-1  | < HTTP/1.1 200 OK
+web320-k8s-kubectl102-1  | < Content-Length: 438
+web320-k8s-kubectl102-1  | < Content-Type: text/plain; charset=utf-8
+web320-k8s-kubectl102-1  | < Date: Sat, 03 Dec 2022 09:20:32 GMT
+web320-k8s-kubectl102-1  | < 
+web320-k8s-kubectl102-1  | { [438 bytes data]
+web320-k8s-kubectl102-1  | * Connection #0 to host localhost left intact
+web320-k8s-kubectl102-1  | Hostname: whoami107a-66b59c97dc-mblxt
+web320-k8s-kubectl102-1  | IP: 127.0.0.1
+web320-k8s-kubectl102-1  | IP: ::1
+web320-k8s-kubectl102-1  | IP: 10.42.0.5
+web320-k8s-kubectl102-1  | IP: fe80::20db:c5ff:fe16:7fe
+web320-k8s-kubectl102-1  | RemoteAddr: 10.42.1.5:58808
+web320-k8s-kubectl102-1  | GET / HTTP/1.1
+web320-k8s-kubectl102-1  | Host: localhost:8081
+web320-k8s-kubectl102-1  | User-Agent: curl/7.83.1
+web320-k8s-kubectl102-1  | Accept: */*
+web320-k8s-kubectl102-1  | Accept-Encoding: gzip
+web320-k8s-kubectl102-1  | X-Forwarded-For: 10.42.0.0
+web320-k8s-kubectl102-1  | X-Forwarded-Host: localhost:8081
+web320-k8s-kubectl102-1  | X-Forwarded-Port: 8081
+web320-k8s-kubectl102-1  | X-Forwarded-Prefix: /107a
+web320-k8s-kubectl102-1  | X-Forwarded-Proto: http
+web320-k8s-kubectl102-1  | X-Forwarded-Server: traefik-7cd4fcff68-5q2rx
+web320-k8s-kubectl102-1  | X-Real-Ip: 10.42.0.0
+web320-k8s-kubectl102-1  | 
+web320-k8s-kubectl102-1  | ===
+web320-k8s-kubectl102-1  | *   Trying 127.0.0.1:8081...
+web320-k8s-kubectl102-1  | * Connected to localhost (127.0.0.1) port 8081 (#0)
+web320-k8s-kubectl102-1  | > GET /107b/ HTTP/1.1
+web320-k8s-kubectl102-1  | > Host: localhost:8081
+web320-k8s-kubectl102-1  | > User-Agent: curl/7.83.1
+web320-k8s-kubectl102-1  | > Accept: */*
+web320-k8s-kubectl102-1  | > 
+web320-k8s-kubectl102-1  | 404 page not found
+web320-k8s-kubectl102-1  | * Mark bundle as not supporting multiuse
+web320-k8s-kubectl102-1  | < HTTP/1.1 404 Not Found
+web320-k8s-kubectl102-1  | < Content-Type: text/plain; charset=utf-8
+web320-k8s-kubectl102-1  | < X-Content-Type-Options: nosniff
+web320-k8s-kubectl102-1  | < Date: Sat, 03 Dec 2022 09:20:32 GMT
+web320-k8s-kubectl102-1  | < Content-Length: 19
+web320-k8s-kubectl102-1  | < 
+web320-k8s-kubectl102-1  | { [19 bytes data]
+web320-k8s-kubectl102-1  | * Connection #0 to host localhost left intact
+web320-k8s-kubectl102-1  | ===
+web320-k8s-kubectl102-1  | *   Trying 127.0.0.1:8081...
+web320-k8s-kubectl102-1  | * Connected to localhost (127.0.0.1) port 8081 (#0)
+web320-k8s-kubectl102-1  | > GET /107a/ HTTP/1.1
+web320-k8s-kubectl102-1  | > Host: localhost:8081
+web320-k8s-kubectl102-1  | > User-Agent: curl/7.83.1
+web320-k8s-kubectl102-1  | > Accept: */*
+web320-k8s-kubectl102-1  | > 
+web320-k8s-kubectl102-1  | * Mark bundle as not supporting multiuse
+web320-k8s-kubectl102-1  | < HTTP/1.1 200 OK
+web320-k8s-kubectl102-1  | < Content-Length: 439
+web320-k8s-kubectl102-1  | < Content-Type: text/plain; charset=utf-8
+web320-k8s-kubectl102-1  | < Date: Sat, 03 Dec 2022 09:20:32 GMT
+web320-k8s-kubectl102-1  | < 
+web320-k8s-kubectl102-1  | { [439 bytes data]
+web320-k8s-kubectl102-1  | * Connection #0 to host localhost left intact
+web320-k8s-kubectl102-1  | Hostname: whoami107a-66b59c97dc-pl479
+web320-k8s-kubectl102-1  | IP: 127.0.0.1
+web320-k8s-kubectl102-1  | IP: ::1
+web320-k8s-kubectl102-1  | IP: 10.42.1.6
+web320-k8s-kubectl102-1  | IP: fe80::a0c4:d7ff:fe83:d03d
+web320-k8s-kubectl102-1  | RemoteAddr: 10.42.1.5:33592
+web320-k8s-kubectl102-1  | GET / HTTP/1.1
+web320-k8s-kubectl102-1  | Host: localhost:8081
+web320-k8s-kubectl102-1  | User-Agent: curl/7.83.1
+web320-k8s-kubectl102-1  | Accept: */*
+web320-k8s-kubectl102-1  | Accept-Encoding: gzip
+web320-k8s-kubectl102-1  | X-Forwarded-For: 10.42.2.0
+web320-k8s-kubectl102-1  | X-Forwarded-Host: localhost:8081
+web320-k8s-kubectl102-1  | X-Forwarded-Port: 8081
+web320-k8s-kubectl102-1  | X-Forwarded-Prefix: /107a
+web320-k8s-kubectl102-1  | X-Forwarded-Proto: http
+web320-k8s-kubectl102-1  | X-Forwarded-Server: traefik-7cd4fcff68-5q2rx
+web320-k8s-kubectl102-1  | X-Real-Ip: 10.42.2.0
+web320-k8s-kubectl102-1  | 
+web320-k8s-kubectl102-1  | deployment.apps "whoami107a" deleted
+web320-k8s-kubectl102-1  | deployment.apps "nginx107b" deleted
+web320-k8s-kubectl102-1  | service "whoami107a" deleted
+web320-k8s-kubectl102-1  | service "nginx107b" deleted
+web320-k8s-kubectl102-1  | ingress.networking.k8s.io "ingress107" deleted
+web320-k8s-kubectl102-1  | middleware.traefik.containo.us "strip-prefix" deleted
+web320-k8s-kubectl102-1 exited with code 0

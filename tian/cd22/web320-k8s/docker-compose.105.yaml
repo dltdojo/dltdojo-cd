@@ -1,0 +1,36 @@
+version: "3.8"
+services:
+  kubectl101:
+    image: alpine/k8s:1.25.4
+    network_mode: "host"
+    entrypoint: sh
+    volumes:
+      - ${HOME}/.kube/config:/.kube/config:ro
+    command:
+      - -c
+      - |
+        ls -al /.kube
+        export KUBEHOME="/.kube"
+        export KUBECONFIG=/.kube/config
+        kubectl config set current-context k3d-foo2021
+        kubectl create deployment --image=nginx nginx105 --replicas=4
+  kubectl102:
+    image: alpine/k8s:1.25.4
+    network_mode: "host"
+    entrypoint: sh
+    volumes:
+      - ${HOME}/.kube/config:/.kube/config:ro
+    command:
+      - -c
+      - |
+        export KUBEHOME="/.kube"
+        export KUBECONFIG=/.kube/config
+        kubectl config set current-context k3d-foo2021
+        sleep 10
+        kubectl get nodes
+        sleep 3
+        kubectl get deploy nginx105 -o yaml
+        kubectl get all
+        kubectl delete deployment nginx105
+        sleep 5
+        kubectl get all
