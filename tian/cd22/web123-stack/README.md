@@ -1,14 +1,34 @@
 # web123
 
-# 🍪 101 busybox httpd cgi sqlite
+# 🍪 101 busybox httpd
 
-- [SQLite Transaction Explained By Practical Examples](https://www.sqlitetutorial.net/sqlite-transaction/)
+兩頁靜態網站。
 
 ```sh
 docker compose -f docker-compose.101.yaml up
 ```
 
-#  🍫 10x LAMP
+# 🐐 102 cgi-bin and sqlite
+
+內嵌資料庫與動態網頁 cgi-bin。
+
+- [SQLite Transaction Explained By Practical Examples](https://www.sqlitetutorial.net/sqlite-transaction/)
+
+```sh
+docker compose -f docker-compose.102.yaml up
+```
+
+# 🐑 103 curl
+
+抓取外部服務內容。
+
+- http://info.cern.ch - home of the first website
+
+```sh
+docker compose -f docker-compose.103.yaml up
+```
+
+#  🍫 20x LAMP
 
 - [LAMP (software bundle) - Wikipedia](https://en.wikipedia.org/wiki/LAMP_(software_bundle))
 - [LAMP vs. MEAN: What’s the Difference? | IBM](https://www.ibm.com/cloud/blog/lamp-vs-mean)
@@ -19,7 +39,7 @@ docker compose -f docker-compose.101.yaml up
 - [MEAN and MERN (JS-based Stacks) Vs LAMP Stack](https://codecondo.com/mean-and-mern-js-based-stacks-vs-lamp-stack/)
 
 
-# 🍬 10x MEAN
+# 🍬 30x MEAN
 
 - [MEAN (solution stack) - Wikipedia](https://en.wikipedia.org/wiki/MEAN_(solution_stack))
 - M: MongoDB (non-RDBMS NoSQL database)
@@ -28,12 +48,12 @@ docker compose -f docker-compose.101.yaml up
 - N: Node.js (open-source backend runtime environment)
 
 
-#  🍭 10x MERN
+#  🍭 40x MERN
 
 - R: React (frontend framework)
 - [MERN vs LAMP. Has the Time Come to Dump LAMP and… | by Ajay Kapoor | Enlear Academy](https://enlear.academy/mern-vs-lamp-f0653b0dc96a)
 
-#  🍮 10x JAM
+#  🍮 50x JAM
 
 Javascript, APIs, and Markup
 
