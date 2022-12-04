@@ -1,0 +1,289 @@
+docker compose -f docker-compose.104.yaml up
+[+] Running 3/0
+ ⠿ Container web123-stack-repo101-1  Created                                                                                                                                           0.0s
+ ⠿ Container web123-stack-dev102-1   Created                                                                                                                                           0.0s
+ ⠿ Container web123-stack-dev101-1   Recreated                                                                                                                                         0.0s
+Attaching to web123-stack-dev101-1, web123-stack-dev102-1, web123-stack-repo101-1
+web123-stack-dev102-1   | HOSTNAME=caabd2d6e5d9
+web123-stack-dev102-1   | SHLVL=1
+web123-stack-dev102-1   | HOME=/root
+web123-stack-dev102-1   | PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+web123-stack-dev102-1   | PWD=/
+web123-stack-dev102-1   | *   Trying 192.168.64.3:3000...
+web123-stack-dev102-1   | * connect to 192.168.64.3 port 3000 failed: Connection refused
+web123-stack-dev102-1   | * Failed to connect to dev101 port 3000 after 0 ms: Connection refused
+web123-stack-dev102-1   | * Closing connection 0
+web123-stack-repo101-1  | HOSTNAME=b12f27e9e36a
+web123-stack-repo101-1  | SHLVL=1
+web123-stack-repo101-1  | HOME=/root
+web123-stack-repo101-1  | PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+web123-stack-repo101-1  | PWD=/
+web123-stack-dev102-1   | * Hostname dev101 was found in DNS cache
+web123-stack-dev102-1   | *   Trying 192.168.64.3:3000...
+web123-stack-dev102-1   | * connect to 192.168.64.3 port 3000 failed: Connection refused
+web123-stack-dev102-1   | * Failed to connect to dev101 port 3000 after 0 ms: Connection refused
+web123-stack-dev102-1   | * Closing connection 1
+web123-stack-dev101-1   | HOSTNAME=d53e0872e6be
+web123-stack-dev101-1   | SHLVL=1
+web123-stack-dev101-1   | HOME=/root
+web123-stack-dev101-1   | PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+web123-stack-dev101-1   | PWD=/
+web123-stack-dev102-1   | * Hostname dev101 was found in DNS cache
+web123-stack-dev102-1   | *   Trying 192.168.64.3:3000...
+web123-stack-dev102-1   | * connect to 192.168.64.3 port 3000 failed: Connection refused
+web123-stack-dev102-1   | * Failed to connect to dev101 port 3000 after 0 ms: Connection refused
+web123-stack-dev102-1   | * Closing connection 2
+web123-stack-repo101-1  | [::ffff:192.168.64.3]:33446: response:200
+web123-stack-repo101-1  | [::ffff:192.168.64.3]:33454: response:200
+web123-stack-dev101-1   | CREATE TABLE accounts ( 
+web123-stack-dev101-1   |   account_no INTEGER NOT NULL, 
+web123-stack-dev101-1   |   balance DECIMAL NOT NULL DEFAULT 0,
+web123-stack-dev101-1   |   PRIMARY KEY(account_no),
+web123-stack-dev101-1   |   CHECK(balance >= 0)
+web123-stack-dev101-1   | );
+web123-stack-dev101-1   | CREATE TABLE account_changes (
+web123-stack-dev101-1   |   change_no INTEGER PRIMARY KEY,
+web123-stack-dev101-1   |   account_no INTEGER NOT NULL, 
+web123-stack-dev101-1   |   flag TEXT NOT NULL, 
+web123-stack-dev101-1   |   amount DECIMAL NOT NULL, 
+web123-stack-dev101-1   |   changed_at TEXT NOT NULL 
+web123-stack-dev101-1   | );
+web123-stack-dev101-1   | INSERT INTO accounts (account_no,balance) VALUES (100,20100);
+web123-stack-dev101-1   | INSERT INTO accounts (account_no,balance) VALUES (200,10100);
+web123-stack-dev101-1   | SELECT * FROM accounts;
+web123-stack-dev101-1   | 100|20100
+web123-stack-dev101-1   | 200|10100
+web123-stack-dev101-1   | 
+web123-stack-dev101-1   | BEGIN TRANSACTION;
+web123-stack-dev101-1   | UPDATE accounts SET balance = balance - 1000 WHERE account_no = 100;
+web123-stack-dev101-1   | UPDATE accounts SET balance = balance + 1000 WHERE account_no = 200;
+web123-stack-dev101-1   | INSERT INTO account_changes(account_no,flag,amount,changed_at) 
+web123-stack-dev101-1   | VALUES(100,'-',1000,datetime('now'));
+web123-stack-dev101-1   | INSERT INTO account_changes(account_no,flag,amount,changed_at) 
+web123-stack-dev101-1   | VALUES(200,'+',1000,datetime('now'));
+web123-stack-dev101-1   | COMMIT;
+web123-stack-dev101-1   | SELECT * FROM accounts;
+web123-stack-dev101-1   | 100|19100
+web123-stack-dev101-1   | 200|11100
+web123-stack-dev101-1   | SELECT * FROM account_changes;
+web123-stack-dev101-1   | 1|100|-|1000|2022-12-04 13:26:17
+web123-stack-dev101-1   | 2|200|+|1000|2022-12-04 13:26:17
+web123-stack-dev102-1   | * Hostname dev101 was found in DNS cache
+web123-stack-dev102-1   | *   Trying 192.168.64.3:3000...
+web123-stack-dev102-1   | * Connected to dev101 (192.168.64.3) port 3000 (#3)
+web123-stack-dev102-1   | > GET / HTTP/1.1
+web123-stack-dev102-1   | > Host: dev101:3000
+web123-stack-dev102-1   | > User-Agent: curl/7.83.1
+web123-stack-dev102-1   | > Accept: */*
+web123-stack-dev102-1   | > 
+web123-stack-dev101-1   | [::ffff:192.168.64.4]:55956: response:200
+web123-stack-dev102-1   | * Mark bundle as not supporting multiuse
+web123-stack-dev102-1   | < HTTP/1.1 200 OK
+web123-stack-dev102-1   | < Date: Sun, 04 Dec 2022 13:26:21 GMT
+web123-stack-dev102-1   | < Connection: close
+web123-stack-dev102-1   | < Content-type: text/html
+web123-stack-dev102-1   | < Accept-Ranges: bytes
+web123-stack-dev102-1   | < Last-Modified: Sun, 04 Dec 2022 13:26:17 GMT
+web123-stack-dev102-1   | < ETag: "638c9ff9-e6"
+web123-stack-dev102-1   | < Content-Length: 230
+web123-stack-dev102-1   | < 
+web123-stack-dev102-1   | <html>
+web123-stack-dev102-1   | <head><title>Web Dev Stack Testing</title></head>
+web123-stack-dev102-1   | <body><h1>WebDev Stack 101 Sun Dec  4 13:26:17 UTC 2022</h1>
+web123-stack-dev102-1   | <h2><a href="/page.html">page</a></h2>
+web123-stack-dev102-1   | <h2><a href="/cgi-bin/data.sh">/cgi-bin/data.sh</a></h2>
+web123-stack-dev102-1   | </body>
+web123-stack-dev102-1   | </html>
+web123-stack-dev102-1   | { [230 bytes data]
+web123-stack-dev102-1   | * Closing connection 3
+web123-stack-dev102-1   | *   Trying 192.168.64.3:3000...
+web123-stack-dev102-1   | * Connected to dev101 (192.168.64.3) port 3000 (#0)
+web123-stack-dev102-1   | > GET /page.html HTTP/1.1
+web123-stack-dev102-1   | > Host: dev101:3000
+web123-stack-dev102-1   | > User-Agent: curl/7.83.1
+web123-stack-dev102-1   | > Accept: */*
+web123-stack-dev102-1   | > 
+web123-stack-dev101-1   | [::ffff:192.168.64.4]:55966: response:200
+web123-stack-dev102-1   | * Mark bundle as not supporting multiuse
+web123-stack-dev102-1   | < HTTP/1.1 200 OK
+web123-stack-dev102-1   | < Date: Sun, 04 Dec 2022 13:26:21 GMT
+web123-stack-dev102-1   | < Connection: close
+web123-stack-dev102-1   | < Content-type: text/html
+web123-stack-dev102-1   | < Accept-Ranges: bytes
+web123-stack-dev102-1   | < Last-Modified: Sun, 04 Dec 2022 13:26:17 GMT
+web123-stack-dev102-1   | < ETag: "638c9ff9-89"
+web123-stack-dev102-1   | < Content-Length: 137
+web123-stack-dev102-1   | < 
+web123-stack-dev102-1   | { [137 bytes data]
+web123-stack-dev102-1   | * Closing connection 0
+web123-stack-dev102-1   | <html>
+web123-stack-dev102-1   | <head><title>Page: Web Dev Stack</title></head>
+web123-stack-dev102-1   | <body><h1>Page: WebDev Stack 101 Sun Dec  4 13:26:14 UTC 2022</h1></body>
+web123-stack-dev102-1   | </html>
+web123-stack-dev102-1   | *   Trying 192.168.64.3:3000...
+web123-stack-dev102-1   | * Connected to dev101 (192.168.64.3) port 3000 (#0)
+web123-stack-dev102-1   | > GET /cgi-bin/data.sh HTTP/1.1
+web123-stack-dev102-1   | > Host: dev101:3000
+web123-stack-dev102-1   | > User-Agent: curl/7.83.1
+web123-stack-dev102-1   | > Accept: */*
+web123-stack-dev102-1   | > 
+web123-stack-dev102-1   | * Mark bundle as not supporting multiuse
+web123-stack-dev102-1   | < HTTP/1.1 200 OK
+web123-stack-dev102-1   | < Content-type: text/plain; charset=utf-8
+web123-stack-dev102-1   | * no chunk, no close, no size. Assume close to signal end
+web123-stack-dev102-1   | < 
+web123-stack-dev102-1   | { [17 bytes data]
+web123-stack-dev102-1   | # SQL statements
+web123-stack-repo101-1  | [::ffff:192.168.64.3]:50110: response:200
+web123-stack-dev102-1   | *   Trying 192.168.64.2:3000...
+web123-stack-dev102-1   | * Connected to repo101 (192.168.64.2) port 3000 (#0)
+web123-stack-dev102-1   | > GET /db.sql HTTP/1.1
+web123-stack-dev102-1   | > Host: repo101:3000
+web123-stack-dev102-1   | > User-Agent: curl/7.83.1
+web123-stack-dev102-1   | > Accept: */*
+web123-stack-dev102-1   | > 
+web123-stack-dev102-1   | * Mark bundle as not supporting multiuse
+web123-stack-dev102-1   | < HTTP/1.1 200 OK
+web123-stack-dev102-1   | < Date: Sun, 04 Dec 2022 13:26:21 GMT
+web123-stack-dev102-1   | < Connection: close
+web123-stack-dev102-1   | < Accept-Ranges: bytes
+web123-stack-dev102-1   | < Last-Modified: Sun, 04 Dec 2022 13:26:14 GMT
+web123-stack-dev102-1   | < ETag: "638c9ff6-382"
+web123-stack-dev102-1   | < Content-Length: 898
+web123-stack-dev102-1   | < 
+web123-stack-dev102-1   | { [898 bytes data]
+web123-stack-dev102-1   | CREATE TABLE accounts ( 
+web123-stack-dev102-1   |   account_no INTEGER NOT NULL, 
+web123-stack-dev102-1   |   balance DECIMAL NOT NULL DEFAULT 0,
+web123-stack-dev102-1   |   PRIMARY KEY(account_no),
+web123-stack-dev102-1   |   CHECK(balance >= 0)
+web123-stack-dev102-1   | );
+web123-stack-dev102-1   | CREATE TABLE account_changes (
+web123-stack-dev102-1   |   change_no INTEGER PRIMARY KEY,
+web123-stack-dev102-1   |   account_no INTEGER NOT NULL, 
+web123-stack-dev102-1   |   flag TEXT NOT NULL, 
+web123-stack-dev102-1   |   amount DECIMAL NOT NULL, 
+web123-stack-dev102-1   |   changed_at TEXT NOT NULL 
+web123-stack-dev102-1   | );
+web123-stack-dev102-1   | INSERT INTO accounts (account_no,balance) VALUES (100,20100);
+web123-stack-dev102-1   | INSERT INTO accounts (account_no,balance) VALUES (200,10100);
+web123-stack-dev102-1   | SELECT * FROM accounts;
+web123-stack-dev102-1   | 
+web123-stack-dev102-1   | BEGIN TRANSACTION;
+web123-stack-dev102-1   | UPDATE accounts SET balance = balance - 1000 WHERE account_no = 100;
+web123-stack-dev102-1   | UPDATE accounts SET balance = balance + 1000 WHERE account_no = 200;
+web123-stack-dev102-1   | INSERT INTO account_changes(account_no,flag,amount,changed_at) 
+web123-stack-dev102-1   | VALUES(100,'-',1000,datetime('now'));
+web123-stack-dev102-1   | INSERT INTO account_changes(account_no,flag,amount,changed_at) 
+web123-stack-dev102-1   | VALUES(200,'+',1000,datetime('now'));
+web123-stack-dev102-1   | COMMIT;
+web123-stack-dev102-1   | SELECT * FROM accounts;
+web123-stack-dev102-1   | SELECT * FROM account_changes;
+web123-stack-dev102-1   | * Closing connection 0
+web123-stack-dev102-1   | # ===
+web123-stack-dev102-1   | # SELECT * FROM accounts
+web123-stack-dev102-1   | 100|19100
+web123-stack-dev102-1   | 200|11100
+web123-stack-dev102-1   | # ===
+web123-stack-dev102-1   | # SELECT * FROM account_changes
+web123-stack-dev102-1   | 1|100|-|1000|2022-12-04 13:26:17
+web123-stack-dev102-1   | 2|200|+|1000|2022-12-04 13:26:17
+web123-stack-dev102-1   | # http://info.cern.ch - home of the first website
+web123-stack-dev102-1   | *   Trying 188.184.21.108:80...
+web123-stack-dev102-1   | *   Trying 2001:1458:d00:34::100:125:80...
+web123-stack-dev102-1   | * Immediate connect fail for 2001:1458:d00:34::100:125: Address not available
+web123-stack-dev102-1   | * Connected to info.cern.ch (188.184.21.108) port 80 (#0)
+web123-stack-dev102-1   | > GET /hypertext/WWW/TheProject.html HTTP/1.1
+web123-stack-dev102-1   | > Host: info.cern.ch
+web123-stack-dev102-1   | > User-Agent: curl/7.83.1
+web123-stack-dev102-1   | > Accept: */*
+web123-stack-dev102-1   | > 
+web123-stack-dev102-1   | * Mark bundle as not supporting multiuse
+web123-stack-dev102-1   | < HTTP/1.1 200 OK
+web123-stack-dev102-1   | < Date: Sun, 04 Dec 2022 13:26:22 GMT
+web123-stack-dev102-1   | < Server: Apache
+web123-stack-dev102-1   | < Last-Modified: Thu, 03 Dec 1992 08:37:20 GMT
+web123-stack-dev102-1   | < ETag: "8a9-291e721905000"
+web123-stack-dev102-1   | < Accept-Ranges: bytes
+web123-stack-dev102-1   | < Content-Length: 2217
+web123-stack-dev102-1   | < Connection: close
+web123-stack-dev102-1   | < Content-Type: text/html
+web123-stack-dev102-1   | < 
+web123-stack-dev102-1   | { [2217 bytes data]
+web123-stack-dev102-1   | <HEADER>
+web123-stack-dev102-1   | <TITLE>The World Wide Web project</TITLE>
+web123-stack-dev102-1   | <NEXTID N="55">
+web123-stack-dev102-1   | </HEADER>
+web123-stack-dev102-1   | <BODY>
+web123-stack-dev102-1   | <H1>World Wide Web</H1>The WorldWideWeb (W3) is a wide-area<A
+web123-stack-dev102-1   | NAME=0 HREF="WhatIs.html">
+web123-stack-dev102-1   | hypermedia</A> information retrieval
+web123-stack-dev102-1   | initiative aiming to give universal
+web123-stack-dev102-1   | access to a large universe of documents.<P>
+web123-stack-dev102-1   | Everything there is online about
+web123-stack-dev102-1   | W3 is linked directly or indirectly
+web123-stack-dev102-1   | to this document, including an <A
+web123-stack-dev102-1   | NAME=24 HREF="Summary.html">executive
+web123-stack-dev102-1   | summary</A> of the project, <A
+web123-stack-dev102-1   | NAME=29 HREF="Administration/Mailing/Overview.html">Mailing lists</A>
+web123-stack-dev102-1   | , <A
+web123-stack-dev102-1   | NAME=30 HREF="Policy.html">Policy</A> , November's  <A
+web123-stack-dev102-1   | NAME=34 HREF="News/9211.html">W3  news</A> ,
+web123-stack-dev102-1   | <A
+web123-stack-dev102-1   | NAME=41 HREF="FAQ/List.html">Frequently Asked Questions</A> .
+web123-stack-dev102-1   | <DL>
+web123-stack-dev102-1   | <DT><A
+web123-stack-dev102-1   | NAME=44 HREF="../DataSources/Top.html">What's out there?</A>
+web123-stack-dev102-1   | <DD> Pointers to the
+web123-stack-dev102-1   | world's online information,<A
+web123-stack-dev102-1   | NAME=45 HREF="../DataSources/bySubject/Overview.html"> subjects</A>
+web123-stack-dev102-1   | , <A
+web123-stack-dev102-1   | NAME=z54 HREF="../DataSources/WWW/Servers.html">W3 servers</A>, etc.
+web123-stack-dev102-1   | <DT><A
+web123-stack-dev102-1   | NAME=46 HREF="Help.html">Help</A>
+web123-stack-dev102-1   | <DD> on the browser you are using
+web123-stack-dev102-1   | <DT><A
+web123-stack-dev102-1   | NAME=13 HREF="Status.html">Software Products</A>
+web123-stack-dev102-1   | <DD> A list of W3 project
+web123-stack-dev102-1   | components and their current state.
+web123-stack-dev102-1   | (e.g. <A
+web123-stack-dev102-1   | NAME=27 HREF="LineMode/Browser.html">Line Mode</A> ,X11 <A
+web123-stack-dev102-1   | NAME=35 HREF="Status.html#35">Viola</A> ,  <A
+web123-stack-dev102-1   | NAME=26 HREF="NeXT/WorldWideWeb.html">NeXTStep</A>
+web123-stack-dev102-1   | , <A
+web123-stack-dev102-1   | NAME=25 HREF="Daemon/Overview.html">Servers</A> , <A
+web123-stack-dev102-1   | NAME=51 HREF="Tools/Overview.html">Tools</A> ,<A
+web123-stack-dev102-1   | NAME=53 HREF="MailRobot/Overview.html"> Mail robot</A> ,<A
+web123-stack-dev102-1   | NAME=52 HREF="Status.html#57">
+web123-stack-dev102-1   | Library</A> )
+web123-stack-dev102-1   | <DT><A
+web123-stack-dev102-1   | NAME=47 HREF="Technical.html">Technical</A>
+web123-stack-dev102-1   | <DD> Details of protocols, formats,
+web123-stack-dev102-1   | program internals etc
+web123-stack-dev102-1   | <DT><A
+web123-stack-dev102-1   | NAME=40 HREF="Bibliography.html">Bibliography</A>
+web123-stack-dev102-1   | <DD> Paper documentation
+web123-stack-dev102-1   | on  W3 and references.
+web123-stack-dev102-1   | <DT><A
+web123-stack-dev102-1   | NAME=14 HREF="People.html">People</A>
+web123-stack-dev102-1   | <DD> A list of some people involved
+web123-stack-dev102-1   | in the project.
+web123-stack-dev102-1   | <DT><A
+web123-stack-dev102-1   | NAME=15 HREF="History.html">History</A>
+web123-stack-dev102-1   | <DD> A summary of the history
+web123-stack-dev102-1   | of the project.
+web123-stack-dev102-1   | <DT><A
+web123-stack-dev102-1   | NAME=37 HREF="Helping.html">How can I help</A> ?
+web123-stack-dev102-1   | <DD> If you would like
+web123-stack-dev102-1   | to support the web..
+web123-stack-dev102-1   | <DT><A
+web123-stack-dev102-1   | NAME=48 HREF="../README.html">Getting code</A>
+web123-stack-dev102-1   | <DD> Getting the code by<A
+web123-stack-dev102-1   | NAME=49 HREF="LineMode/Defaults/Distribution.html">
+web123-stack-dev102-1   | anonymous FTP</A> , etc.</A>
+web123-stack-dev102-1   | </DL>
+web123-stack-dev102-1   | </BODY>
+web123-stack-dev102-1   | * Closing connection 0
+web123-stack-dev102-1   | * Closing connection 0
+web123-stack-dev102-1   | 
+web123-stack-dev102-1 exited with code 0

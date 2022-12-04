@@ -1,0 +1,104 @@
+version: "3.8"
+services:
+  repo101:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        env
+        cd /home
+        cat <<EOF > db.sql
+        CREATE TABLE accounts ( 
+          account_no INTEGER NOT NULL, 
+          balance DECIMAL NOT NULL DEFAULT 0,
+          PRIMARY KEY(account_no),
+          CHECK(balance >= 0)
+        );
+        CREATE TABLE account_changes (
+          change_no INTEGER PRIMARY KEY,
+          account_no INTEGER NOT NULL, 
+          flag TEXT NOT NULL, 
+          amount DECIMAL NOT NULL, 
+          changed_at TEXT NOT NULL 
+        );
+        INSERT INTO accounts (account_no,balance) VALUES (100,20100);
+        INSERT INTO accounts (account_no,balance) VALUES (200,10100);
+        SELECT * FROM accounts;
+
+        BEGIN TRANSACTION;
+        UPDATE accounts SET balance = balance - 1000 WHERE account_no = 100;
+        UPDATE accounts SET balance = balance + 1000 WHERE account_no = 200;
+        INSERT INTO account_changes(account_no,flag,amount,changed_at) 
+        VALUES(100,'-',1000,datetime('now'));
+        INSERT INTO account_changes(account_no,flag,amount,changed_at) 
+        VALUES(200,'+',1000,datetime('now'));
+        COMMIT;
+        SELECT * FROM accounts;
+        SELECT * FROM account_changes;
+        EOF
+        TODAY=$(date)
+        cat <<EOF > /home/page.html
+        <html>
+        <head><title>Page: Web Dev Stack</title></head>
+        <body><h1>Page: WebDev Stack 101 $$TODAY</h1></body>
+        </html>
+        EOF
+        httpd -fv -p 3000 -h /home
+  dev101:
+    build: 
+      context: .
+      target: busybox101
+    command:
+      - /bin/sh
+      - -c
+      - |
+        sleep 3
+        env
+        cd /home
+        curl -s -o db.sql http://repo101:3000/db.sql
+        curl -s -o page.html http://repo101:3000/page.html
+        sqlite3 -echo test.db < db.sql
+        TODAY=$(date)
+        cat <<EOF > /home/index.html
+        <html>
+        <head><title>Web Dev Stack Testing</title></head>
+        <body><h1>WebDev Stack 101 $$TODAY</h1>
+        <h2><a href="/page.html">page</a></h2>
+        <h2><a href="/cgi-bin/data.sh">/cgi-bin/data.sh</a></h2>
+        </body>
+        </html>
+        EOF
+        mkdir /home/cgi-bin
+        cat <<\EOOF > /home/cgi-bin/data.sh
+        #!/bin/sh
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        echo "# SQL statements"
+        curl -sv http://repo101:3000/db.sql 2>&1
+        echo "# ==="
+        echo "# SELECT * FROM accounts"
+        echo "SELECT * FROM accounts;" | sqlite3 /home/test.db
+        echo "# ==="
+        echo "# SELECT * FROM account_changes"
+        echo "SELECT * FROM account_changes;" | sqlite3 /home/test.db
+        echo "# http://info.cern.ch - home of the first website"
+        curl -sv http://info.cern.ch/hypertext/WWW/TheProject.html 2>&1
+        echo ""
+        EOOF
+        chmod 700 /home/cgi-bin/data.sh
+        httpd -fv -p 3000 -h /home
+    ports:
+      - 8300:3000
+  dev102:
+    build: 
+      context: .
+      target: busybox101
+    command:
+      - /bin/sh
+      - -c
+      - |
+        env
+        curl -sv --retry 10 --retry-all-errors http://dev101:3000/
+        curl -sv --retry 10 --retry-all-errors http://dev101:3000/page.html
+        curl -sv --retry 10 --retry-all-errors http://dev101:3000/cgi-bin/data.sh

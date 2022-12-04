@@ -92,3 +92,6 @@ docker compose -f docker-compose.107.yaml up
 ```
 
 
+# 20x Bad Pods
+
+[Bad Pods: Kubernetes Pod Privilege Escalation | Bishop Fox](https://bishopfox.com/blog/kubernetes-pod-privilege-escalation)

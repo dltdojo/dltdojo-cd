@@ -28,6 +28,46 @@ docker compose -f docker-compose.102.yaml up
 docker compose -f docker-compose.103.yaml up
 ```
 
+# 🍧 104 repo site
+
+抓取內部服務內容。
+
+```sh
+docker compose -f docker-compose.104.yaml up
+```
+
+# 🍧 105 sqlite service
+
+sqlite 轉成 HTTP 微服務，實際上原始資料庫有自己的協定都不是走 HTTP，部份會支援類似 JDBC 通用協定。
+
+```sh
+docker compose -f docker-compose.105.yaml up
+```
+
+# 10x database
+
+- [postgres - Official Image | Docker Hub](https://hub.docker.com/_/postgres)
+
+# 10x php
+
+todo
+
+# 10x java/jsp
+
+todo
+
+# 10x html script element
+
+- javascript
+- playwright
+
+# 10x server site javascript
+
+- nodejs
+- playwright
+- k6
+
+
 #  🍫 20x LAMP
 
 - [LAMP (software bundle) - Wikipedia](https://en.wikipedia.org/wiki/LAMP_(software_bundle))
