@@ -5,7 +5,7 @@ RUN <<EOF
 /home/.openvscode-server/bin/openvscode-server --install-extension=redhat.vscode-yaml
 EOF
 
-FROM openvscode102 AS openvscode103
+FROM openvscode102 AS openvscode201
 USER root
 # Install docker cli
 RUN <<EOF
@@ -24,7 +24,7 @@ RUN <<EOF
 /home/.openvscode-server/bin/openvscode-server --install-extension=ms-azuretools.vscode-docker
 EOF
 
-FROM openvscode103 AS openvscode104
+FROM openvscode201 AS openvscode301
 USER root
 # Install kubectl 
 RUN <<EOF

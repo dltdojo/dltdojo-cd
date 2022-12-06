@@ -135,7 +135,19 @@ EOF
 docker compose -f docker-compose.102.yaml up
 ```
 
-# 🍜 103 docker
+# 🍱 103 git version control system
+
+預設新增 workspace foo 並提供開啟連結指引，並將該工作區納入 git 做版本控制。目前版本測試時 chrome 環境會比 firefox 好，當 firefox 的 terminal 出現無法複製貼上時建議更換成 chrome 類瀏覽器。
+
+vscode 在同一個 workspace 開幾個瀏覽器頁面都會同步，所以一個頁面編輯修改後 git checkout -b foo101 其他頁面也會一起轉到這個分支。這種功能很適合廣播教學環境，如要個別練習與設定獨立編寫須另外使用新的 workspace 來區隔。
+
+- http://localhost:3000/?folder=/home/workspace/foo
+
+```sh
+docker compose -f docker-compose.103.yaml up
+```
+
+# 🍜 201 docker
 
 安裝 redhat.vscode-yaml 與 ms-azuretools.vscode-docker
 
@@ -147,10 +159,10 @@ docker compose -f docker-compose.102.yaml up
 須注意容器內 apt-get 不需要安裝 docker 服務端的 docker-ce，這套件會新增 docker group，並產生對應的 GID，如果容器安裝 docker-ce 可能會衝到主機使用的 docker group，這時要先刪掉容器內 docker group 再 groupadd 補上 host 端的 docker gid 避免出現找不到 gid 訊息，當然最好是不裝 docker-ce。
 
 ```sh
-GID="$(getent group docker | cut -d: -f3)" docker compose -f docker-compose.103.yaml up
+GID="$(getent group docker | cut -d: -f3)" docker compose -f docker-compose.201.yaml up
 ```
 
-# 🍙 104 kubernetes
+# 🍙 301 kubernetes
 
 - Kubernetes - Visual Studio Marketplace https://marketplace.visualstudio.com/items?itemName=ms-kubernetes-tools.vscode-kubernetes-tools
 
@@ -160,6 +172,6 @@ GID="$(getent group docker | cut -d: -f3)" docker compose -f docker-compose.103.
 
 ```sh
 k3d cluster create foo1999
-GID="$(getent group docker | cut -d: -f3)" docker compose -f docker-compose.104.yaml up
+GID="$(getent group docker | cut -d: -f3)" docker compose -f docker-compose.301.yaml up
 ```
 

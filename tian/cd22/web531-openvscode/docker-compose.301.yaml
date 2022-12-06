@@ -3,7 +3,7 @@ services:
   vscode101:
     build:
       context: .
-      target: openvscode104
+      target: openvscode301
     network_mode: "host"
     user: "1000:${GID}"
     environment:
