@@ -1,0 +1,97 @@
+deployment.apps/my-nginx created
+service/my-nginx created
+job.batch/job101 created
+job.batch/job101 condition met
+=== box501 ===
+MY_NGINX_SERVICE_PORT=80
+MY_NGINX_PORT=tcp://10.43.83.161:80
+KUBERNETES_SERVICE_PORT=443
+KUBERNETES_PORT=tcp://10.43.0.1:443
+HOSTNAME=job101-b4jcr
+SHLVL=1
+MY_NGINX_PORT_80_TCP_ADDR=10.43.83.161
+HOME=/root
+MY_NGINX_PORT_80_TCP_PORT=80
+MY_NGINX_PORT_80_TCP_PROTO=tcp
+MY_NGINX_PORT_80_TCP=tcp://10.43.83.161:80
+KUBERNETES_PORT_443_TCP_ADDR=10.43.0.1
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+KUBERNETES_PORT_443_TCP_PORT=443
+KUBERNETES_PORT_443_TCP_PROTO=tcp
+KUBERNETES_SERVICE_PORT_HTTPS=443
+KUBERNETES_PORT_443_TCP=tcp://10.43.0.1:443
+MY_NGINX_SERVICE_HOST=10.43.83.161
+KUBERNETES_SERVICE_HOST=10.43.0.1
+PWD=/
+Tue Dec  6 10:09:39 UTC 2022
+=== curl501 ===
+MY_NGINX_PORT=tcp://10.43.83.161:80
+MY_NGINX_SERVICE_PORT=80
+CURL_CA_BUNDLE=/cacert.pem
+KUBERNETES_SERVICE_PORT=443
+KUBERNETES_PORT=tcp://10.43.0.1:443
+HOSTNAME=job101-b4jcr
+CURL_RELEASE_TAG=curl-7_86_0
+CURL_GIT_REPO=https://github.com/curl/curl.git
+SHLVL=1
+MY_NGINX_PORT_80_TCP_ADDR=10.43.83.161
+HOME=/home/curl_user
+MY_NGINX_PORT_80_TCP_PORT=80
+MY_NGINX_PORT_80_TCP_PROTO=tcp
+MY_NGINX_PORT_80_TCP=tcp://10.43.83.161:80
+KUBERNETES_PORT_443_TCP_ADDR=10.43.0.1
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+KUBERNETES_PORT_443_TCP_PORT=443
+KUBERNETES_PORT_443_TCP_PROTO=tcp
+KUBERNETES_PORT_443_TCP=tcp://10.43.0.1:443
+KUBERNETES_SERVICE_PORT_HTTPS=443
+MY_NGINX_SERVICE_HOST=10.43.83.161
+KUBERNETES_SERVICE_HOST=10.43.0.1
+PWD=/
+CURL_VERSION=7_86_0
+*   Trying 10.43.83.161:80...
+* Connected to my-nginx.default.svc.cluster.local (10.43.83.161) port 80 (#0)
+> GET / HTTP/1.1
+> Host: my-nginx.default.svc.cluster.local
+> User-Agent: curl/7.86.0-DEV
+> Accept: */*
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Server: nginx/1.23.2
+< Date: Tue, 06 Dec 2022 10:09:44 GMT
+< Content-Type: text/html
+< Content-Length: 615
+< Last-Modified: Wed, 19 Oct 2022 07:56:21 GMT
+< Connection: keep-alive
+< ETag: "634fada5-267"
+< Accept-Ranges: bytes
+< 
+{ [615 bytes data]
+* Connection #0 to host my-nginx.default.svc.cluster.local left intact
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+deployment.apps "my-nginx" deleted
+service "my-nginx" deleted
+job.batch "job101" deleted

@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx
+spec:
+  selector:
+    matchLabels:
+      run: my-nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: my-nginx
+    spec:
+      containers:
+        - name: my-nginx
+          image: nginx
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-nginx
+  labels:
+    run: my-nginx
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+  selector:
+    run: my-nginx
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job101
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: box501
+          image: busybox:1.35.0
+          command:
+            - sh
+          args:
+            - -c
+            - |
+              env
+              sleep 5
+              date
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+        - name: curl501
+          image: curlimages/curl
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          command:
+            - sh
+          args:
+            - -c
+            - |
+              env
+              ls -lah
+              curl -sv --retry 5 --retry-all-errors http://my-nginx.default.svc.cluster.local:80/

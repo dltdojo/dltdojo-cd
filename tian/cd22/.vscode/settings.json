@@ -4,5 +4,8 @@
   "editor.defaultFormatter": "denoland.vscode-deno",
   "[rust]": {
     "editor.defaultFormatter": "rust-lang.rust-analyzer"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
   }
 }

@@ -91,6 +91,34 @@ k3d cluster create foo2021 -p "8081:80@loadbalancer" --agents 2
 docker compose -f docker-compose.107.yaml up
 ```
 
+# 201 Declarative k8s objects(deployment, service, job)
+
+- [Declarative Management of Kubernetes Objects Using Configuration Files | Kubernetes](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/declarative-config/)
+
+
+類似 docker compose up 輸出，只是要看輸出比較麻煩，如果卡住或是沒完成需要個別 pod 進去看。
+
+```sh
+k3d cluster create foo2021
+cat <<EOF | sh
+kubectl apply -f k201.yaml
+kubectl wait --for=condition=complete job.batch/job101
+echo "=== box501 ==="
+kubectl logs job.batch/job101 box501
+echo "=== curl501 ==="
+kubectl logs job.batch/job101 curl501
+sleep 14
+kubectl delete -f k201.yaml
+EOF
+```
+
+watchexec 用來自動更新很方便，不過輸出的結果沒有類似 docker compose 前面標注其他訊息容易知道目前是哪個容器的輸出結果。
+
+```sh
+watchexec -e yaml -r 'bash k201.sh'
+```
+
+測試 skaffold dev 不過無法即時看到 job 用處不大。 [skaffold.yaml | Skaffold](https://skaffold.dev/docs/references/yaml/)
 
 # 20x Bad Pods
 
