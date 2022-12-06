@@ -1,0 +1,36 @@
+version: "3.8"
+services:
+  vscode101:
+    image: gitpod/openvscode-server:1.73.1
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        env
+        id
+        cat<<EOF >> /home/workspace/.bashrc
+        alias la='ls -lah'
+        EOF
+        mkdir /home/workspace/foo
+        cd /home/workspace/foo
+        echo hello-world-2022 > README.md
+        git config --global user.email "foo1001@testing.local"
+        git config --global user.name "FooName1001"
+        git init -q
+        git status
+        git add .
+        git status
+        git commit -m 'first commit'
+        git status
+        git log
+        git checkout -b issue302
+        git branch
+        echo $(date) >> README.md
+        /home/.openvscode-server/bin/openvscode-server --host 0.0.0.0 --without-connection-token &
+        sleep 5
+        echo "open http://localhost:3000/?folder=/home/workspace/foo"
+        wait
+    ports:
+      - 3000:3000
+    #volumes:
+    #  - .:/home/workspace:cached

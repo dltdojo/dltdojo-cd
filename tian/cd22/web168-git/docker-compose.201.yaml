@@ -1,0 +1,31 @@
+version: "3.8"
+services:
+  githttp201:
+    build:
+      context: .
+      target: busybox101
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        env
+        id
+        mkdir -p /app/repo/foo
+        git config --global user.email "you@example.com"
+        git config --global user.name "Your Name"
+        cd /app/repo/foo
+        echo foo123 > README.md
+        git init -q
+        git status
+        git add .
+        git status
+        git commit -m 'first commit'
+        echo "=== Test1 ==="
+        git http-backend
+        echo "=== Test2 ==="
+        # mapping /foo.git to /foo
+        echo "=== Test2 /foo/HEAD ==="
+        GIT_HTTP_EXPORT_ALL=1 REQUEST_METHOD=GET GIT_PROJECT_ROOT=/app/repo PATH_INFO=/foo/HEAD git http-backend
+        echo "=== Test2 /foo/info/refs ==="
+        GIT_HTTP_EXPORT_ALL=1 REQUEST_METHOD=GET GIT_PROJECT_ROOT=/app/repo PATH_INFO=/foo/info/refs git http-backend
+        

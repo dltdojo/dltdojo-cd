@@ -1,0 +1,97 @@
+version: "3.8"
+services:
+  githttp201:
+    build:
+      context: .
+      target: busybox101
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        env
+        id
+        mkdir -p /app/repo/foo
+        git config --system http.receivepack true
+        git config --system http.uploadpack true
+        git config --system user.email "gitserver@dev.local"
+        git config --system user.name "Git Server"
+        git config --global user.email "you@example.com"
+        git config --global user.name "Your Name"
+        cd /app/repo/foo &&  git init --bare -q
+        mkdir -p /app/repo/bar && cd /app/repo/bar && git init -q --bare
+        #
+        # https://github.com/ryan0x44/local-git-server
+        # NOTE: docker compose escape $$ 
+        #
+        cat <<\EOF > /etc/lighttpd/lighttpd.conf
+        server.document-root = "/app/repo"
+        server.modules += ( "mod_alias", "mod_cgi", "mod_setenv" )
+        $$HTTP["host"] =~ "" { 
+          alias.url += ( "/git" => "/usr/libexec/git-core/git-http-backend")
+          $$HTTP["url"] =~ "^/git" {
+            cgi.assign = ( "" => "" )
+            setenv.add-environment = (
+              "GIT_PROJECT_ROOT" => "/app/repo",
+              "GIT_HTTP_EXPORT_ALL" => "1"
+            )
+          }
+        }
+        EOF
+        lighttpd -D -f /etc/lighttpd/lighttpd.conf
+    ports:
+      - 9080:80
+  githttp202:
+    build:
+      context: .
+      target: busybox101
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        env
+        sleep 5
+        git config --global user.email "foo101@dev.local"
+        git config --global user.name "Foo101Name"
+        TEMP_DIR=`mktemp -d`
+        cd $$TEMP_DIR
+        echo "=== git clone/push foo repo ==="
+        git clone http://githttp201:80/git/foo
+        cd foo
+        git status
+        git remote -v
+        echo `date` >> README.md
+        git add .
+        git commit -m 'foo 1st commit'
+        git push
+        git log
+  githttp203:
+    build:
+      context: .
+      target: busybox101
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        env
+        sleep 10
+        git config --global user.email "foo101@dev.local"
+        git config --global user.name "Foo101Name"
+        TEMP_DIR=`mktemp -d`
+        cd $$TEMP_DIR
+        echo "=== git clone foo repo ==="
+        git clone http://githttp201:80/git/foo
+        cd foo
+        git status
+        git remote -v
+        cd ..
+        echo "=== git clone bar repo ==="
+        git clone http://githttp201:80/git/bar
+        cd bar
+        git status
+        git remote -v
+        echo `date` >> README.md
+        git add .
+        git commit -m 'bar 1st commit'
+        git push
+        git log
+        
