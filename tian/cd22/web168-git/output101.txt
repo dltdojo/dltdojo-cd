@@ -1,0 +1,83 @@
+docker run -i --init --rm --entrypoint=sh alpine/git:2.36.3 <<\EOF
+> git config --global user.email "foo1001@testing.local"
+> git config --global user.name "FooName1001"
+> mkdir /foo
+> cd /foo
+> echo hello-world-2022 > README.md
+> git init -q
+> git status
+> git add .
+> git status
+> ls -alh
+> git commit -m 'first commit'
+> git status
+> git log
+> git checkout -b issue302
+> git branch
+> echo $(date) >> README.md
+> git add README.md
+> git status
+> git clone /foo /foo123
+> cd /foo123
+> ls -alh
+> git branch
+> git status
+> git log
+> EOF
+On branch master
+
+No commits yet
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        README.md
+
+nothing added to commit but untracked files present (use "git add" to track)
+On branch master
+
+No commits yet
+
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+        new file:   README.md
+
+total 16K    
+drwxr-xr-x    3 root     root        4.0K Dec  8 00:36 .
+drwxr-xr-x    1 root     root        4.0K Dec  8 00:36 ..
+drwxr-xr-x    7 root     root        4.0K Dec  8 00:36 .git
+-rw-r--r--    1 root     root          17 Dec  8 00:36 README.md
+[master (root-commit) d87f91d] first commit
+ 1 file changed, 1 insertion(+)
+ create mode 100644 README.md
+On branch master
+nothing to commit, working tree clean
+commit d87f91de95489e13135118cef19bab2a3a0f023d
+Author: FooName1001 <foo1001@testing.local>
+Date:   Thu Dec 8 00:36:19 2022 +0000
+
+    first commit
+Switched to a new branch 'issue302'
+* issue302
+  master
+On branch issue302
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        modified:   README.md
+
+Cloning into '/foo123'...
+done.
+total 16K    
+drwxr-xr-x    3 root     root        4.0K Dec  8 00:36 .
+drwxr-xr-x    1 root     root        4.0K Dec  8 00:36 ..
+drwxr-xr-x    8 root     root        4.0K Dec  8 00:36 .git
+-rw-r--r--    1 root     root          17 Dec  8 00:36 README.md
+* issue302
+On branch issue302
+Your branch is up to date with 'origin/issue302'.
+
+nothing to commit, working tree clean
+commit d87f91de95489e13135118cef19bab2a3a0f023d
+Author: FooName1001 <foo1001@testing.local>
+Date:   Thu Dec 8 00:36:19 2022 +0000
+
+    first commit

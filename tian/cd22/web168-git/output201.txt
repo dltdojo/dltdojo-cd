@@ -1,0 +1,53 @@
+docker compose -f docker-compose.201.yaml up
+WARN[0000] Found orphan containers ([web168-git-githttp202-1 web168-git-githttp203-1]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up. 
+[+] Running 1/0
+ ⠿ Container web168-git-githttp201-1  Recreated                                                                                                                                                                                                                       0.0s
+Attaching to web168-git-githttp201-1
+web168-git-githttp201-1  | HOSTNAME=45acba94fcae
+web168-git-githttp201-1  | SHLVL=1
+web168-git-githttp201-1  | HOME=/root
+web168-git-githttp201-1  | PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+web168-git-githttp201-1  | PWD=/
+web168-git-githttp201-1  | uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
+web168-git-githttp201-1  | On branch master
+web168-git-githttp201-1  | 
+web168-git-githttp201-1  | No commits yet
+web168-git-githttp201-1  | 
+web168-git-githttp201-1  | Untracked files:
+web168-git-githttp201-1  |   (use "git add <file>..." to include in what will be committed)
+web168-git-githttp201-1  |      README.md
+web168-git-githttp201-1  | 
+web168-git-githttp201-1  | nothing added to commit but untracked files present (use "git add" to track)
+web168-git-githttp201-1  | On branch master
+web168-git-githttp201-1  | 
+web168-git-githttp201-1  | No commits yet
+web168-git-githttp201-1  | 
+web168-git-githttp201-1  | Changes to be committed:
+web168-git-githttp201-1  |   (use "git rm --cached <file>..." to unstage)
+web168-git-githttp201-1  |      new file:   README.md
+web168-git-githttp201-1  | 
+web168-git-githttp201-1  | [master (root-commit) 6712d63] first commit
+web168-git-githttp201-1  |  1 file changed, 1 insertion(+)
+web168-git-githttp201-1  |  create mode 100644 README.md
+web168-git-githttp201-1  | === Test1 ===
+web168-git-githttp201-1  | fatal: No REQUEST_METHOD from server
+web168-git-githttp201-1  | Status: 500 Internal Server Error
+web168-git-githttp201-1  | Expires: Fri, 01 Jan 1980 00:00:00 GMT
+web168-git-githttp201-1  | Pragma: no-cache
+web168-git-githttp201-1  | Cache-Control: no-cache, max-age=0, must-revalidate
+web168-git-githttp201-1  | 
+web168-git-githttp201-1  | === Test2 ===
+web168-git-githttp201-1  | === Test2 /foo/HEAD ===
+web168-git-githttp201-1  | Content-Length: 23
+web168-git-githttp201-1  | Content-Type: text/plain
+web168-git-githttp201-1  | 
+web168-git-githttp201-1  | ref: refs/heads/master
+web168-git-githttp201-1  | === Test2 /foo/info/refs ===
+web168-git-githttp201-1  | Expires: Fri, 01 Jan 1980 00:00:00 GMT
+web168-git-githttp201-1  | Pragma: no-cache
+web168-git-githttp201-1  | Cache-Control: no-cache, max-age=0, must-revalidate
+web168-git-githttp201-1  | Content-Length: 59
+web168-git-githttp201-1  | Content-Type: text/plain
+web168-git-githttp201-1  | 
+web168-git-githttp201-1  | 6712d63ecd3077ce190126960587eda8c04c50f6     refs/heads/master
+web168-git-githttp201-1 exited with code 0

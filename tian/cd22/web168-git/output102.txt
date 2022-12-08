@@ -1,0 +1,57 @@
+docker compose -f docker-compose.102.yaml up
+WARN[0000] Found orphan containers ([web168-git-githttp201-1 web168-git-githttp202-1 web168-git-githttp203-1]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up. 
+[+] Running 1/0
+ ⠿ Container web168-git-vscode101-1  Recreated                                                                                                                                                                                                                        0.0s
+Attaching to web168-git-vscode101-1
+web168-git-vscode101-1  | GIT_EDITOR=code --wait
+web168-git-vscode101-1  | HOSTNAME=f22926fc43c3
+web168-git-vscode101-1  | OPENVSCODE_SERVER_ROOT=/home/.openvscode-server
+web168-git-vscode101-1  | HOME=/home/workspace
+web168-git-vscode101-1  | VISUAL=code
+web168-git-vscode101-1  | PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+web168-git-vscode101-1  | LANG=C.UTF-8
+web168-git-vscode101-1  | LC_ALL=C.UTF-8
+web168-git-vscode101-1  | PWD=/home/workspace
+web168-git-vscode101-1  | EDITOR=code
+web168-git-vscode101-1  | uid=1000(openvscode-server) gid=1000(openvscode-server) groups=1000(openvscode-server)
+web168-git-vscode101-1  | On branch master
+web168-git-vscode101-1  | 
+web168-git-vscode101-1  | No commits yet
+web168-git-vscode101-1  | 
+web168-git-vscode101-1  | Untracked files:
+web168-git-vscode101-1  |   (use "git add <file>..." to include in what will be committed)
+web168-git-vscode101-1  |       README.md
+web168-git-vscode101-1  | 
+web168-git-vscode101-1  | nothing added to commit but untracked files present (use "git add" to track)
+web168-git-vscode101-1  | On branch master
+web168-git-vscode101-1  | 
+web168-git-vscode101-1  | No commits yet
+web168-git-vscode101-1  | 
+web168-git-vscode101-1  | Changes to be committed:
+web168-git-vscode101-1  |   (use "git rm --cached <file>..." to unstage)
+web168-git-vscode101-1  |       new file:   README.md
+web168-git-vscode101-1  | 
+web168-git-vscode101-1  | [master (root-commit) 17aa7d6] first commit
+web168-git-vscode101-1  |  1 file changed, 1 insertion(+)
+web168-git-vscode101-1  |  create mode 100644 README.md
+web168-git-vscode101-1  | On branch master
+web168-git-vscode101-1  | nothing to commit, working tree clean
+web168-git-vscode101-1  | commit 17aa7d6acd34d4b855081545a4fc68a3a788d154
+web168-git-vscode101-1  | Author: FooName1001 <foo1001@testing.local>
+web168-git-vscode101-1  | Date:   Thu Dec 8 00:41:18 2022 +0000
+web168-git-vscode101-1  | 
+web168-git-vscode101-1  |     first commit
+web168-git-vscode101-1  | Switched to a new branch 'issue302'
+web168-git-vscode101-1  | * issue302
+web168-git-vscode101-1  |   master
+web168-git-vscode101-1  | Server bound to 0.0.0.0:3000 (IPv4)
+web168-git-vscode101-1  | Extension host agent listening on 3000
+web168-git-vscode101-1  | 
+web168-git-vscode101-1  | [00:41:19] 
+web168-git-vscode101-1  | 
+web168-git-vscode101-1  | 
+web168-git-vscode101-1  | 
+web168-git-vscode101-1  | 
+web168-git-vscode101-1  | Web UI available at http://localhost:3000/
+web168-git-vscode101-1  | [00:41:19] Extension host agent started.
+web168-git-vscode101-1  | open http://localhost:3000/?folder=/home/workspace/foo

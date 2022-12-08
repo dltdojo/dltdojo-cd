@@ -1,0 +1,78 @@
+docker compose -f docker-compose.202.yaml up
+[+] Running 3/0
+ ⠿ Container web168-git-githttp201-1  Created                                                                                                                                                                                                                         0.0s
+ ⠿ Container web168-git-githttp202-1  Created                                                                                                                                                                                                                         0.0s
+ ⠿ Container web168-git-githttp203-1  Created                                                                                                                                                                                                                         0.0s
+Attaching to web168-git-githttp201-1, web168-git-githttp202-1, web168-git-githttp203-1
+web168-git-githttp201-1  | HOSTNAME=abe94d916310
+web168-git-githttp201-1  | SHLVL=1
+web168-git-githttp201-1  | HOME=/root
+web168-git-githttp201-1  | PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+web168-git-githttp201-1  | PWD=/
+web168-git-githttp201-1  | uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
+web168-git-githttp201-1  | 2022-12-08 00:55:24: (server.c.1568) server started (lighttpd/1.4.64)
+web168-git-githttp203-1  | HOSTNAME=7dfc61910838
+web168-git-githttp203-1  | SHLVL=1
+web168-git-githttp203-1  | HOME=/root
+web168-git-githttp203-1  | PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+web168-git-githttp203-1  | PWD=/
+web168-git-githttp202-1  | HOSTNAME=19752410d193
+web168-git-githttp202-1  | SHLVL=1
+web168-git-githttp202-1  | HOME=/root
+web168-git-githttp202-1  | PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+web168-git-githttp202-1  | PWD=/
+web168-git-githttp202-1  | === git clone/push foo repo ===
+web168-git-githttp202-1  | Cloning into 'foo'...
+web168-git-githttp202-1  | warning: You appear to have cloned an empty repository.
+web168-git-githttp202-1  | On branch master
+web168-git-githttp202-1  | 
+web168-git-githttp202-1  | No commits yet
+web168-git-githttp202-1  | 
+web168-git-githttp202-1  | nothing to commit (create/copy files and use "git add" to track)
+web168-git-githttp202-1  | origin       http://githttp201:80/git/foo (fetch)
+web168-git-githttp202-1  | origin       http://githttp201:80/git/foo (push)
+web168-git-githttp202-1  | [master (root-commit) ec1f9ab] foo 1st commit
+web168-git-githttp202-1  |  1 file changed, 1 insertion(+)
+web168-git-githttp202-1  |  create mode 100644 README.md
+web168-git-githttp202-1  | To http://githttp201:80/git/foo
+web168-git-githttp202-1  |  * [new branch]      master -> master
+web168-git-githttp202-1  | commit ec1f9ab93e208dd54618989a5a3f81501e537dc9
+web168-git-githttp202-1  | Author: Foo101Name <foo101@dev.local>
+web168-git-githttp202-1  | Date:   Thu Dec 8 00:55:29 2022 +0000
+web168-git-githttp202-1  | 
+web168-git-githttp202-1  |     foo 1st commit
+web168-git-githttp202-1 exited with code 0
+web168-git-githttp203-1  | === git clone foo repo ===
+web168-git-githttp203-1  | Cloning into 'foo'...
+web168-git-githttp203-1  | On branch master
+web168-git-githttp203-1  | Your branch is up to date with 'origin/master'.
+web168-git-githttp203-1  | 
+web168-git-githttp203-1  | nothing to commit, working tree clean
+web168-git-githttp203-1  | origin       http://githttp201:80/git/foo (fetch)
+web168-git-githttp203-1  | origin       http://githttp201:80/git/foo (push)
+web168-git-githttp203-1  | === git clone bar repo ===
+web168-git-githttp203-1  | Cloning into 'bar'...
+web168-git-githttp203-1  | warning: You appear to have cloned an empty repository.
+web168-git-githttp203-1  | On branch master
+web168-git-githttp203-1  | 
+web168-git-githttp203-1  | No commits yet
+web168-git-githttp203-1  | 
+web168-git-githttp203-1  | nothing to commit (create/copy files and use "git add" to track)
+web168-git-githttp203-1  | origin       http://githttp201:80/git/bar (fetch)
+web168-git-githttp203-1  | origin       http://githttp201:80/git/bar (push)
+web168-git-githttp203-1  | [master (root-commit) 009925e] bar 1st commit
+web168-git-githttp203-1  |  1 file changed, 1 insertion(+)
+web168-git-githttp203-1  |  create mode 100644 README.md
+web168-git-githttp203-1  | To http://githttp201:80/git/bar
+web168-git-githttp203-1  |  * [new branch]      master -> master
+web168-git-githttp203-1  | commit 009925ee4c82673c4a06abbe0772524fe4408041
+web168-git-githttp203-1  | Author: Foo101Name <foo101@dev.local>
+web168-git-githttp203-1  | Date:   Thu Dec 8 00:55:34 2022 +0000
+web168-git-githttp203-1  | 
+web168-git-githttp203-1  |     bar 1st commit
+web168-git-githttp203-1 exited with code 0
+^CGracefully stopping... (press Ctrl+C again to force)
+[+] Running 3/3
+ ⠿ Container web168-git-githttp203-1  Stopped                                                                                                                                                                                                                         0.0s
+ ⠿ Container web168-git-githttp201-1  Stopped                                                                                                                                                                                                                        10.5s
+ ⠿ Container web168-git-githttp202-1  Stopped                                       

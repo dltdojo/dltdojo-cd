@@ -1,0 +1,23 @@
+@startuml d301-gitops
+actor "Developer\n,Operator" as dev #Yellow
+actor "Code\nReviewer" as rev #red
+participant "Git\nRepository" as git
+
+box "Kubernetes Cluster"
+    participant "GitOps\nAgent" as agent
+    participant "State\n,Software\n,Config" as soft
+end box
+
+== kubectl and scripts ==
+autonumber 101
+dev -> soft: sh something; kubectl edit something
+== GitOps: No kubectl, no scripts ==
+autonumber 201
+dev -> git: Submit PR
+rev -> git: Review and accept PR
+rev -> git: Merge changes with master
+agent -> git: Observer repository\n and pull changes\nfrom git repo
+agent -> soft: Sync/Ensure state\n consistent with git repo
+
+
+@enduml
