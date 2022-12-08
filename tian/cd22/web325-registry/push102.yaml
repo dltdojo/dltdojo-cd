@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: buildkit101
+spec:
+  restartPolicy: Never
+  containers:
+    - name: buildkit101
+      image: moby/buildkit:v0.10.6
+      command:
+        - sh
+      args:
+        - -c 
+        - |
+          echo "===> buildkit101"
+          date
+          env
+          nslookup k3d-registry101.localhost
+          mkdir /workspace
+          echo FROM public.ecr.aws/docker/library/hello-world:latest > /workspace/Dockerfile
+          buildctl-daemonless.sh build --frontend dockerfile.v0 \
+            --local context=/workspace --local dockerfile=/workspace \
+            --output type=image,name=k3d-registry101.localhost:5000/mybox:v102,push=true,registry.insecure=true
+          echo "THE END"
+      resources: {}
+      securityContext:
+        privileged: true
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: buildkit102
+spec:
+  restartPolicy: Never
+  containers:
+    - name: buildkit102
+      image: moby/buildkit:v0.10.6
+      command:
+        - sh
+      args:
+        - -c 
+        - |
+          echo "===> buildkit102"
+          sleep 10
+          date
+          env
+          nslookup k3d-registry101.localhost
+          mkdir /workspace
+          echo "FROM k3d-registry101.localhost:12345/mybox:v102" > /workspace/Dockerfile
+          buildctl-daemonless.sh build --frontend dockerfile.v0 \
+            --local context=/workspace --local dockerfile=/workspace \
+            --output type=image,name=k3d-registry101.localhost:5000/mybox:v103,push=true,registry.insecure=true
+          echo "THE END"
+      resources: {}
+      securityContext:
+        privileged: true

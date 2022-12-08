@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-registry
+spec:
+  selector:
+    matchLabels:
+      run: my-registry
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: my-registry
+    spec:
+      containers:
+      - name: my-registry
+        image: registry:2
+        ports:
+        - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry101
+spec:
+  ports:
+  - port: 5000
+    protocol: TCP
+  selector:
+    run: my-registry
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myingress
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+    - host: registry101.localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: registry101
+                port:
+                  number: 5000
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: buildkit108
+spec:
+  restartPolicy: Never
+  containers:
+    - name: buildkit
+      image: moby/buildkit:v0.10.6
+      command:
+        - sh
+      args:
+        - -c 
+        - |
+          sleep 10
+          date
+          env
+          mkdir /workspace
+          echo FROM hello-world > /workspace/Dockerfile
+          buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=/workspace --local dockerfile=/workspace \
+            --output type=image,name=registry101.default.svc.cluster.local:5000/mybox:v1.3,push=true,registry.insecure=true
+          echo "THE END"
+      resources: {}
+      securityContext:
+        privileged: true
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: curl987
+spec:
+  restartPolicy: Never
+  containers:
+    - name: curl
+      image: curlimages/curl:7.86.0
+      command:
+        - sh
+      args:
+        - -c 
+        - |
+          date
+          env
+          sleep 15
+          curl -sv http://registry101.default.svc.cluster.local:5000/v2/_catalog
+          echo ""
+          tail -f /dev/null

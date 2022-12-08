@@ -1,0 +1,332 @@
+$ kubectl apply -f build103.yaml
+job.batch/build103 created
+
+
+$ kubectl get job
+NAME       COMPLETIONS   DURATION   AGE
+build103   0/1           16s        16s
+
+
+$ kubectl logs job/build103 build-box
+=== shell build-box ===
+Thu Dec  8 07:33:22 UTC 2022
+KUBERNETES_SERVICE_PORT=443
+KUBERNETES_PORT=tcp://10.43.0.1:443
+HOSTNAME=build103-87fdt
+VER_ALPINE=3.17.0
+SHLVL=1
+HOME=/root
+REGISTRY_LOOKUP=k3d-registry101.localhost
+KUBERNETES_PORT_443_TCP_ADDR=10.43.0.1
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+VER_APP=3.17.0-1
+KUBERNETES_PORT_443_TCP_PORT=443
+KUBERNETES_PORT_443_TCP_PROTO=tcp
+REGISTRY_PORT=5000
+KUBERNETES_PORT_443_TCP=tcp://10.43.0.1:443
+KUBERNETES_SERVICE_PORT_HTTPS=443
+KUBERNETES_SERVICE_HOST=10.43.0.1
+PWD=/
+Server:         10.43.0.10
+Address:        10.43.0.10:53
+
+
+Name:   k3d-registry101.localhost
+Address: 192.168.48.2
+
+mkdir: can't create directory '/workspace': File exists
+build image from https://gallery.ecr.aws/docker/library/alpine
+=== build abox-curl
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 367B done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1.3-labs
+#3 DONE 2.9s
+
+#4 docker-image://docker.io/docker/dockerfile:1.3-labs@sha256:250ce669e1aeeb5ffb892b18039c3f0801466536cb4210c8eb2638e628859bfd
+#4 resolve docker.io/docker/dockerfile:1.3-labs@sha256:250ce669e1aeeb5ffb892b18039c3f0801466536cb4210c8eb2638e628859bfd 0.0s done
+#4 DONE 0.0s
+
+#4 docker-image://docker.io/docker/dockerfile:1.3-labs@sha256:250ce669e1aeeb5ffb892b18039c3f0801466536cb4210c8eb2638e628859bfd
+#4 sha256:0c76d7f9da16dfe838973bd96e94cb18398c87af9d13c00bb9e9683f2dca1e91 0B / 9.68MB 0.2s
+#4 sha256:0c76d7f9da16dfe838973bd96e94cb18398c87af9d13c00bb9e9683f2dca1e91 3.15MB / 9.68MB 0.5s
+#4 sha256:0c76d7f9da16dfe838973bd96e94cb18398c87af9d13c00bb9e9683f2dca1e91 6.29MB / 9.68MB 0.6s
+#4 sha256:0c76d7f9da16dfe838973bd96e94cb18398c87af9d13c00bb9e9683f2dca1e91 9.68MB / 9.68MB 0.8s done
+#4 extracting sha256:0c76d7f9da16dfe838973bd96e94cb18398c87af9d13c00bb9e9683f2dca1e91 0.1s done
+#4 DONE 0.9s
+
+#5 [internal] load metadata for public.ecr.aws/docker/library/alpine:3.17.0
+#5 DONE 2.6s
+
+#6 [infile-box-curl 1/2] FROM public.ecr.aws/docker/library/alpine:3.17.0@sha256:8914eb54f968791faf6a8638949e480fef81e697984fba772b3976835194c6d4
+#6 resolve public.ecr.aws/docker/library/alpine:3.17.0@sha256:8914eb54f968791faf6a8638949e480fef81e697984fba772b3976835194c6d4 done
+#6 sha256:c158987b05517b6f2c5913f3acef1f2182a32345a304fe357e3ace5fadcad715 0B / 3.37MB 0.2s
+#6 sha256:c158987b05517b6f2c5913f3acef1f2182a32345a304fe357e3ace5fadcad715 3.37MB / 3.37MB 0.3s done
+#6 extracting sha256:c158987b05517b6f2c5913f3acef1f2182a32345a304fe357e3ace5fadcad715
+#6 extracting sha256:c158987b05517b6f2c5913f3acef1f2182a32345a304fe357e3ace5fadcad715 0.1s done
+#6 DONE 0.4s
+
+#7 [infile-box-curl 2/2] RUN apk --no-cache add busybox-extras curl && rm -rf /var/cache/apk/*
+#0 0.083 fetch https://dl-cdn.alpinelinux.org/alpine/v3.17/main/x86_64/APKINDEX.tar.gz
+#7 0.657 fetch https://dl-cdn.alpinelinux.org/alpine/v3.17/community/x86_64/APKINDEX.tar.gz
+#7 0.996 (1/6) Installing busybox-extras (1.35.0-r29)
+#7 1.063 Executing busybox-extras-1.35.0-r29.post-install
+#7 1.072 (2/6) Installing ca-certificates (20220614-r2)
+#7 1.174 (3/6) Installing brotli-libs (1.0.9-r9)
+#7 1.271 (4/6) Installing nghttp2-libs (1.51.0-r0)
+#7 1.340 (5/6) Installing libcurl (7.86.0-r1)
+#7 1.429 (6/6) Installing curl (7.86.0-r1)
+#7 1.507 Executing busybox-1.35.0-r29.trigger
+#7 1.527 Executing ca-certificates-20220614-r2.trigger
+#7 1.649 OK: 10 MiB in 21 packages
+#7 DONE 1.7s
+
+#8 exporting to image
+#8 exporting layers 0.1s done
+#8 exporting manifest sha256:0b80d3e07e07e5df9c551a3a3ca4a8a296de89fd34d5ea988fbc8179e8ca5e6c done
+#8 exporting config sha256:fd5f0b5e54837a99954c1967c6d2c23a30f57dfa7dcb9d51c695f7d6a0813ced done
+#8 pushing layers 0.0s done
+#8 pushing manifest for k3d-registry101.localhost:5000/abox-curl:3.17.0-1@sha256:0b80d3e07e07e5df9c551a3a3ca4a8a296de89fd34d5ea988fbc8179e8ca5e6c done
+#8 DONE 0.1s
+=== build abox-gitsrv
+#1 [internal] load .dockerignore
+#1 transferring context: 2B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 367B done
+#2 DONE 0.0s
+
+#3 resolve image config for docker.io/docker/dockerfile:1.3-labs
+#3 DONE 2.0s
+
+#4 docker-image://docker.io/docker/dockerfile:1.3-labs@sha256:250ce669e1aeeb5ffb892b18039c3f0801466536cb4210c8eb2638e628859bfd
+#4 resolve docker.io/docker/dockerfile:1.3-labs@sha256:250ce669e1aeeb5ffb892b18039c3f0801466536cb4210c8eb2638e628859bfd 0.0s done
+#4 CACHED
+
+#5 [internal] load metadata for public.ecr.aws/docker/library/alpine:3.17.0
+#5 DONE 1.9s
+
+#6 [infile-box-curl 1/2] FROM public.ecr.aws/docker/library/alpine:3.17.0@sha256:8914eb54f968791faf6a8638949e480fef81e697984fba772b3976835194c6d4
+#6 resolve public.ecr.aws/docker/library/alpine:3.17.0@sha256:8914eb54f968791faf6a8638949e480fef81e697984fba772b3976835194c6d4 done
+#6 DONE 0.0s
+
+#7 [infile-box-curl 2/2] RUN apk --no-cache add busybox-extras curl && rm -rf /var/cache/apk/*
+#7 CACHED
+
+#8 [infile-box-gitsrv 1/1] RUN apk --no-cache add busybox-extras curl git-daemon lighttpd && rm -rf /var/cache/apk/*
+#0 0.095 fetch https://dl-cdn.alpinelinux.org/alpine/v3.17/main/x86_64/APKINDEX.tar.gz
+#8 0.663 fetch https://dl-cdn.alpinelinux.org/alpine/v3.17/community/x86_64/APKINDEX.tar.gz
+#8 0.979 (1/11) Installing libexpat (2.5.0-r0)
+#8 1.090 (2/11) Installing pcre2 (10.41-r0)
+#8 1.185 (3/11) Installing git (2.38.1-r0)
+#8 1.377 (4/11) Installing git-daemon (2.38.1-r0)
+#8 1.503 (5/11) Installing libdbi (0.9.0-r2)
+#8 1.578 (6/11) Installing gdbm (1.23-r0)
+#8 1.642 (7/11) Installing libsasl (2.1.28-r3)
+#8 1.720 (8/11) Installing libldap (2.6.3-r6)
+#8 1.819 (9/11) Installing lua5.4-libs (5.4.4-r6)
+#8 1.886 (10/11) Installing zstd-libs (1.5.2-r9)
+#8 1.967 (11/11) Installing lighttpd (1.4.67-r0)
+#8 2.036 Executing lighttpd-1.4.67-r0.pre-install
+#8 2.109 Executing busybox-1.35.0-r29.trigger
+#8 2.115 OK: 20 MiB in 32 packages
+#8 DONE 2.2s
+
+#9 exporting to image
+#9 exporting layers
+#9 exporting layers 0.4s done
+#9 exporting manifest sha256:020dbc63bedcb5ef4a5ecc16c045beaacbcec53a5f430630fdc9cfeeeab2dde5 done
+#9 exporting config sha256:9dc9f2aa5e7c1decf5f99e5c00f14dcac51ac81d44f0597739fb10faad3f5163 done
+#9 pushing layers 0.0s done
+#9 pushing manifest for k3d-registry101.localhost:5000/abox-gitsrv:3.17.0-1@sha256:020dbc63bedcb5ef4a5ecc16c045beaacbcec53a5f430630fdc9cfeeeab2dde5 done
+#9 DONE 0.5s
+=== build end
+
+$ kubectl logs job/build103 build-box-curl
+=== shell build-box-curl ===
+Thu Dec  8 07:33:22 UTC 2022
+CURL_CA_BUNDLE=/cacert.pem
+KUBERNETES_PORT=tcp://10.43.0.1:443
+KUBERNETES_SERVICE_PORT=443
+HOSTNAME=build103-87fdt
+CURL_RELEASE_TAG=curl-7_86_0
+CURL_GIT_REPO=https://github.com/curl/curl.git
+SHLVL=1
+HOME=/home/curl_user
+REGISTRY_LOOKUP=k3d-registry101.localhost
+KUBERNETES_PORT_443_TCP_ADDR=10.43.0.1
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+VER_APP=3.17.0-1
+KUBERNETES_PORT_443_TCP_PORT=443
+KUBERNETES_PORT_443_TCP_PROTO=tcp
+REGISTRY_PORT=5000
+KUBERNETES_PORT_443_TCP=tcp://10.43.0.1:443
+KUBERNETES_SERVICE_PORT_HTTPS=443
+KUBERNETES_SERVICE_HOST=10.43.0.1
+PWD=/
+CURL_VERSION=7_86_0
+Server:         10.43.0.10
+Address:        10.43.0.10:53
+
+
+Name:   k3d-registry101.localhost
+Address: 192.168.48.2
+
+192.168.48.2
+GET /v2/_catalog
+*   Trying 192.168.48.2:5000...
+* Connected to 192.168.48.2 (192.168.48.2) port 5000 (#0)
+> GET /v2/_catalog HTTP/1.1
+> Host: 192.168.48.2:5000
+> User-Agent: curl/7.86.0-DEV
+> Accept: */*
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Content-Type: application/json; charset=utf-8
+< Docker-Distribution-Api-Version: registry/2.0
+< X-Content-Type-Options: nosniff
+< Date: Thu, 08 Dec 2022 07:33:40 GMT
+{"repositories":["abox-curl","abox-gitsrv","box-curl","box-gitsrv","mybox"]}
+< Content-Length: 77
+< 
+{ [77 bytes data]
+* Connection #0 to host 192.168.48.2 left intact
+GET /v2/<name>/manifests/<reference>
+*   Trying 192.168.48.2:5000...
+* Connected to 192.168.48.2 (192.168.48.2) port 5000 (#0)
+> GET /v2/abox-curl/manifests/3.17.0-1 HTTP/1.1
+> Host: 192.168.48.2:5000
+> User-Agent: curl/7.86.0-DEV
+> Accept: */*
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Content-Length: 2600
+< Content-Type: application/vnd.docker.distribution.manifest.v1+prettyjws
+< Docker-Content-Digest: sha256:c4020399de30869135a4dd87dbff74993c640db57374b80c78181a4a56d58122
+< Docker-Distribution-Api-Version: registry/2.0
+< Etag: "sha256:c4020399de30869135a4dd87dbff74993c640db57374b80c78181a4a56d58122"
+{
+< X-Content-Type-Options: nosniff
+   "schemaVersion": 1,
+< Date: Thu, 08 Dec 2022 07:33:40 GMT
+   "name": "abox-curl",
+< 
+   "tag": "3.17.0-1",
+{ [2600 bytes data]
+   "architecture": "amd64",
+* Connection #0 to host 192.168.48.2 left intact
+   "fsLayers": [
+      {
+         "blobSum": "sha256:1d130c9940f58392a25be4d6af4e3afc4b377ce4a9bddb9ad2badae93e1ec92f"
+      },
+      {
+         "blobSum": "sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4"
+      },
+      {
+         "blobSum": "sha256:c158987b05517b6f2c5913f3acef1f2182a32345a304fe357e3ace5fadcad715"
+      }
+   ],
+   "history": [
+      {
+         "v1Compatibility": "{\"architecture\":\"amd64\",\"config\":{\"Env\":[\"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"],\"Cmd\":[\"/bin/sh\"],\"OnBuild\":null},\"created\":\"2022-12-08T07:33:31.437581236Z\",\"id\":\"7b55e2f6d5ca736707261ba1a6dfb4ff746c4c0e967c552f767b93c87bc9b84d\",\"moby.buildkit.buildinfo.v1\":\"eyJmcm9udGVuZCI6ImRvY2tlcmZpbGUudjAiLCJzb3VyY2VzIjpbeyJ0eXBlIjoiZG9ja2VyLWltYWdlIiwicmVmIjoicHVibGljLmVjci5hd3MvZG9ja2VyL2xpYnJhcnkvYWxwaW5lOjMuMTcuMEBzaGEyNTY6ODkxNGViNTRmOTY4NzkxZmFmNmE4NjM4OTQ5ZTQ4MGZlZjgxZTY5Nzk4NGZiYTc3MmIzOTc2ODM1MTk0YzZkNCIsInBpbiI6InNoYTI1Njo4OTE0ZWI1NGY5Njg3OTFmYWY2YTg2Mzg5NDllNDgwZmVmODFlNjk3OTg0ZmJhNzcyYjM5NzY4MzUxOTRjNmQ0In1dfQ==\",\"os\":\"linux\",\"parent\":\"532ccf2417bdfb46cc617b82c606647c2a1724a24f9fb0993b1129b5d496c9b9\"}"
+      },
+      {
+         "v1Compatibility": "{\"id\":\"532ccf2417bdfb46cc617b82c606647c2a1724a24f9fb0993b1129b5d496c9b9\",\"parent\":\"6240fc6088f9f01fee66f3be7fd628bd9daa37e4760b23c2f89ee71a3c749783\",\"created\":\"2022-11-22T22:19:29.008562326Z\",\"container_config\":{\"Cmd\":[\"/bin/sh -c #(nop)  CMD [\\\"/bin/sh\\\"]\"]},\"throwaway\":true}"
+      },
+      {
+         "v1Compatibility": "{\"id\":\"6240fc6088f9f01fee66f3be7fd628bd9daa37e4760b23c2f89ee71a3c749783\",\"created\":\"2022-11-22T22:19:28.870801855Z\",\"container_config\":{\"Cmd\":[\"/bin/sh -c #(nop) ADD file:587cae71969871d3c6456d844a8795df9b64b12c710c275295a1182b46f630e7 in / \"]}}"
+      }
+   ],
+   "signatures": [
+      {
+         "header": {
+            "jwk": {
+               "crv": "P-256",
+               "kid": "TI25:GG6B:FVGZ:O5R3:OTAX:65BM:EGSY:K6GA:XWWB:OBA2:T6JE:MD7E",
+               "kty": "EC",
+               "x": "KNiFNpD0lwx9KIRIiAvo-gt1jlRcdGhEc0W8fVLqw1M",
+               "y": "be0qvFcD_0rByI15RsmdD9Ofl5UDq7Nr_TtLaUJgDBU"
+            },
+            "alg": "ES256"
+         },
+         "signature": "Aklv2COMPE1Ixio-vhJ-hCRGrZI3LdzzSSO6r0nHb531Ubrl6yodb7mz1ptpKj26ndG8tSR2KNfJ8j8sKVcf2g",
+         "protected": "eyJmb3JtYXRMZW5ndGgiOjE5NTMsImZvcm1hdFRhaWwiOiJDbjAiLCJ0aW1lIjoiMjAyMi0xMi0wOFQwNzozMzo0MFoifQ"
+      }
+   ]
+*   Trying 192.168.48.2:5000...
+* Connected to 192.168.48.2 (192.168.48.2) port 5000 (#0)
+> GET /v2/abox-gitsrv/manifests/3.17.0-1 HTTP/1.1
+> Host: 192.168.48.2:5000
+> User-Agent: curl/7.86.0-DEV
+> Accept: */*
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Content-Length: 3145
+< Content-Type: application/vnd.docker.distribution.manifest.v1+prettyjws
+< Docker-Content-Digest: sha256:5f24a0179453128838493ed2947e6dcf84c140425335bb97cacee85bae7f5ab1
+< Docker-Distribution-Api-Version: registry/2.0
+< Etag: "sha256:5f24a0179453128838493ed2947e6dcf84c140425335bb97cacee85bae7f5ab1"
+< X-Content-Type-Options: nosniff
+< Date: Thu, 08 Dec 2022 07:33:40 GMT
+< 
+{ [3145 bytes data]
+}{
+* Connection #0 to host 192.168.48.2 left intact
+   "schemaVersion": 1,
+   "name": "abox-gitsrv",
+   "tag": "3.17.0-1",
+   "architecture": "amd64",
+   "fsLayers": [
+      {
+         "blobSum": "sha256:82b3a7794c633c415ff734464fc43841ba8a01b254f0537f114169f8d9093fe7"
+      },
+      {
+         "blobSum": "sha256:1d130c9940f58392a25be4d6af4e3afc4b377ce4a9bddb9ad2badae93e1ec92f"
+      },
+      {
+         "blobSum": "sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4"
+      },
+      {
+         "blobSum": "sha256:c158987b05517b6f2c5913f3acef1f2182a32345a304fe357e3ace5fadcad715"
+      }
+   ],
+   "history": [
+      {
+         "v1Compatibility": "{\"architecture\":\"amd64\",\"config\":{\"Env\":[\"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"],\"Cmd\":[\"/bin/sh\"],\"OnBuild\":null},\"created\":\"2022-12-08T07:33:38.031276031Z\",\"id\":\"eea7b3c28106e7861c3962d7d604b927569b0c3172ebc6202a05fdd8fd2bd6a8\",\"moby.buildkit.buildinfo.v1\":\"eyJmcm9udGVuZCI6ImRvY2tlcmZpbGUudjAiLCJzb3VyY2VzIjpbeyJ0eXBlIjoiZG9ja2VyLWltYWdlIiwicmVmIjoicHVibGljLmVjci5hd3MvZG9ja2VyL2xpYnJhcnkvYWxwaW5lOjMuMTcuMEBzaGEyNTY6ODkxNGViNTRmOTY4NzkxZmFmNmE4NjM4OTQ5ZTQ4MGZlZjgxZTY5Nzk4NGZiYTc3MmIzOTc2ODM1MTk0YzZkNCIsInBpbiI6InNoYTI1Njo4OTE0ZWI1NGY5Njg3OTFmYWY2YTg2Mzg5NDllNDgwZmVmODFlNjk3OTg0ZmJhNzcyYjM5NzY4MzUxOTRjNmQ0In1dfQ==\",\"os\":\"linux\",\"parent\":\"1409c61c782002d6007b2320a0bde7ed4b0799f94332793844b8d330909fe968\"}"
+      },
+      {
+         "v1Compatibility": "{\"id\":\"1409c61c782002d6007b2320a0bde7ed4b0799f94332793844b8d330909fe968\",\"parent\":\"532ccf2417bdfb46cc617b82c606647c2a1724a24f9fb0993b1129b5d496c9b9\",\"comment\":\"buildkit.dockerfile.v0\",\"created\":\"2022-12-08T07:33:31.437581236Z\",\"container_config\":{\"Cmd\":[\"RUN /bin/sh -c apk --no-cache add busybox-extras curl \\u0026\\u0026 rm -rf /var/cache/apk/* # buildkit\"]}}"
+      },
+      {
+         "v1Compatibility": "{\"id\":\"532ccf2417bdfb46cc617b82c606647c2a1724a24f9fb0993b1129b5d496c9b9\",\"parent\":\"6240fc6088f9f01fee66f3be7fd628bd9daa37e4760b23c2f89ee71a3c749783\",\"created\":\"2022-11-22T22:19:29.008562326Z\",\"container_config\":{\"Cmd\":[\"/bin/sh -c #(nop)  CMD [\\\"/bin/sh\\\"]\"]},\"throwaway\":true}"
+      },
+      {
+         "v1Compatibility": "{\"id\":\"6240fc6088f9f01fee66f3be7fd628bd9daa37e4760b23c2f89ee71a3c749783\",\"created\":\"2022-11-22T22:19:28.870801855Z\",\"container_config\":{\"Cmd\":[\"/bin/sh -c #(nop) ADD file:587cae71969871d3c6456d844a8795df9b64b12c710c275295a1182b46f630e7 in / \"]}}"
+      }
+   ],
+   "signatures": [
+      {
+         "header": {
+            "jwk": {
+               "crv": "P-256",
+               "kid": "TI25:GG6B:FVGZ:O5R3:OTAX:65BM:EGSY:K6GA:XWWB:OBA2:T6JE:MD7E",
+               "kty": "EC",
+               "x": "KNiFNpD0lwx9KIRIiAvo-gt1jlRcdGhEc0W8fVLqw1M",
+               "y": "be0qvFcD_0rByI15RsmdD9Ofl5UDq7Nr_TtLaUJgDBU"
+            },
+            "alg": "ES256"
+         },
+         "signature": "5NA-kNJqfogccqMy7b5WsJ2elNJMQzw9ptpHMvOpMsw0cEbjMe43dSQxeADtNHJjd8dC7ZrBa4V8D1TnH7NyVQ",
+         "protected": "eyJmb3JtYXRMZW5ndGgiOjI0OTgsImZvcm1hdFRhaWwiOiJDbjAiLCJ0aW1lIjoiMjAyMi0xMi0wOFQwNzozMzo0MFoifQ"
+      }
+   ]
+}=== curl end

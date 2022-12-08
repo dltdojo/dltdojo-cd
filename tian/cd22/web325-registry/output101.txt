@@ -1,0 +1,123 @@
+cat <<EOF | sh
+> kubectl apply -f push101.yaml
+> sleep 20
+> echo "=== k run buildkit ==="
+> kubectl logs buildkit100
+> echo "=== k run curl ==="
+> kubectl logs curl987
+> echo "=== k run k3d-registry101.localhost:12345 ==="
+> kubectl run foo501 --image k3d-registry101.localhost:12345/mybox:v1.3
+> sleep 5
+> kubectl logs foo501
+> kubectl delete po foo501
+> kubectl delete -f push101.yaml
+> EOF
+pod/buildkit100 created
+pod/curl987 created
+=== k run buildkit ===
+Wed Dec  7 06:27:43 UTC 2022
+KUBERNETES_SERVICE_PORT=443
+KUBERNETES_PORT=tcp://10.43.0.1:443
+HOSTNAME=buildkit100
+SHLVL=1
+HOME=/root
+KUBERNETES_PORT_443_TCP_ADDR=10.43.0.1
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+KUBERNETES_PORT_443_TCP_PORT=443
+KUBERNETES_PORT_443_TCP_PROTO=tcp
+KUBERNETES_SERVICE_PORT_HTTPS=443
+KUBERNETES_PORT_443_TCP=tcp://10.43.0.1:443
+KUBERNETES_SERVICE_HOST=10.43.0.1
+PWD=/
+Server:         10.43.0.10
+Address:        10.43.0.10:53
+
+
+Name:   k3d-registry101.localhost
+Address: 192.168.80.2
+
+#1 [internal] load .dockerignore
+#1 transferring context: 2B done
+#1 DONE 0.1s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 54B done
+#2 DONE 0.1s
+
+#3 [internal] load metadata for docker.io/library/hello-world:latest
+#3 DONE 3.1s
+
+#4 [1/1] FROM docker.io/library/hello-world@sha256:faa03e786c97f07ef34423fccceeec2398ec8a5759259f94d99078f264e9d7af
+#4 resolve docker.io/library/hello-world@sha256:faa03e786c97f07ef34423fccceeec2398ec8a5759259f94d99078f264e9d7af 0.0s done
+#4 DONE 0.1s
+
+#5 exporting to image
+#5 exporting layers
+#5 exporting layers done
+#5 exporting manifest sha256:629028efb47ab183d0c08828135bdcca85a8f20801053def96854cc176f3f301 0.0s done
+#5 exporting config sha256:4924096514f3d06d2a9ce61194cfa37cf0ae9d9289fdfe3784b1b6e9ca9d035d 0.0s done
+#5 pushing layers 0.0s done
+#5 pushing manifest for k3d-registry101.localhost:5000/mybox:v1.3@sha256:629028efb47ab183d0c08828135bdcca85a8f20801053def96854cc176f3f301 done
+#5 DONE 0.1s
+THE END
+=== k run curl ===
+Wed Dec  7 06:27:38 UTC 2022
+CURL_CA_BUNDLE=/cacert.pem
+KUBERNETES_SERVICE_PORT=443
+KUBERNETES_PORT=tcp://10.43.0.1:443
+HOSTNAME=curl987
+CURL_RELEASE_TAG=curl-7_86_0
+CURL_GIT_REPO=https://github.com/curl/curl.git
+SHLVL=1
+HOME=/home/curl_user
+KUBERNETES_PORT_443_TCP_ADDR=10.43.0.1
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+KUBERNETES_PORT_443_TCP_PORT=443
+KUBERNETES_PORT_443_TCP_PROTO=tcp
+KUBERNETES_PORT_443_TCP=tcp://10.43.0.1:443
+KUBERNETES_SERVICE_PORT_HTTPS=443
+KUBERNETES_SERVICE_HOST=10.43.0.1
+PWD=/
+CURL_VERSION=7_86_0
+Server:         10.43.0.10
+Address:        10.43.0.10:53
+
+
+Name:   k3d-registry101.localhost
+Address: 192.168.80.2
+
+*   Trying 127.0.0.1:5000...
+* connect to 127.0.0.1 port 5000 failed: Connection refused
+*   Trying [::1]:5000...
+* connect to ::1 port 5000 failed: Connection refused
+* Failed to connect to k3d-registry101.localhost port 5000 after 0 ms: Couldn't connect to server
+* Closing connection 0
+* Closing connection -1
+
+=== k run k3d-registry101.localhost:12345 ===
+pod/foo501 created
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+
+pod "foo501" deleted
+pod "buildkit100" deleted
+pod "curl987" deleted

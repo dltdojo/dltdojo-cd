@@ -1,0 +1,132 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-build104
+data:
+  REGISTRY_LOOKUP: "k3d-registry101.localhost"
+  VER_ALPINE: "3.17.0"
+  VER_APP: "3.17.0-2"
+  Dockerfile: |
+              # syntax=docker/dockerfile:1.3-labs
+              ARG ALPINE_VER
+              FROM public.ecr.aws/docker/library/alpine:${ALPINE_VER} AS infile-box-curl
+              RUN apk --no-cache add busybox-extras curl && rm -rf /var/cache/apk/*
+              FROM infile-box-curl AS infile-box-gitsrv
+              RUN apk --no-cache add busybox-extras curl git-daemon lighttpd && rm -rf /var/cache/apk/*
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: build104
+spec:
+  ttlSecondsAfterFinished: 120
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: build-box
+          image: moby/buildkit:v0.10.6
+          env:
+          - name: REGISTRY_LOOKUP
+            valueFrom: 
+              configMapKeyRef:
+                name: cm-build104
+                key: REGISTRY_LOOKUP
+          - name: REGISTRY_PORT
+            value: "5000"
+          - name: VER_ALPINE
+            valueFrom: 
+              configMapKeyRef:
+                name: cm-build104
+                key: VER_ALPINE
+          - name: VER_APP
+            valueFrom: 
+              configMapKeyRef:
+                name: cm-build104
+                key: VER_APP
+          command:
+            - sh
+          args:
+            - -c
+            - |
+              echo "=== shell build-box ==="
+              date
+              env
+              nslookup $REGISTRY_LOOKUP
+              mkdir /workspace
+              echo "build image from https://gallery.ecr.aws/docker/library/alpine"
+              cat /cm/Dockerfile
+              cp /cm/Dockerfile /workspace/
+              echo "=== build abox-curl"
+              IMAGE_PUSH_CURL=$REGISTRY_LOOKUP:$REGISTRY_PORT/abox-curl:$VER_APP
+              buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=/workspace \
+                --local dockerfile=/workspace \
+                --opt target=infile-box-curl \
+                --opt build-arg:ALPINE_VER=$VER_ALPINE \
+                --output type=image,name=$IMAGE_PUSH_CURL,push=true,registry.insecure=true
+              echo "=== build abox-gitsrv"
+              IMAGE_PUSH_GITSRV=$REGISTRY_LOOKUP:$REGISTRY_PORT/abox-gitsrv:$VER_APP
+              buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=/workspace \
+                --local dockerfile=/workspace \
+                --opt target=infile-box-gitsrv \
+                --opt build-arg:ALPINE_VER=$VER_ALPINE \
+                --output type=image,name=$IMAGE_PUSH_GITSRV,push=true,registry.insecure=true
+              echo DONE > /workspace/DONE
+              echo "=== build end"
+          resources: {}
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+            - name: config
+              mountPath: /cm
+              readOnly: true
+        - name: build-box-curl
+          image: curlimages/curl:7.86.0
+          env:
+          - name: REGISTRY_LOOKUP
+            valueFrom: 
+              configMapKeyRef:
+                name: cm-build104
+                key: REGISTRY_LOOKUP
+          - name: REGISTRY_PORT
+            value: "5000"
+          - name: VER_APP
+            valueFrom: 
+              configMapKeyRef:
+                name: cm-build104
+                key: VER_APP
+          command:
+            - sh
+          args:
+            - -c
+            - |
+              echo "=== shell build-box-curl ==="
+              date
+              env
+              nslookup $REGISTRY_LOOKUP
+              REGISTRY_IP=`nslookup $REGISTRY_LOOKUP | awk 'NR==6 {print $2}'`
+              echo $REGISTRY_IP
+              until [ -f /workspace/DONE ]; do sleep 3 ; done
+              echo "GET /v2/_catalog"
+              curl -sv http://$REGISTRY_IP:$REGISTRY_PORT/v2/_catalog
+              echo "GET /v2/<name>/manifests/<reference>"
+              curl -sv http://$REGISTRY_IP:$REGISTRY_PORT/v2/abox-curl/manifests/$VER_APP
+              curl -sv http://$REGISTRY_IP:$REGISTRY_PORT/v2/abox-gitsrv/manifests/$VER_APP
+              echo "=== curl end"
+          resources: {}
+          volumeMounts:
+            - name: workspace
+              readOnly: true
+              mountPath: /workspace
+      volumes:
+        - name: workspace
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: cm-build104
+            items:
+              - key: Dockerfile
+                path: Dockerfile
+          

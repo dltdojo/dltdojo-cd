@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: buildkit100
+spec:
+  restartPolicy: Never
+  containers:
+    - name: buildkit101
+      image: moby/buildkit:v0.10.6
+      command:
+        - sh
+      args:
+        - -c 
+        - |
+          date
+          env
+          nslookup k3d-registry101.localhost
+          mkdir /workspace
+          echo FROM public.ecr.aws/docker/library/hello-world:latest > /workspace/Dockerfile
+          buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=/workspace --local dockerfile=/workspace \
+            --output type=image,name=k3d-registry101.localhost:5000/mybox:v1.3,push=true,registry.insecure=true
+          echo "THE END"
+      resources: {}
+      securityContext:
+        privileged: true
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: curl987
+spec:
+  restartPolicy: Never
+  containers:
+    - name: curl
+      image: curlimages/curl:7.86.0
+      resources: {}
+      command:
+        - sh
+      args:
+        - -c 
+        - |
+          date
+          env
+          nslookup k3d-registry101.localhost
+          REGISTRY_IP=`nslookup k3d-registry101.localhost | awk 'NR==6 {print $2}'`
+          sleep 15
+          curl -sv http://k3d-registry101.localhost:5000/v2/_catalog
+          curl -sv http://$REGISTRY_IP:5000/v2/_catalog
+          echo ""
+          tail -f /dev/null
