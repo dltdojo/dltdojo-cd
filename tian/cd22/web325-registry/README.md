@@ -155,13 +155,39 @@ kubectl logs job/build103 build-box-curl
 # k3d cluster create foo2021 --registry-use k3d-registry101.localhost:12345
 kubectl apply -f build104.yaml
 kubectl get job
-kubectl logs job/build103 build-box
-kubectl logs job/build103 build-box-curl
+kubectl logs job/build104 build-box
+kubectl logs job/build104 build-box-curl
 kubectl run foo101 --image=k3d-registry101.localhost:12345/abox-curl:3.17.0-2 -- sh -c "curl --version"
 kubectl logs foo101 ; kubectl delete po foo101
 kubectl run foo101 --image=k3d-registry101.localhost:12345/abox-gitsrv:3.17.0-2 -- sh -c "git --version"
 kubectl logs foo101 ; kubectl delete po foo101
 ```
+
+
+# 🍟 105 Pod Lifecycle
+
+- Pod Lifecycle | Kubernetes https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/
+
+> The spec of a Pod has a restartPolicy field with possible values Always, OnFailure, and Never. The default value is Always.
+
+直接將測試新建映像的 pod 植入變成類似 CI 流程 build-push-testing。由於新的鏡像未出現一開始會失敗一直重試。
+
+```sh
+# k3d registry create registry101.localhost --port 12345
+# k3d cluster create foo2021 --registry-use k3d-registry101.localhost:12345
+# sleep 120 ? 
+kubectl apply -f ci105.yaml
+kubectl get job
+kubectl logs job/build-ci105 box
+kubectl logs job/build-ci105 curl
+kubectl logs job/test-ci105 box
+kubectl logs job/test-ci105 curl
+```
+
+重開機出現 ```** server can't find k3d-registry101.localhost: NXDOMAIN``` 與 ```dial tcp: lookup k3d-registry101.localhost on 10.43.0.10:53: no such host``` 問題。刪掉重建 k3d cluster create 綁定 registry-use 後執行 ci105.yaml 還是會出現 nslookup k3d-registry101.localhost 錯誤，第二次重建等一下(猜測)後 k3d-registry101.localhost 才在 nslookup 正常出現。猜測是 coredns 需要時間。
+
+> You can check /etc/hosts inside the node containers, the core DNS configmap or the LocalRegistryHosting configmap to see what registry was configured inside k3d.
+
 
 # 測試失敗紀錄：901/902 不建議 k3d 的 k8s 內部建立 local registry
 

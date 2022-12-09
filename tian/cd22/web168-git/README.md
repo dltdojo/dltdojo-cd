@@ -75,12 +75,30 @@ docker compose -f docker-compose.202.yaml up
 ```
 
 
-# 🚲 203 git and vscode
+# 🚲 203 docker compose version: git service and vscode
 
 使用瀏覽器開啟 vscode 來執行 git 任務，不須安裝 git 環境。
 
+- http://localhost:3000/?folder=/home/workspace/foo
+
 ```sh
 docker compose -f docker-compose.203.yaml up
+```
+
+
+# 🚲 204 k8s version: git service and vscode  
+
+kubernetes version：配置 git service 供遠端分享，由瀏覽器開啟 vscode 來執行 git 任務無須安裝 git 可用環境。
+
+kubernetes 環境與 docker compose 的差異在於 Dockerfile 編譯鏡像後推送到 registry 供於 kubernetes cluster 內的 container image 可用，另外還必須加上 ingress 配置才能對外使用相對繁瑣的 yaml 配置。為了先省掉 registry 設置，直接在啟動 alpine 時下載 apk add lighttpd git-daemon 安裝。kubernetes 因為雲端原生配置機器可能不只一台，故不用本地的檔案與鏡像來配置，這樣相對開發階段遠比 docker compose 複雜，要看測試輸出結果也要 kubectl logs 不斷的找，並不是很直覺的 UX。
+
+- vscode 無權限控管 http://vscode204.localhost:8300/?folder=/home/workspace/foo
+- gitsrv 無權限控管 http://gitsrv204.localhost:8300
+
+
+```sh
+# k3d cluster create foo2021 -p "8300:80@loadbalancer" --agents 2
+kubectl apply -f k204.yaml
 ```
 
 # 🌽 301 gitops

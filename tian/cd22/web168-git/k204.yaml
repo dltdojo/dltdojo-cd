@@ -1,0 +1,163 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitsrv204
+spec:
+  selector:
+    matchLabels:
+      run: gitsrv204
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: gitsrv204
+    spec:
+      containers:
+        - name: gitsrv204
+          image: public.ecr.aws/docker/library/alpine:3.17.0
+          command:
+            - sh
+          args:
+            - -c
+            - |
+              echo "Install lighttpd and git-http-backend"
+              apk --no-cache add busybox-extras curl git-daemon lighttpd
+              env
+              id
+              mkdir -p /app/repo/foo
+              git config --system http.receivepack true
+              git config --system http.uploadpack true
+              git config --system user.email "gitserver@dev.local"
+              git config --system user.name "Git Server"
+              git config --global user.email "you@example.com"
+              git config --global user.name "Your Name"
+              cd /app/repo/foo &&  git init --bare -q
+              mkdir -p /app/repo/bar && cd /app/repo/bar && git init -q --bare
+              #
+              # https://github.com/ryan0x44/local-git-server
+              #
+              cat <<\EOF > /etc/lighttpd/lighttpd.conf
+              server.document-root = "/app/repo"
+              server.modules += ( "mod_alias", "mod_cgi", "mod_setenv" )
+              $HTTP["host"] =~ "" { 
+                alias.url += ( "/git" => "/usr/libexec/git-core/git-http-backend")
+                $$HTTP["url"] =~ "^/git" {
+                  cgi.assign = ( "" => "" )
+                  setenv.add-environment = (
+                    "GIT_PROJECT_ROOT" => "/app/repo",
+                    "GIT_HTTP_EXPORT_ALL" => "1"
+                  )
+                }
+              }
+              EOF
+              lighttpd -D -f /etc/lighttpd/lighttpd.conf
+          ports:
+            - containerPort: 80
+          resources: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitsrv204
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    run: gitsrv204
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vscode204
+spec:
+  selector:
+    matchLabels:
+      run: vscode204
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: vscode204
+    spec:
+      containers:
+        - name: vscode204
+          image: gitpod/openvscode-server:1.73.1
+          command:
+            - sh
+          args:
+            - -c
+            - |
+              echo "starting gitpod openvscode service"
+              sleep 15
+              env
+              id
+              cat<<EOF >> /home/workspace/.bashrc
+              alias la='ls -lah'
+              EOF
+              mkdir /home/workspace
+              git clone http://gitsrv204.default.svc.cluster.local:80/git/foo
+              cd /home/workspace/foo
+              git config --global user.email "foo1001@testing.local"
+              git config --global user.name "FooName1001"
+              echo hello-world-vscode-git >> README.md
+              git status
+              git add .
+              git status
+              git commit -m 'vscode git : commit'
+              git status
+              git push
+              git log
+              git checkout -b issue302
+              git branch
+              echo $(date) >> README.md
+              /home/.openvscode-server/bin/openvscode-server --host 0.0.0.0 --without-connection-token &
+              sleep 5
+              echo "open http://localhost:3000/?folder=/home/workspace/foo"
+              wait
+          ports:
+            - containerPort: 3000
+          resources: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vscode204
+spec:
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+  selector:
+    run: vscode204
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myingress
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+    - host: gitsrv204.localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: gitsrv204
+                port:
+                  number: 80
+    - host: vscode204.localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vscode204
+                port:
+                  number: 80

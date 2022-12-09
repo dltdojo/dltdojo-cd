@@ -100,3 +100,9 @@ Javascript, APIs, and Markup
 - [Jamstack: a Deep Dive | Xata Blog](https://xata.io/blog/jamstack-mern-lamp-stack-comparison)
 - [Jamstack Community Survey Results 2022 | Jamstack](https://jamstack.org/survey/2022/)
 - [What does CSR, SSR, SSG and ISR means and why should you care?](https://www.flavienbonvin.com/data-building-strategy-for-nextjs-app/)
+
+
+
+# TODO Grafana LGTM
+
+Grafana LGTM (Loki for logs, Grafana for visualization, Tempo for traces, and Mimir for metrics)
