@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitsrv205
+spec:
+  selector:
+    matchLabels:
+      run: gitsrv205
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: gitsrv205
+    spec:
+      volumes:
+        - name: cm-init-sh
+          configMap:
+            name: cm-init-sh
+            defaultMode: 0755
+      containers:
+        - name: gitsrv205
+          image: alpine:3.17.0
+          volumeMounts:
+            - mountPath: /opt/sh/git-init.sh
+              name: cm-init-sh
+              subPath: git-init.sh
+          command:
+            - sh
+          args:
+            - -c
+            - |
+              echo "Install lighttpd and git-http-backend"
+              apk --no-cache add busybox-extras curl git-daemon lighttpd
+              env
+              id
+              /opt/sh/git-init.sh
+          ports:
+            - containerPort: 80
+          resources: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitsrv205
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    run: gitsrv205

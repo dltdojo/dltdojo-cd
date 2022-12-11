@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitsrv205
+spec:
+  template:
+    spec:
+      volumes:
+        - name: cm-init-sh
+          configMap:
+            name: cm-init-sh-206
+            defaultMode: 0755

@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: k205
+namespace: default
+commonLabels:
+  app.cd22.dltdojo/name: k205
+
+resources:
+  - gitsrv.yaml
+  - vscode.yaml
+  - ingress.yaml
+
+images:
+  - name: alpine:3.17.0
+    newName: public.ecr.aws/docker/library/alpine
+    newTag: 3.17.0
+
+configMapGenerator:
+  - name: cm-init-sh
+    files:
+      - git-init.sh
+      - vscode-init.sh

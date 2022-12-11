@@ -132,6 +132,40 @@ curl -s -o "$BASE/#1.yaml" "https://raw.githubusercontent.com\
 /{configMap,deployment,kustomization,service}.yaml"
 ```
 
+如果只是單一檔案可以使用 kubectl apply，由於沒有內部自建鏡像與registry配置可以直接在不同機器上使用。
+
+```sh
+kubectl apply -f https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/cd22/web168-git/k205.yaml
+```
+
+# 🐐 206 kustomize overlays
+
+沿用 k205 但是換掉 configmap 需要作兩件事：
+
+- 產生新的 configmap cm-init-sh-206
+- path-cm-gitsrv 換掉舊的用新的 cm-init-sh-206 蓋過去。(其實同名 cm-init-sh 也不會衝到，因為前面會被加上 stag)
+- 光 patch gitsrv 不夠，vscode 初始化需要直接使用內部網址，故會出現 Could not resolve host: gitsrv205.default.svc.cluster.local 錯誤，因這裡的內部服務被改名為 service/stag-gitsrv205，如果原始沒有配置參數可改，只能直接改 vscode-init.sh。不然就是不加上 prefix。
+- 另外改良 205 使用 sleep 模式常常因為 gitsrv 未就位失敗。
+
+注意只有改 gitsrv 所以 vscode 的配置會沿用舊的版本，所以會有 cm-init-sh 與 cm-init-sh-206 同時存在。
+
+- vscode http://vscode205.localhost:8300/?folder=/home/workspace/foo
+
+
+```sh
+# k3d cluster create foo2021 -p "8300:80@loadbalancer" --agents 2
+kubectl apply -k k206/base --dry-run=client -o yaml > k206-base.yaml
+kubectl apply -k k206/staging --dry-run=client -o yaml > k206-staging.yaml
+kubectl apply -k k206/staging
+```
+
+單一檔案
+
+```sh
+kubectl apply -f https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/cd22/web168-git/k206-base.yaml
+kubectl apply -f https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/cd22/web168-git/k206-staging.yaml
+```
+
 
 # 🌽 301 gitops
 
