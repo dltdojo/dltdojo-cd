@@ -109,13 +109,13 @@ kubectl apply -f k204.yaml
 - 打上全區標籤 app.cd22.dltdojo/name: k205
 - 更換 image
 - 將部份 shell script 移出 yaml
-- vscode http://vscode204.localhost:8300/?folder=/home/workspace/foo
+- vscode http://vscode205.localhost:8300/?folder=/home/workspace/foo
 
 kustomize 化的一個缺點是要觀察全貌變得複雜，這個問題在 helm 上更嚴重，這雖然減少了重複性工作與可能出錯，但是切細之後要維護修補還是需要組起來觀察。
 
 ```sh
 # k3d cluster create foo2021 -p "8300:80@loadbalancer" --agents 2
-kubectl apply -k k205 --dry-run=client -o yaml
+kubectl apply -k k205 --dry-run=client -o yaml > k205.yaml
 kubectl apply -k k205
 ```
 

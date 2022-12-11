@@ -7,7 +7,7 @@ metadata:
     kubernetes.io/ingress.class: traefik
 spec:
   rules:
-    - host: gitsrv204.localhost
+    - host: gitsrv205.localhost
       http:
         paths:
           - path: /
@@ -17,7 +17,7 @@ spec:
                 name: gitsrv205
                 port:
                   number: 80
-    - host: vscode204.localhost
+    - host: vscode205.localhost
       http:
         paths:
           - path: /
