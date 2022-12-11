@@ -11,11 +11,8 @@ resources:
   - ../base
 
 configMapGenerator:
-  - name: cm-init-sh-206
+  - name: cm-init-sh
+    behavior: replace
     files:
       - git-init.sh
       - vscode-init.sh
-
-patchesStrategicMerge:
-  - patch-cm-gitsrv.yaml
-  - patch-cm-vscode.yaml
