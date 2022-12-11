@@ -1,0 +1,217 @@
+# kubectl apply -k k205 --dry-run=client -o yaml
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    git-init.sh: "#!/bin/sh\nmkdir -p /app/repo/foo\ngit config --system http.receivepack
+      true\ngit config --system http.uploadpack true\ngit config --system user.email
+      \"gitserver@dev.local\"\ngit config --system user.name \"Git Server\"\ngit config
+      --global user.email \"you@example.com\"\ngit config --global user.name \"Your
+      Name\"\ncd /app/repo/foo &&  git init --bare -q\nmkdir -p /app/repo/bar && cd
+      /app/repo/bar && git init -q --bare\n#\n# https://github.com/ryan0x44/local-git-server\n#\ncat
+      <<\\EOF > /etc/lighttpd/lighttpd.conf\nserver.document-root = \"/app/repo\"\nserver.modules
+      += ( \"mod_alias\", \"mod_cgi\", \"mod_setenv\" )\n$HTTP[\"host\"] =~ \"\" {
+      \nalias.url += ( \"/git\" => \"/usr/libexec/git-core/git-http-backend\")\n$HTTP[\"url\"]
+      =~ \"^/git\" {\n    cgi.assign = ( \"\" => \"\" )\n    setenv.add-environment
+      = (\n    \"GIT_PROJECT_ROOT\" => \"/app/repo\",\n    \"GIT_HTTP_EXPORT_ALL\"
+      => \"1\"\n    )\n}\n}\nEOF\nlighttpd -D -f /etc/lighttpd/lighttpd.conf"
+    vscode-init.sh: |-
+      #!/bin/sh
+      cat<<EOF >> /home/workspace/.bashrc
+      alias la='ls -lah'
+      EOF
+      mkdir /home/workspace
+      git clone http://gitsrv205.default.svc.cluster.local:80/git/foo
+      cd /home/workspace/foo
+      git config --global user.email "foo1001@testing.local"
+      git config --global user.name "FooName1001"
+      echo hello-world-vscode-git >> README.md
+      git status
+      git add .
+      git status
+      git commit -m 'vscode git : commit'
+      git status
+      git push
+      git log
+      git checkout -b issue302
+      git branch
+      echo $(date) >> README.md
+      /home/.openvscode-server/bin/openvscode-server --host 0.0.0.0 --without-connection-token &
+      sleep 5
+      echo "open http://localhost:3000/?folder=/home/workspace/foo"
+      wait
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"git-init.sh":"#!/bin/sh\nmkdir -p /app/repo/foo\ngit config --system http.receivepack true\ngit config --system http.uploadpack true\ngit config --system user.email \"gitserver@dev.local\"\ngit config --system user.name \"Git Server\"\ngit config --global user.email \"you@example.com\"\ngit config --global user.name \"Your Name\"\ncd /app/repo/foo \u0026\u0026  git init --bare -q\nmkdir -p /app/repo/bar \u0026\u0026 cd /app/repo/bar \u0026\u0026 git init -q --bare\n#\n# https://github.com/ryan0x44/local-git-server\n#\ncat \u003c\u003c\\EOF \u003e /etc/lighttpd/lighttpd.conf\nserver.document-root = \"/app/repo\"\nserver.modules += ( \"mod_alias\", \"mod_cgi\", \"mod_setenv\" )\n$HTTP[\"host\"] =~ \"\" { \nalias.url += ( \"/git\" =\u003e \"/usr/libexec/git-core/git-http-backend\")\n$HTTP[\"url\"] =~ \"^/git\" {\n    cgi.assign = ( \"\" =\u003e \"\" )\n    setenv.add-environment = (\n    \"GIT_PROJECT_ROOT\" =\u003e \"/app/repo\",\n    \"GIT_HTTP_EXPORT_ALL\" =\u003e \"1\"\n    )\n}\n}\nEOF\nlighttpd -D -f /etc/lighttpd/lighttpd.conf","vscode-init.sh":"#!/bin/sh\ncat\u003c\u003cEOF \u003e\u003e /home/workspace/.bashrc\nalias la='ls -lah'\nEOF\nmkdir /home/workspace\ngit clone http://gitsrv205.default.svc.cluster.local:80/git/foo\ncd /home/workspace/foo\ngit config --global user.email \"foo1001@testing.local\"\ngit config --global user.name \"FooName1001\"\necho hello-world-vscode-git \u003e\u003e README.md\ngit status\ngit add .\ngit status\ngit commit -m 'vscode git : commit'\ngit status\ngit push\ngit log\ngit checkout -b issue302\ngit branch\necho $(date) \u003e\u003e README.md\n/home/.openvscode-server/bin/openvscode-server --host 0.0.0.0 --without-connection-token \u0026\nsleep 5\necho \"open http://localhost:3000/?folder=/home/workspace/foo\"\nwait"},"kind":"ConfigMap","metadata":{"annotations":{},"labels":{"app.cd22.dltdojo/name":"k205"},"name":"cm-init-sh-ccmh7mc6hf","namespace":"default"}}
+    labels:
+      app.cd22.dltdojo/name: k205
+    name: cm-init-sh-ccmh7mc6hf
+    namespace: default
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app.cd22.dltdojo/name":"k205"},"name":"gitsrv205","namespace":"default"},"spec":{"ports":[{"port":80,"protocol":"TCP","targetPort":80}],"selector":{"app.cd22.dltdojo/name":"k205","run":"gitsrv205"}}}
+    labels:
+      app.cd22.dltdojo/name: k205
+    name: gitsrv205
+    namespace: default
+  spec:
+    ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80
+    selector:
+      app.cd22.dltdojo/name: k205
+      run: gitsrv205
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app.cd22.dltdojo/name":"k205"},"name":"vscode205","namespace":"default"},"spec":{"ports":[{"port":80,"protocol":"TCP","targetPort":3000}],"selector":{"app.cd22.dltdojo/name":"k205","run":"vscode205"}}}
+    labels:
+      app.cd22.dltdojo/name: k205
+    name: vscode205
+    namespace: default
+  spec:
+    ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 3000
+    selector:
+      app.cd22.dltdojo/name: k205
+      run: vscode205
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.cd22.dltdojo/name":"k205"},"name":"gitsrv205","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app.cd22.dltdojo/name":"k205","run":"gitsrv205"}},"template":{"metadata":{"labels":{"app.cd22.dltdojo/name":"k205","run":"gitsrv205"}},"spec":{"containers":[{"args":["-c","echo \"Install lighttpd and git-http-backend\"\napk --no-cache add busybox-extras curl git-daemon lighttpd\nenv\nid\n/opt/sh/git-init.sh\n"],"command":["sh"],"image":"public.ecr.aws/docker/library/alpine:3.17.0","name":"gitsrv205","ports":[{"containerPort":80}],"resources":{},"volumeMounts":[{"mountPath":"/opt/sh/git-init.sh","name":"cm-init-sh","subPath":"git-init.sh"}]}],"volumes":[{"configMap":{"defaultMode":493,"name":"cm-init-sh-ccmh7mc6hf"},"name":"cm-init-sh"}]}}}}
+    labels:
+      app.cd22.dltdojo/name: k205
+    name: gitsrv205
+    namespace: default
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app.cd22.dltdojo/name: k205
+        run: gitsrv205
+    template:
+      metadata:
+        labels:
+          app.cd22.dltdojo/name: k205
+          run: gitsrv205
+      spec:
+        containers:
+        - args:
+          - -c
+          - |
+            echo "Install lighttpd and git-http-backend"
+            apk --no-cache add busybox-extras curl git-daemon lighttpd
+            env
+            id
+            /opt/sh/git-init.sh
+          command:
+          - sh
+          image: public.ecr.aws/docker/library/alpine:3.17.0
+          name: gitsrv205
+          ports:
+          - containerPort: 80
+          resources: {}
+          volumeMounts:
+          - mountPath: /opt/sh/git-init.sh
+            name: cm-init-sh
+            subPath: git-init.sh
+        volumes:
+        - configMap:
+            defaultMode: 493
+            name: cm-init-sh-ccmh7mc6hf
+          name: cm-init-sh
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.cd22.dltdojo/name":"k205"},"name":"vscode205","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app.cd22.dltdojo/name":"k205","run":"vscode205"}},"template":{"metadata":{"labels":{"app.cd22.dltdojo/name":"k205","run":"vscode205"}},"spec":{"containers":[{"args":["-c","echo \"starting gitpod openvscode service\"\nsleep 15\nenv\nid\n/opt/sh/vscode-init.sh\n"],"command":["sh"],"image":"gitpod/openvscode-server:1.73.1","name":"vscode205","ports":[{"containerPort":3000}],"resources":{},"volumeMounts":[{"mountPath":"/opt/sh/vscode-init.sh","name":"cm-init-sh","subPath":"vscode-init.sh"}]}],"volumes":[{"configMap":{"defaultMode":493,"name":"cm-init-sh-ccmh7mc6hf"},"name":"cm-init-sh"}]}}}}
+    labels:
+      app.cd22.dltdojo/name: k205
+    name: vscode205
+    namespace: default
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app.cd22.dltdojo/name: k205
+        run: vscode205
+    template:
+      metadata:
+        labels:
+          app.cd22.dltdojo/name: k205
+          run: vscode205
+      spec:
+        containers:
+        - args:
+          - -c
+          - |
+            echo "starting gitpod openvscode service"
+            sleep 15
+            env
+            id
+            /opt/sh/vscode-init.sh
+          command:
+          - sh
+          image: gitpod/openvscode-server:1.73.1
+          name: vscode205
+          ports:
+          - containerPort: 3000
+          resources: {}
+          volumeMounts:
+          - mountPath: /opt/sh/vscode-init.sh
+            name: cm-init-sh
+            subPath: vscode-init.sh
+        volumes:
+        - configMap:
+            defaultMode: 493
+            name: cm-init-sh-ccmh7mc6hf
+          name: cm-init-sh
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      ingress.kubernetes.io/ssl-redirect: "false"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{"ingress.kubernetes.io/ssl-redirect":"false","kubernetes.io/ingress.class":"traefik"},"labels":{"app.cd22.dltdojo/name":"k205"},"name":"myingress","namespace":"default"},"spec":{"rules":[{"host":"gitsrv204.localhost","http":{"paths":[{"backend":{"service":{"name":"gitsrv205","port":{"number":80}}},"path":"/","pathType":"Prefix"}]}},{"host":"vscode204.localhost","http":{"paths":[{"backend":{"service":{"name":"vscode205","port":{"number":80}}},"path":"/","pathType":"Prefix"}]}}]}}
+      kubernetes.io/ingress.class: traefik
+    labels:
+      app.cd22.dltdojo/name: k205
+    name: myingress
+    namespace: default
+  spec:
+    rules:
+    - host: gitsrv204.localhost
+      http:
+        paths:
+        - backend:
+            service:
+              name: gitsrv205
+              port:
+                number: 80
+          path: /
+          pathType: Prefix
+    - host: vscode204.localhost
+      http:
+        paths:
+        - backend:
+            service:
+              name: vscode205
+              port:
+                number: 80
+          path: /
+          pathType: Prefix
+kind: List
+metadata: {}

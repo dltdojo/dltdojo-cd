@@ -101,6 +101,38 @@ kubernetes 環境與 docker compose 的差異在於 Dockerfile 編譯鏡像後�
 kubectl apply -f k204.yaml
 ```
 
+# 🐐 205 kustomize git-service-vscode
+
+將 204 拆開並可配置不同版本，不需要複製貼上重複修改 k204.yaml，代價是檔案變多必須建立一個 k205 目錄，以及將功能拆分。
+
+- kubectl 加上 -k 針對目錄
+- 打上全區標籤 app.cd22.dltdojo/name: k205
+- 更換 image
+- 將部份 shell script 移出 yaml
+- vscode http://vscode204.localhost:8300/?folder=/home/workspace/foo
+
+kustomize 化的一個缺點是要觀察全貌變得複雜，這個問題在 helm 上更嚴重，這雖然減少了重複性工作與可能出錯，但是切細之後要維護修補還是需要組起來觀察。
+
+```sh
+# k3d cluster create foo2021 -p "8300:80@loadbalancer" --agents 2
+kubectl apply -k k205 --dry-run=client -o yaml
+kubectl apply -k k205
+```
+
+參考 [kustomize/examples/helloWorld at master · kubernetes-sigs/kustomize](https://github.com/kubernetes-sigs/kustomize/tree/master/examples/helloWorld)
+
+由於已經不是單一檔案，遠端要初始化環境需要同時下載不少檔案如下：
+
+```sh
+BASE=$DEMO_HOME/base
+mkdir -p $BASE
+
+curl -s -o "$BASE/#1.yaml" "https://raw.githubusercontent.com\
+/kubernetes-sigs/kustomize/master/examples/helloWorld\
+/{configMap,deployment,kustomization,service}.yaml"
+```
+
+
 # 🌽 301 gitops
 
 - What Is GitOps https://www.weave.works/blog/what-is-gitops-really

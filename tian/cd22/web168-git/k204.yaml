@@ -41,7 +41,7 @@ spec:
               server.modules += ( "mod_alias", "mod_cgi", "mod_setenv" )
               $HTTP["host"] =~ "" { 
                 alias.url += ( "/git" => "/usr/libexec/git-core/git-http-backend")
-                $$HTTP["url"] =~ "^/git" {
+                $HTTP["url"] =~ "^/git" {
                   cgi.assign = ( "" => "" )
                   setenv.add-environment = (
                     "GIT_PROJECT_ROOT" => "/app/repo",
