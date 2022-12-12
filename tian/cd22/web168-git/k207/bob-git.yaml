@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: k207
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: Never
+      volumes:
+        - name: vol-bob-git
+          configMap:
+            name: cm-bob-git
+            defaultMode: 0755
+      initContainers:
+        - name: init-curl
+          image: curlimages/curl:7.86.0
+          command:
+            - sh
+          args:
+            - -c
+            - |
+              env
+              date
+              curl -sv --retry-delay 6 --retry 10 --retry-all-errors http://gitsrv207.default.svc.cluster.local:80/git/foo/
+      containers:
+        - name: bob-git
+          image: alpine/git:2.36.3
+          volumeMounts:
+            - mountPath: /sh/bob-git.sh
+              name: vol-bob-git
+              subPath: bob-git.sh
+          command:
+            - /sh/bob-git.sh
+          resources: {}

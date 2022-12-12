@@ -1,0 +1,33 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: k207
+namespace: default
+commonLabels:
+  app.cd22.dltdojo/name: k207
+
+resources:
+  - gitsrv.yaml
+  - vscode.yaml
+  - ingress.yaml
+  - bob-git.yaml
+
+images:
+  - name: alpine:3.17.0
+    # 使用外部原生鏡像版本
+    # git-init.sh 裡面自動判斷是否需要 apk add 所以不須更換 sh
+    # newName: public.ecr.aws/docker/library/alpine
+    # newTag: 3.17.0
+    # 
+    # 使用 k3d image import 版本
+    newName: gitsrv
+    newTag: 0.1.3
+
+configMapGenerator:
+  - name: cm-init-sh
+    files:
+      - git-init.sh=git-init-101.sh
+      - vscode-init.sh
+  - name: cm-bob-git
+    files:
+      - bob-git.sh

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vscode207
+spec:
+  selector:
+    matchLabels:
+      run: vscode207
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: vscode207
+    spec:
+      volumes:
+        - name: cm-init-sh
+          configMap:
+            name: cm-init-sh
+            defaultMode: 0755
+      containers:
+        - name: vscode207
+          image: gitpod/openvscode-server:1.73.1
+          volumeMounts:
+            - mountPath: /opt/sh/vscode-init.sh
+              name: cm-init-sh
+              subPath: vscode-init.sh
+          command:
+            - sh
+          args:
+            - -c
+            - |
+              echo "starting gitpod openvscode service"
+              env
+              id
+              /opt/sh/vscode-init.sh
+          ports:
+            - containerPort: 3000
+          resources: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vscode207
+spec:
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+  selector:
+    run: vscode207

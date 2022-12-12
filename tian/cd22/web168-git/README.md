@@ -166,8 +166,58 @@ kubectl apply -f https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/
 kubectl apply -f https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/cd22/web168-git/k206-staging.yaml
 ```
 
+# 🏈 207 gitweb and git instaweb
 
-# 🌽 301 gitops
+Difference between 'git request-pull' and 'pull request' - Stack Overflow https://stackoverflow.com/questions/49423624/difference-between-git-request-pull-and-pull-request
+
+純 git 使用 email 來通知所有者是否拉取，這點與 GitHub/GitLab/Gitea 等的流程不同。新增瀏覽界面可以不須安裝　git 也可瀏覽不同的 branch/log 紀錄。
+
+- git http-backend 與 git instaweb 是兩件事，前者是 git 的轉接，後者只是單純瀏覽，並無 git push/pull/fetch...等協定的功能。
+- gitweb http://gitweb.localhost:8300
+  - 可定位網址到特定行不過網址很長
+  - http://gitweb.localhost:8300/?p=bob101;a=blob;f=README.md;h=cc8959f5ba089248b8f287e13cf9632dba17dce5;hb=a18860159fc694895ed7f74659c88521eee0c1b6#l2
+- vscode http://vscode.localhost:8300/?folder=/home/workspace/foo
+- cd /app/repo/foo && git instaweb 不會只有 foo 會將同一階目錄的 bar, bob101 都納進來 gitweb 界面。
+- alpine apk 需要 git-gitweb 與 perl-cgi 否則會有 500 error 出現。 git instaweb fails with "500 - Internal Server Error" · Issue #4871 · microsoft/WSL
+https://github.com/microsoft/WSL/issues/4871
+- 使用 k3d import 只適合可匯入環境，如果是無法匯入 docker build 鏡像還是需要公開基底鏡像的話須直接在 sh 內做 apk add，後者方便沒有匯入機制的環境但是每次刪減測試都需要重來耗費時間。
+
+```sh
+# k3d cluster create foo2021 -p "8300:80@loadbalancer" --agents 2
+DOCKER_BUILDKIT=1 docker build -t gitsrv:0.1.3 --target=k207-gitsrv .
+k3d image import gitsrv:0.1.3 -c foo2021
+kubectl apply -k k207
+```
+
+沒有真正測試 git request-pull 只提供概念。
+
+- BOB: git clone repo ; edit; git push new-repo
+- VSCODE: git remote add new-repo; git fetch new-repo; git merge new-repo/branchxx
+
+# 🌽 301 gitops argocd
+
+- Getting Started - Argo CD - Declarative GitOps CD for Kubernetes https://argo-cd.readthedocs.io/en/stable/getting_started/
+- 使用 kustomize 異動配置 argocd-cm.yaml 調整預設使用者 https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/
+- 注意新版的 kustomize 配置合併不會加上獨一無二的名稱尾部，如要更新必須手動做。 Allow disabling of suffix hashes on merged ConfigMaps generated from ConfigMapGenerators https://github.com/kubernetes-sigs/kustomize/issues/4693
+- 安裝 argocd 並同步 https://github.com/argoproj/argocd-example-apps/tree/master/guestbook
+- 採用宣告式不使用 UI 生成 https://github.com/argoproj/argo-cd/blob/v2.5.4/docs/operator-manual/application.yaml
+- 不考慮憑證問題
+- 刪除 argocd app 不代表刪除資源，要分開刪除資源須手動，或是設置 finalizer 來刪除。 https://argo-cd.readthedocs.io/en/stable/user-guide/app_deletion/
+- app 須設定 automated 才會自動同步資源（沒開啟資源的會新增啟動），如無設定需用 argo cli/ui 來啟動資源同步。 https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/
+- 使用 Port Forwarding https://localhost:8080
+
+```sh
+# k3d cluster create foo2021
+# kubectl create namespace argocd
+kubectl apply -k k301
+# get admin password
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+sleep 30
+kubectl apply -n argocd -f k301/app301.yaml
+```
+
+gitops 參考：
 
 - What Is GitOps https://www.weave.works/blog/what-is-gitops-really
 - What is GitOps? https://www.redhat.com/en/topics/devops/what-is-gitops

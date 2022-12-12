@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitsrv207
+spec:
+  selector:
+    matchLabels:
+      run: gitsrv207
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: gitsrv207
+    spec:
+      volumes:
+        - name: cm-init-sh
+          configMap:
+            name: cm-init-sh
+            defaultMode: 0755
+      containers:
+        - name: gitsrv207
+          image: alpine:3.17.0
+          volumeMounts:
+            - mountPath: /opt/sh/git-init.sh
+              name: cm-init-sh
+              subPath: git-init.sh
+          command:
+            - /opt/sh/git-init.sh
+          ports:
+            - containerPort: 80
+            # gitweb
+            - containerPort: 1234
+          resources: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitsrv207
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    run: gitsrv207
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitsrv207-web
+spec:
+  ports:
+    - port: 80
+      targetPort: 1234
+      protocol: TCP
+  selector:
+    run: gitsrv207
