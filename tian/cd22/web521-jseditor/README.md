@@ -61,3 +61,34 @@ import { AppListen } from "https://raw.githubusercontent.com/dltdojo/dltdojo-cd/
 # docker compose -f docker-compose.105.yaml up
 curl https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/cd22/web521-jseditor/docker-compose.105.yaml | docker compose -f - up
 ```
+
+如果不嵌入預設的複雜 HTML 範例可簡化。從 deno 的 stdin 傳入。
+
+```sh
+deno run --allow-net - <<EOF
+import { AppListen } from "https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/cd22/web521-jseditor/d104-mod.ts";
+await AppListen('<h1>hello</h1><script>console.log(Date())</script>');
+EOF
+```
+
+或是不須安裝 deno 直接使用 docker compose，兩層 stdin 輸入，只是這種作法每次都要下載一次花時間，只適合用來作簡易的測試。
+
+```sh
+docker compose -f - up <<\EOF
+version: "3.8"
+services:
+  deno104:
+    image: denoland/deno:1.29.1
+    command:
+      - sh
+      - -c 
+      - |
+        deno run --allow-net - <<\EOOF
+        import { AppListen } from "https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/cd22/web521-jseditor/d104-mod.ts";
+        await AppListen('<h1>hello</h1><script>console.log(Date())</script>');
+        EOOF
+    ports:
+      - 8300:3000
+EOF
+```
+
