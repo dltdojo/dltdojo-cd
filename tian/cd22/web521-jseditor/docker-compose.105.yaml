@@ -1,0 +1,40 @@
+version: "3.8"
+services:
+  deno104:
+    image: denoland/deno:1.29.1
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        cd /app
+        cat <<\EOF > main.ts
+        import { AppListen } from "https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/cd22/web521-jseditor/d104-mod.ts";
+
+        const JS_HERE = `<!DOCTYPE html>
+        <html>
+        <body>
+        <h2>JavaScript Demo 104</h2>
+        <button type="button" onclick="foo()">DateTime&Random</button>
+        <p id="demo"></p>
+        <script>
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * max);
+        }
+        function foo(){
+            let dstr = Date();
+            document.getElementById('demo').innerHTML = 
+            \`Date is \${dstr} and random is \${getRandomInt(3999)}\`;
+        }
+        </script>
+        </body>
+        </html>`
+        await AppListen(JS_HERE);
+        EOF
+        deno run --allow-net --allow-read --allow-env main.ts &
+        sleep 3
+        date
+        echo "start http://localhost:8300"
+        wait
+    ports:
+      - 8300:3000

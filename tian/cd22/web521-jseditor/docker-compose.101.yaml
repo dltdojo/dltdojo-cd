@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  deno101:
+    image: busybox:1.35.0
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        cd /app
+        httpd -fv -p 3000
+    volumes:
+      - ./d101.html:/app/index.html:ro
+    ports:
+      - 8300:3000

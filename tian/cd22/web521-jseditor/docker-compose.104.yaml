@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  deno104:
+    image: denoland/deno:1.29.1
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        cd /app
+        deno run --allow-net --allow-read --allow-env main.ts &
+        sleep 3
+        date
+        echo "start http://localhost:8300"
+        wait
+    volumes:
+      - ./d104.ts:/app/main.ts:ro
+      - ./d104-mod.ts:/app/d104-mod.ts:ro
+    ports:
+      - 8300:3000
