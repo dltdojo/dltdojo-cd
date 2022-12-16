@@ -7,7 +7,6 @@ services:
       - -c 
       - |
         env
-        cd /app
         cat <<\EOF > main.ts
         import { AppListen } from "https://raw.githubusercontent.com/dltdojo/dltdojo-cd/e6b3b075e25b3a4646e6d08d2576e25868928ad0/tian/cd22/web521-jseditor/d104-mod.ts";
         const JS_HERE = `<!DOCTYPE html>
