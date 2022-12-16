@@ -50,10 +50,14 @@ docker compose -f docker-compose.104.yaml up
 import { AppListen } from "https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/cd22/web521-jseditor/d104-mod.ts";
 ```
 
-# 105 one docker compose yaml
+# 105 🍟 one docker compose yaml
 
-一檔到底沒有本機掛載。
+- 一檔到底沒有本機掛載。
+- 不支援 url 下載 [Request: Add docker-compose file for streamlined setup · Issue #31 · vogler/free-games-claimer](https://github.com/vogler/free-games-claimer/issues/31)
+- [Use docker compose config from file and stdin - Stack Overflow](https://stackoverflow.com/questions/53695725/use-docker-compose-config-from-file-and-stdin)
+
 
 ```sh
-docker compose -f https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/cd22/web521-jseditor/docker-compose.105.yaml up
+# docker compose -f docker-compose.105.yaml up
+curl https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/cd22/web521-jseditor/docker-compose.105.yaml | docker compose -f - up
 ```
