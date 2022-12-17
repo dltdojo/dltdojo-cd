@@ -1,0 +1,53 @@
+version: "3.8"
+services:
+  pg102:
+    image: postgres:15.1
+    restart: always
+    environment:
+      POSTGRES_USER: admin102
+      POSTGRES_PASSWORD: pass102
+      POSTGRES_DB: test_db
+    ports:
+      - "5432:5432"
+  psql101:
+    image: postgres:15.1
+    depends_on:
+      - pg102
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        sleep 15
+        date
+        psql postgres://admin102:pass102@pg102:5432/test_db -l
+        cat <<EOF > /tmp/test.sql
+        CREATE TABLE IF NOT EXISTS todos ( id SERIAL PRIMARY KEY, title TEXT NOT NULL);
+        INSERT INTO todos (title) VALUES ('FOO');
+        EOF
+        psql postgres://admin102:pass102@pg102:5432/test_db -f /tmp/test.sql
+  adminer:
+    depends_on:
+      - pg102
+    image: adminer:4.8.1
+    restart: always
+    ports:
+      - 8091:8080
+  deno102:
+    # image: denoland/deno:1.29.1
+    build:
+      context: .
+      target: web105-102
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        sleep 10
+        cd /app
+        deno run --allow-net --allow-read --allow-env main.ts &
+        sleep 3
+        date
+        wait
+    volumes:
+      - ./d102.ts:/app/main.ts:ro
