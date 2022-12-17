@@ -1,0 +1,59 @@
+version: "3.8"
+services:
+  deno101:
+    # image: denoland/deno:1.28.3
+    build:
+      context: .
+      target: web090-passkeys101
+    environment:
+      - ORIGIN=http://localhost:8700
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        cd /app
+        deno run --allow-net --allow-read --allow-env main.ts &
+        sleep 3
+        date
+        echo "Notice: WebAuthn HTTP Origin is $$ORIGIN"
+        wait
+    volumes:
+      - ./d102-register.ts:/app/main.ts:ro
+    ports:
+      - 8302:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.deno1.rule=PathPrefix(`/webauthn`)"
+      - "traefik.http.routers.deno1.entrypoints=web"
+      - "traefik.http.services.deno1.loadbalancer.server.port=3000"
+  busybox101:
+    image: busybox:1.35.0
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        cd /app
+        busybox httpd -fv -p 3000
+    volumes:
+      - ./d102-index.html:/app/index.html
+    ports:
+      - 8301:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.box1.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.box1.entrypoints=web"
+      - "traefik.http.services.box1.loadbalancer.server.port=3000"
+  traefik:
+    image: traefik:v2.9
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "8700:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"

@@ -1,0 +1,25 @@
+@startuml d102-microservices
+actor "Alice" as dev #Yellow
+participant "ServiceOne" as SRVA
+
+box "Docker compose"
+    participant "Gateway" as GW
+    participant "Frontend" as FE
+    participant "Backend" as BE
+end box
+
+== Monolithic service ==
+autonumber 101
+dev -> SRVA: webauthn registration html
+dev -> SRVA: /webauthn/register
+SRVA -> dev: challenge
+dev -> dev: browser call authenticator...
+dev -> SRVA: /webauthn/attestation
+SRVA -> dev: HTTP OK
+== Microservices ==
+autonumber 201
+dev -> GW: webauthn registration
+GW <-> FE: static html
+GW <-> BE: /webauthn api
+GW -> dev: HTTP OK
+@enduml

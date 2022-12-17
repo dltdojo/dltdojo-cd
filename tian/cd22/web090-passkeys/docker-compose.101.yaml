@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  deno101:
+    # image: denoland/deno:1.28.3
+    build:
+      context: .
+      target: web090-passkeys101
+    environment:
+      - ORIGIN=http://localhost:8300
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        cd /app
+        deno run --allow-net --allow-read --allow-env main.ts &
+        sleep 3
+        date
+        echo "Notice: WebAuthn HTTP Origin is $$ORIGIN"
+        wait
+    volumes:
+      - ./d101-register.ts:/app/main.ts:ro
+    ports:
+      - 8300:3000
