@@ -1,0 +1,48 @@
+version: "3.8"
+services:
+  box1061:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        mkdir /home/cgi-bin
+        # [How to parse $QUERY_STRING from a bash CGI script? - Stack Overflow](https://stackoverflow.com/questions/3919755/how-to-parse-query-string-from-a-bash-cgi-script)
+        # Most trivial crack: your.host/your.cgi?rm%20-rf%20%7e <-- this will let your webserver to execute an rm -rf / :-)
+        cat <<\EOOF > /home/cgi-bin/wasm.sh
+        #!/bin/sh
+        # eval "$${QUERY_STRING//&/;}"
+        if [ ! -z "$${QUERY_STRING:-}" ]; then
+          file=$(echo "$$QUERY_STRING" | sed 's/.*file=\([^&]*\).*/\1/')
+        fi
+        echo "Content-Type: application/wasm"
+        echo "Access-Control-Allow-Origin: *"
+        echo "Cache-Control: no-cache"
+        echo "Cache-Control: max-age=30"
+        echo ""
+        cat /home/$$file
+        EOOF
+        cat /home/cgi-bin/wasm.sh
+        chmod 700 /home/cgi-bin/wasm.sh
+        date
+        echo "testing endpoint is http://localhost:8061"
+        busybox httpd -fv -p 3000 -h /home
+    ports:
+      - "8061:3000"
+    volumes:
+      - ./r105/pkg/r105_bg.wasm:/home/pkg/r105_bg.wasm:ro
+  box1062:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        date
+        echo "testing endpoint is http://localhost:8062"
+        sed 's|r105_bg.wasm|http://localhost:8061/cgi-bin/wasm.sh?file=pkg/r105_bg.wasm|' /home/pkg/r105-tpl.js > /home/pkg/r105.js
+        busybox httpd -fv -p 3000 -h /home
+    volumes:
+      - ./r105/index.html:/home/index.html:ro
+      - ./r105/pkg/r105.js:/home/pkg/r105-tpl.js:ro
+    ports:
+      - "8062:3000"

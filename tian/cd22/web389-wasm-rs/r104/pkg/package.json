@@ -1,0 +1,12 @@
+{
+  "name": "sample-cairo-wasm",
+  "version": "0.1.0",
+  "files": [
+    "sample_cairo_wasm_bg.wasm",
+    "sample_cairo_wasm.js",
+    "sample_cairo_wasm.d.ts"
+  ],
+  "module": "sample_cairo_wasm.js",
+  "types": "sample_cairo_wasm.d.ts",
+  "sideEffects": false
+}

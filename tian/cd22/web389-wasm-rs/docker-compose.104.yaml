@@ -11,7 +11,7 @@ services:
         EOOF
         busybox httpd -fv -p 3000 -c /etc/httpd.conf -h /home
     volumes:
-      - .:/home
+      - ./r104:/home
     ports:
       - "8300:3000"
   cypress101:

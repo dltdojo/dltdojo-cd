@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>bip39 example</title>
+  </head>
+  <body>
+    <h1>BIP39</h1>
+    <script type="module">
+      import init, { seed } from "/pkg/r105.js";
+      init().then(() => {
+        console.log(seed("狀 姜 幾 叛 客 參 鑽 搞 筒 冬 明 滲 等 零 願 由 改 儀"));
+      });
+    </script>
+  </body>
+</html>

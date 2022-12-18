@@ -1,0 +1,12 @@
+{
+  "name": "r105",
+  "version": "0.1.0",
+  "files": [
+    "r105_bg.wasm",
+    "r105.js",
+    "r105.d.ts"
+  ],
+  "module": "r105.js",
+  "types": "r105.d.ts",
+  "sideEffects": false
+}

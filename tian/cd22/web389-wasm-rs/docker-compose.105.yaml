@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  box101:
+    build:
+      context: .
+      target: busybox-105-1
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cat <<EOOF > /etc/httpd.conf
+        .wasm:application/wasm
+        EOOF
+        date
+        echo "testing endpoint is http://localhost:8105"
+        busybox httpd -fv -p 3000 -c /etc/httpd.conf -h /www
+    ports:
+      - "8105:3000"

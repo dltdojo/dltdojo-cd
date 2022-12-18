@@ -70,3 +70,30 @@ FROM busybox:1.35.0 AS busybox136
 WORKDIR /www
 COPY --from=builder102 /app/hello-wasm/pkg /www/pkg
 # busybox httpd -fv -p 3000 -c /etc/xxx.conf -h /www
+
+FROM rust:1.66 AS chef-105
+RUN cargo install cargo-chef && cargo install wasm-pack
+RUN rustup target add wasm32-unknown-unknown
+WORKDIR /app
+
+FROM chef-105 AS planner-105
+COPY r105/. .
+RUN cargo chef prepare --recipe-path recipe.json
+
+FROM chef-105 AS builder-105
+COPY --from=planner-105 /app/recipe.json recipe.json
+# Build dependencies - this is the caching Docker layer!
+RUN cargo chef cook --release --target wasm32-unknown-unknown --recipe-path recipe.json
+# Build application
+COPY r105/. .
+RUN wasm-pack build --release --target web
+
+FROM busybox:1.35.0 AS busybox-105-1
+WORKDIR /www
+COPY --from=builder-105 /app/pkg /www/pkg
+COPY --from=builder-105 /app/index.html /www/index.html
+
+FROM busybox:1.35.0 AS busybox-105-2
+WORKDIR /www
+COPY r105/pkg /www/pkg
+COPY r105/index.html /www/index.html

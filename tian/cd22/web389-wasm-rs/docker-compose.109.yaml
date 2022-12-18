@@ -1,0 +1,54 @@
+version: "3.8"
+services:
+  box1091:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cat <<EOOF > /etc/httpd.conf
+        .wasm:application/wasm
+        EOOF
+        date
+        busybox httpd -fv -p 3000 -c /etc/httpd.conf -h /home
+    ports:
+      - "8091:3000"
+    volumes:
+      - ./r105/pkg/r105_bg.wasm:/home/pkg/r105_bg.wasm:ro
+      - ./r105/pkg/r105.js:/home/pkg/r105.js:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.box2.rule=PathPrefix(`/pkg`)"
+      - "traefik.http.routers.box2.entrypoints=web"
+      - "traefik.http.services.box2.loadbalancer.server.port=3000"
+  box1092:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        date
+        sleep 3
+        echo "Testing endpoint is http://localhost:8062"
+        busybox httpd -fv -p 3000 -h /home
+    volumes:
+      - ./r105/index.html:/home/index.html:ro
+    ports:
+      - "8092:3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.box1.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.box1.entrypoints=web"
+      - "traefik.http.services.box1.loadbalancer.server.port=3000"
+  traefik:
+    image: traefik:v2.9
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "8701:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"

@@ -1,0 +1,60 @@
+version: "3.8"
+services:
+  box1061:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        mkdir /home/cgi-bin
+        cat <<\EOOF > /home/cgi-bin/wasm.sh
+        #!/bin/sh
+        if [ ! -z "$${QUERY_STRING:-}" ]; then
+          file=$(echo "$$QUERY_STRING" | sed 's/.*file=\([^&]*\).*/\1/')
+        fi
+        echo "Content-Type: application/wasm"
+        echo "Access-Control-Allow-Origin: *"
+        echo "Cache-Control: no-cache"
+        echo "Cache-Control: max-age=30"
+        echo ""
+        cat /home/$$file
+        EOOF
+        cat /home/cgi-bin/wasm.sh
+        chmod 700 /home/cgi-bin/wasm.sh
+        cat <<\EOOF > /home/cgi-bin/js.sh
+        #!/bin/sh
+        if [ ! -z "$${QUERY_STRING:-}" ]; then
+          file=$(echo "$$QUERY_STRING" | sed 's/.*file=\([^&]*\).*/\1/')
+        fi
+        echo "Content-Type: text/javascript"
+        echo "Access-Control-Allow-Origin: *"
+        echo "Cache-Control: no-cache"
+        echo "Cache-Control: max-age=30"
+        echo ""
+        cat /home/$$file
+        EOOF
+        cat /home/cgi-bin/js.sh
+        chmod 700 /home/cgi-bin/js.sh
+        date
+        sed 's|r105_bg.wasm|/cgi-bin/wasm.sh?file=pkg/r105_bg.wasm|' /home/pkg/r105-tpl.js > /home/pkg/r105.js
+        busybox httpd -fv -p 3000 -h /home
+    ports:
+      - "8061:3000"
+    volumes:
+      - ./r105/pkg/r105_bg.wasm:/home/pkg/r105_bg.wasm:ro
+      - ./r105/pkg/r105.js:/home/pkg/r105-tpl.js:ro
+  box1062:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        date
+        sleep 3
+        sed 's|/pkg/r105.js|http://localhost:8061/cgi-bin/js.sh?file=pkg/r105.js|' /home/index-tpl.html > /home/index.html
+        echo "Testing endpoint is http://localhost:8062"
+        busybox httpd -fv -p 3000 -h /home
+    volumes:
+      - ./r105/index.html:/home/index-tpl.html:ro
+    ports:
+      - "8062:3000"
