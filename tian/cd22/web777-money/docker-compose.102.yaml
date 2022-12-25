@@ -1,0 +1,112 @@
+version: "3.8"
+services:
+  bob101:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        echo "🌽" > /home/corn
+        echo "100" >> /home/corn
+        echo "🐓" > /home/chicken
+        echo "💰" > /home/money
+        echo "200" >> /home/money
+        mkdir /home/cgi-bin
+        cat <<\EOF > /home/cgi-bin/asset
+        #!/bin/sh
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        cat /home/corn
+        cat /home/chicken
+        cat /home/money
+        EOF
+        chmod 700 /home/cgi-bin/asset
+        # [How to parse $QUERY_STRING from a bash CGI script? - Stack Overflow](https://stackoverflow.com/questions/3919755/how-to-parse-query-string-from-a-bash-cgi-script)
+        # Most trivial crack: your.host/your.cgi?rm%20-rf%20%7e <-- this will let your webserver to execute an rm -rf / :-)
+        cat <<\EOF > /home/cgi-bin/update
+        #!/bin/sh
+        eval "$${QUERY_STRING//&/;}"
+        echo $$chicken >> /home/chicken
+        echo $$money >> /home/money
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        cat /home/chicken
+        cat /home/money
+        EOF
+        cat /home/cgi-bin/update
+        chmod 700 /home/cgi-bin/update
+        date
+        echo "Bob Endpoint = http://localhost:8061/cgi-bin/asset"
+        busybox httpd -fv -p 3000 -h /home
+    ports:
+      - "8061:3000"
+  alice101:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        echo "🐓" > /home/chicken
+        echo "10" >> /home/chicken
+        echo "💰" > /home/money
+        echo "100" >> /home/money
+        mkdir /home/cgi-bin
+        cat <<\EOF > /home/cgi-bin/asset
+        #!/bin/sh
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        cat /home/chicken
+        cat /home/money
+        EOF
+        chmod 700 /home/cgi-bin/asset
+        cat <<\EOF > /home/cgi-bin/update
+        #!/bin/sh
+        >&2 echo $$QUERY_STRING
+        eval "$${QUERY_STRING//&/;}"
+        echo $$chicken >> /home/chicken
+        echo $$money >> /home/money
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        cat /home/chicken
+        cat /home/money
+        EOF
+        chmod 700 /home/cgi-bin/update
+        date
+        echo "Alice Endpoint = http://localhost:8071/cgi-bin/asset"
+        busybox httpd -fv -p 3000 -h /home
+    ports:
+      - "8071:3000"
+  exchange101:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        mkdir /home/cgi-bin
+        cat <<\EOF > /home/cgi-bin/exchange
+        #!/bin/sh
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        echo "BOB: list asset"
+        wget -qO- http://bob101:3000/cgi-bin/asset
+        sleep 1
+        echo "Alice: list asset"
+        wget -qO- http://alice101:3000/cgi-bin/asset
+        echo "BOB: 🌽=?🐓"
+        echo "ALICE: 🐓=?🌽"
+        echo "BOB: 🌽=2💰"
+        echo "ALICE: 🐓=10💰"
+        echo "BOB: buy 1🐓=10💰"
+        echo "BOB: update asset"
+        wget -qO- "http://bob101:3000/cgi-bin/update?chicken=+1&money=-10"
+        sleep 1
+        echo "ALICE: update asset"
+        wget -qO- "http://alice101:3000/cgi-bin/update?chicken=-1&money=+10"
+        echo ""
+        EOF
+        chmod 700 /home/cgi-bin/exchange
+        date
+        echo "Exchange Endpoint = http://localhost:8073/cgi-bin/exchange"
+        busybox httpd -fv -p 3000 -h /home
+    ports:
+      - "8073:3000"

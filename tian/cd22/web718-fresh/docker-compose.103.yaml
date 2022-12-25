@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  deno101:
+    image: denoland/deno:1.29.1
+    environment:
+      - DENO_DEPLOYMENT_ID=prod101
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        cd /app
+        deno run -A main.ts &
+        sleep 1
+        echo "Endpoint = http://localhost:8903"
+        wait
+    volumes:
+      - ./d103:/app:ro
+    ports:
+      - 8903:8000

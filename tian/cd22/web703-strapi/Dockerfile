@@ -1,0 +1,19 @@
+# syntax=docker/dockerfile:1.3-labs
+FROM node:18-alpine as web703-build101
+RUN apk update && apk add build-base gcc autoconf automake zlib-dev libpng-dev vips-dev && rm -rf /var/cache/apk/* > /dev/null 2>&1
+WORKDIR /app
+RUN yarn global add @strapi/strapi@v4.5.4 --network-timeout 100000
+RUN yarn create strapi-app app101 --no-run --quickstart
+WORKDIR /app/app101
+RUN strapi install documentation
+
+FROM node:18-alpine as web703-strapi101
+RUN apk add vips-dev git &&  rm -rf /var/cache/apk/*
+WORKDIR /app
+ENV PATH /app/node_modules/.bin:$PATH
+COPY --from=web703-build101 /app/app101 ./
+EXPOSE 1337
+CMD ["strapi", "develop"]
+
+FROM public.ecr.aws/docker/library/alpine:3.17.0 AS web703-githttp101
+RUN apk --no-cache add busybox-extras curl git-daemon lighttpd git-gitweb perl-cgi

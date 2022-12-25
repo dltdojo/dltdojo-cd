@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  deno104:
+    build:
+      context: .
+      target: web718-fresh104
+    environment:
+      - DENO_DEPLOYMENT_ID=prod101
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        cd /app
+        deno run -A main.ts &
+        sleep 1
+        echo "Endpoint = http://localhost:8903"
+        wait
+    volumes:
+      - ./d104:/app:ro
+    ports:
+      - 8903:8000

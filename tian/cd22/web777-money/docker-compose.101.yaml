@@ -1,0 +1,51 @@
+version: "3.8"
+services:
+  exchange101:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        echo "🌽" > /home/corn-bob
+        echo "50" >> /home/corn-bob
+        echo "💰" > /home/money-bob
+        echo "100" >> /home/money-bob
+        echo "🐓" > /home/chicken-bob
+        echo "🐓" > /home/chicken-alice
+        echo "60" >> /home/chicken-alice
+        echo "💰" > /home/money-alice
+        echo "200" >> /home/money-alice
+        mkdir /home/cgi-bin
+        cat <<\EOF > /home/cgi-bin/exchange
+        #!/bin/sh
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        echo "BOB: list asset"
+        cat /home/corn-bob
+        cat /home/money-bob
+        echo "Alice: list asset"
+        cat /home/chicken-alice
+        cat /home/money-alice
+        echo "BOB: 🌽=?🐓"
+        echo "ALICE: 🐓=?🌽"
+        echo "BOB: 🌽=5💰"
+        echo "ALICE: 🐓=10💰"
+        echo "BOB: buy 1🐓=10💰"
+        echo "BOB: update asset"
+        echo "-10" >> /home/money-bob
+        echo "+1" >> /home/chicken-bob
+        cat /home/money-bob
+        cat /home/chicken-bob
+        echo "ALICE: update asset"
+        echo "+10" >> /home/money-alice
+        echo "-1" >> /home/chicken-alice
+        cat /home/money-alice
+        cat /home/chicken-alice
+        echo ""
+        EOF
+        chmod 700 /home/cgi-bin/exchange
+        date
+        echo "Exchange Endpoint = http://localhost:8073/cgi-bin/exchange"
+        busybox httpd -fv -p 3000 -h /home
+    ports:
+      - "8073:3000"

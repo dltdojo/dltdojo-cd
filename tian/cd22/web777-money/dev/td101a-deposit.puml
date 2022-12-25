@@ -1,0 +1,42 @@
+@startuml d101a-deposit
+' https://github.com/mumot1999/sdm-bank/blob/4f32a5298fd8188c5ebcc22e18e980c44ad5a2af/packages/bank-system/docs/usecase.plantuml
+
+!$a  = 0
+
+!procedure $uc($name, $desc)
+!$a = $a + 1
+usecase $name as "UC $a: $desc"
+!endprocedure
+
+skinparam packageStyle rectangle
+actor BANK as bank
+actor ACCOUNT as account
+actor DEPOSIT as deposit
+
+$uc(create_account, "Create account")
+$uc(create_deposit, "Create deposit")
+
+rectangle "Account responsibility" {
+    $uc(get_deposits, "Get deposits")
+    $uc(close_deposit, "Close deposit")
+}
+
+rectangle "Deposit responsibility" {
+    $uc(deposit_end, "Withdraw money")
+}
+
+$uc(get_interest_rates, "Get interest rates")
+
+bank --> create_account
+bank -- create_deposit
+create_account --> account
+create_deposit --> deposit
+account -- create_deposit
+account --> close_deposit
+account --> get_deposits
+get_deposits --> deposit
+close_deposit --> deposit
+deposit --> deposit_end
+
+deposit_end ..> get_interest_rates : include
+@enduml

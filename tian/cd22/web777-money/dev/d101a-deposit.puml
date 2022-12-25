@@ -1,0 +1,17 @@
+@startuml d101a-deposit
+left to right direction
+actor borrower
+actor depositor
+rectangle "Banking System" {
+    usecase make_deposit
+    usecase make_withdraw
+    usecase check_balance
+    usecase make_loan
+}
+depositor --> make_deposit
+depositor --> make_withdraw
+depositor --> check_balance
+borrower --> make_loan
+borrower --> make_withdraw
+borrower --> check_balance
+@enduml

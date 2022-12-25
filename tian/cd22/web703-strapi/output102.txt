@@ -1,0 +1,282 @@
+docker compose -f docker-compose.102.yaml up
+[+] Running 2/0
+ ⠿ Container web703-strapi-strapi102-1   Created                                                                                                         0.1s
+ ⠿ Container web703-strapi-githttp101-1  Created                                                                                                         0.1s
+Attaching to web703-strapi-githttp101-1, web703-strapi-strapi102-1
+web703-strapi-githttp101-1  | HOSTNAME=d7c10ba4e3ad
+web703-strapi-githttp101-1  | SHLVL=1
+web703-strapi-githttp101-1  | HOME=/root
+web703-strapi-githttp101-1  | PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+web703-strapi-githttp101-1  | PWD=/
+web703-strapi-githttp101-1  | uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
+web703-strapi-githttp101-1  | total 40K    
+web703-strapi-githttp101-1  | drwxr-xr-x    7 root     root        4.0K Dec 21 08:11 .
+web703-strapi-githttp101-1  | drwxr-xr-x    3 root     root        4.0K Dec 21 08:11 ..
+web703-strapi-githttp101-1  | -rw-r--r--    1 root     root          23 Dec 21 08:11 HEAD
+web703-strapi-githttp101-1  | drwxr-xr-x    2 root     root        4.0K Dec 21 08:11 branches
+web703-strapi-githttp101-1  | -rw-r--r--    1 root     root          66 Dec 21 08:11 config
+web703-strapi-githttp101-1  | -rw-r--r--    1 root     root          20 Dec 21 08:11 description
+web703-strapi-githttp101-1  | drwxr-xr-x    2 root     root        4.0K Dec 21 08:11 hooks
+web703-strapi-githttp101-1  | drwxr-xr-x    2 root     root        4.0K Dec 21 08:11 info
+web703-strapi-githttp101-1  | drwxr-xr-x    4 root     root        4.0K Dec 21 08:11 objects
+web703-strapi-githttp101-1  | drwxr-xr-x    4 root     root        4.0K Dec 21 08:11 refs
+web703-strapi-githttp101-1  | git instaweb /app/repo/foo to port 1234 and mapping to http://localhost:9080
+web703-strapi-strapi102-1   | NODE_VERSION=18.12.1
+web703-strapi-strapi102-1   | HOSTNAME=9a2f8d89a583
+web703-strapi-strapi102-1   | YARN_VERSION=1.22.19
+web703-strapi-strapi102-1   | SHLVL=2
+web703-strapi-strapi102-1   | HOME=/root
+web703-strapi-strapi102-1   | PATH=/app/node_modules/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+web703-strapi-strapi102-1   | PWD=/app
+web703-strapi-githttp101-1  | No known browser available.
+web703-strapi-githttp101-1  | http://127.0.0.1:1234
+web703-strapi-githttp101-1  | git http push port 80
+web703-strapi-githttp101-1  | 2022-12-21 08:11:48: (server.c.1588) server started (lighttpd/1.4.67)
+web703-strapi-strapi102-1   | total 592K   
+web703-strapi-strapi102-1   | drwxr-xr-x    1 root     root        4.0K Dec 21 05:17 .
+web703-strapi-strapi102-1   | drwxr-xr-x    1 root     root        4.0K Dec 21 08:11 ..
+web703-strapi-strapi102-1   | drwxr-sr-x    5 root     root        4.0K Dec 21 04:16 .cache
+web703-strapi-strapi102-1   | -rw-r--r--    1 root     root         249 Dec 21 03:49 .editorconfig
+web703-strapi-strapi102-1   | -rw-r--r--    1 root     root         214 Dec 21 03:49 .env
+web703-strapi-strapi102-1   | -rw-r--r--    1 root     root         144 Dec 21 03:49 .env.example
+web703-strapi-strapi102-1   | -rw-r--r--    1 root     root          32 Dec 21 03:49 .eslintignore
+web703-strapi-strapi102-1   | -rw-r--r--    1 root     root         541 Dec 21 03:49 .eslintrc
+web703-strapi-strapi102-1   | -rw-r--r--    1 root     root        1.1K Dec 21 03:49 .gitignore
+web703-strapi-strapi102-1   | -rw-------    1 root     root          57 Dec 21 04:16 .strapi-updater.json
+web703-strapi-strapi102-1   | -rw-r--r--    1 root     root        2.2K Dec 21 03:49 README.md
+web703-strapi-strapi102-1   | drwxr-sr-x    2 root     root       20.0K Dec 21 04:16 build
+web703-strapi-strapi102-1   | drwxr-sr-x    2 root     root        4.0K Dec 21 03:49 config
+web703-strapi-strapi102-1   | drwxr-sr-x    3 root     root        4.0K Dec 21 03:49 database
+web703-strapi-strapi102-1   | -rw-r--r--    1 root     root         497 Dec 21 03:49 favicon.png
+web703-strapi-strapi102-1   | drwxr-sr-x  943 root     root       36.0K Dec 21 04:16 node_modules
+web703-strapi-strapi102-1   | -rw-r--r--    1 root     root         698 Dec 21 04:16 package.json
+web703-strapi-strapi102-1   | drwxr-sr-x    3 root     root        4.0K Dec 21 03:49 public
+web703-strapi-strapi102-1   | drwxr-sr-x    5 root     root        4.0K Dec 21 03:49 src
+web703-strapi-strapi102-1   | -rw-r--r--    1 root     root      462.1K Dec 21 04:16 yarn.lock
+web703-strapi-strapi102-1   | [master (root-commit) 05f1d98] init commit
+web703-strapi-strapi102-1   |  22 files changed, 10651 insertions(+)
+web703-strapi-strapi102-1   |  create mode 100644 .editorconfig
+web703-strapi-strapi102-1   |  create mode 100644 .env.example
+web703-strapi-strapi102-1   |  create mode 100644 .eslintignore
+web703-strapi-strapi102-1   |  create mode 100644 .eslintrc
+web703-strapi-strapi102-1   |  create mode 100644 .gitignore
+web703-strapi-strapi102-1   |  create mode 100644 README.md
+web703-strapi-strapi102-1   |  create mode 100644 config/admin.js
+web703-strapi-strapi102-1   |  create mode 100644 config/api.js
+web703-strapi-strapi102-1   |  create mode 100644 config/database.js
+web703-strapi-strapi102-1   |  create mode 100644 config/middlewares.js
+web703-strapi-strapi102-1   |  create mode 100644 config/server.js
+web703-strapi-strapi102-1   |  create mode 100644 database/migrations/.gitkeep
+web703-strapi-strapi102-1   |  create mode 100644 favicon.png
+web703-strapi-strapi102-1   |  create mode 100644 package.json
+web703-strapi-strapi102-1   |  create mode 100644 public/robots.txt
+web703-strapi-strapi102-1   |  create mode 100644 public/uploads/.gitkeep
+web703-strapi-strapi102-1   |  create mode 100644 src/admin/app.example.js
+web703-strapi-strapi102-1   |  create mode 100644 src/admin/webpack.config.example.js
+web703-strapi-strapi102-1   |  create mode 100644 src/api/.gitkeep
+web703-strapi-strapi102-1   |  create mode 100644 src/extensions/.gitkeep
+web703-strapi-strapi102-1   |  create mode 100644 src/index.js
+web703-strapi-strapi102-1   |  create mode 100644 yarn.lock
+web703-strapi-strapi102-1   | fatal: the requested upstream branch 'upstream101/master' does not exist
+web703-strapi-strapi102-1   | hint: 
+web703-strapi-strapi102-1   | hint: If you are planning on basing your work on an upstream
+web703-strapi-strapi102-1   | hint: branch that already exists at the remote, you may need to
+web703-strapi-strapi102-1   | hint: run "git fetch" to retrieve it.
+web703-strapi-strapi102-1   | hint: 
+web703-strapi-strapi102-1   | hint: If you are planning to push out a new local branch that
+web703-strapi-strapi102-1   | hint: will track its remote counterpart, you may want to use
+web703-strapi-strapi102-1   | hint: "git push -u" to set the upstream config as you push.
+web703-strapi-strapi102-1   | hint: Disable this message with "git config advice.setUpstreamFailure false"
+web703-strapi-strapi102-1   | upstream101       http://githttp101:80/git/foo (fetch)
+web703-strapi-strapi102-1   | upstream101       http://githttp101:80/git/foo (push)
+web703-strapi-strapi102-1   | There is no tracking information for the current branch.
+web703-strapi-strapi102-1   | Please specify which branch you want to merge with.
+web703-strapi-strapi102-1   | See git-pull(1) for details.
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   |     git pull <remote> <branch>
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   | If you wish to set tracking information for this branch you can do so with:
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   |     git branch --set-upstream-to=upstream101/<branch> master
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   | To http://githttp101:80/git/foo
+web703-strapi-strapi102-1   |  * [new branch]      master -> master
+web703-strapi-strapi102-1   | branch 'master' set up to track 'upstream101/master'.
+web703-strapi-strapi102-1   | yarn run v1.22.19
+web703-strapi-strapi102-1   | $ strapi develop
+web703-strapi-strapi102-1   | [2022-12-21 08:12:03.464] info: The Users & Permissions plugin automatically generated a jwt secret and stored it in .env under the name JWT_SECRET.
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   |  Project information
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   | ┌────────────────────┬──────────────────────────────────────────────────┐
+web703-strapi-strapi102-1   | │ Time               │ Wed Dec 21 2022 08:12:05 GMT+0000 (Coordinated … │
+web703-strapi-strapi102-1   | │ Launched in        │ 3964 ms                                          │
+web703-strapi-strapi102-1   | │ Environment        │ development                                      │
+web703-strapi-strapi102-1   | │ Process PID        │ 64                                               │
+web703-strapi-strapi102-1   | │ Version            │ 4.5.4 (node v18.12.1)                            │
+web703-strapi-strapi102-1   | │ Edition            │ Community                                        │
+web703-strapi-strapi102-1   | └────────────────────┴──────────────────────────────────────────────────┘
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   |  Actions available
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   | One more thing...
+web703-strapi-strapi102-1   | Create your first administrator 💻 by going to the administration panel at:
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   | ┌─────────────────────────────┐
+web703-strapi-strapi102-1   | │ http://localhost:1337/admin │
+web703-strapi-strapi102-1   | └─────────────────────────────┘
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   | ?? src/extensions/documentation/
+web703-strapi-strapi102-1   | ?? src/extensions/email/
+web703-strapi-strapi102-1   | ?? src/extensions/upload/
+web703-strapi-strapi102-1   | ?? src/extensions/users-permissions/
+web703-strapi-strapi102-1   | [master ce8d3f1] commit something
+web703-strapi-strapi102-1   |  4 files changed, 15670 insertions(+)
+web703-strapi-strapi102-1   |  create mode 100644 src/extensions/documentation/documentation/1.0.0/full_documentation.json
+web703-strapi-strapi102-1   |  create mode 100644 src/extensions/email/documentation/1.0.0/email.json
+web703-strapi-strapi102-1   |  create mode 100644 src/extensions/upload/documentation/1.0.0/upload.json
+web703-strapi-strapi102-1   |  create mode 100644 src/extensions/users-permissions/documentation/1.0.0/users-permissions.json
+web703-strapi-strapi102-1   | To http://githttp101:80/git/foo
+web703-strapi-strapi102-1   |    05f1d98..ce8d3f1  master -> master
+web703-strapi-strapi102-1   | branch 'master' set up to track 'upstream101/master'.
+web703-strapi-strapi102-1   | [2022-12-21 08:13:30.817] http: GET index.html (22 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:13:30.870] http: GET /assets/images/logo_login.png (19 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:13:30.871] http: GET /assets/images/group_people_1.png (10 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:13:30.873] http: GET /assets/images/group_people_2.png (9 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:13:30.875] http: GET /assets/images/group_people_3.png (8 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:13:32.193] http: GET /admin (1 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:13:32.457] http: GET /admin/project-type (1 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:13:32.551] http: GET /admin/init (3 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:13:32.808] http: GET /admin/telemetry-properties (2 ms) 401
+web703-strapi-strapi102-1   | [2022-12-21 08:13:39.804] http: POST /admin/register-admin (127 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:13:43.469] http: GET /admin/information (26 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:13:43.496] http: GET /admin/users/me/permissions (49 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:13:43.513] http: GET /admin/users/me (63 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:13:43.532] http: GET /i18n/locales (15 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:13:43.590] http: GET /content-manager/components (7 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:13:43.603] http: GET /content-manager/content-types (9 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:13:46.694] http: GET /content-type-builder/components (10 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:13:46.709] http: GET /content-type-builder/content-types (11 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:13:46.722] http: GET /content-type-builder/reserved-names (8 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:14:06.572] info: File created: /app/src/api/student/content-types/student/schema.json
+web703-strapi-strapi102-1   | [2022-12-21 08:14:06.574] info: File created: /app/src/api/student/controllers/student.js
+web703-strapi-strapi102-1   | [2022-12-21 08:14:06.578] info: File created: /app/src/api/student/services/student.js
+web703-strapi-strapi102-1   | [2022-12-21 08:14:06.581] info: File created: /app/src/api/student/routes/student.js
+web703-strapi-strapi102-1   | [2022-12-21 08:14:06.583] info: File changed: /app/src/api/student/routes/student.js
+web703-strapi-strapi102-1   | [2022-12-21 08:14:06.583] info: File changed: /app/src/api/student/content-types/student/schema.json
+web703-strapi-strapi102-1   | [2022-12-21 08:14:07.129] http: POST /content-type-builder/content-types (974 ms) 201
+web703-strapi-strapi102-1   | The server is restarting
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   | ?? src/api/student/
+web703-strapi-strapi102-1   | [master b1efb25] commit something
+web703-strapi-strapi102-1   |  4 files changed, 45 insertions(+)
+web703-strapi-strapi102-1   |  create mode 100644 src/api/student/content-types/student/schema.json
+web703-strapi-strapi102-1   |  create mode 100644 src/api/student/controllers/student.js
+web703-strapi-strapi102-1   |  create mode 100644 src/api/student/routes/student.js
+web703-strapi-strapi102-1   |  create mode 100644 src/api/student/services/student.js
+web703-strapi-strapi102-1   | To http://githttp101:80/git/foo
+web703-strapi-strapi102-1   |    ce8d3f1..b1efb25  master -> master
+web703-strapi-strapi102-1   | branch 'master' set up to track 'upstream101/master'.
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   |  Project information
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   | ┌────────────────────┬──────────────────────────────────────────────────┐
+web703-strapi-strapi102-1   | │ Time               │ Wed Dec 21 2022 08:14:10 GMT+0000 (Coordinated … │
+web703-strapi-strapi102-1   | │ Launched in        │ 1290 ms                                          │
+web703-strapi-strapi102-1   | │ Environment        │ development                                      │
+web703-strapi-strapi102-1   | │ Process PID        │ 140                                              │
+web703-strapi-strapi102-1   | │ Version            │ 4.5.4 (node v18.12.1)                            │
+web703-strapi-strapi102-1   | │ Edition            │ Community                                        │
+web703-strapi-strapi102-1   | └────────────────────┴──────────────────────────────────────────────────┘
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   |  Actions available
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   | Welcome back!
+web703-strapi-strapi102-1   | To manage your project 🚀, go to the administration panel at:
+web703-strapi-strapi102-1   | http://localhost:1337/admin
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   | To access the server ⚡️, go to:
+web703-strapi-strapi102-1   | http://localhost:1337
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   | [2022-12-21 08:14:10.313] http: HEAD /_health (22 ms) 204
+web703-strapi-strapi102-1   | [2022-12-21 08:14:10.357] http: GET /admin/users/me/permissions (31 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:14:10.391] http: GET /i18n/locales (25 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:14:10.418] http: GET /content-type-builder/content-types (16 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:14:10.436] http: GET /content-type-builder/components (12 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:14:10.447] http: GET /content-type-builder/reserved-names (8 ms) 200
+web703-strapi-strapi102-1   |  M src/extensions/documentation/documentation/1.0.0/full_documentation.json
+web703-strapi-strapi102-1   | ?? src/api/student/documentation/
+web703-strapi-strapi102-1   | [master f479e61] commit something
+web703-strapi-strapi102-1   |  2 files changed, 7622 insertions(+), 5298 deletions(-)
+web703-strapi-strapi102-1   |  create mode 100644 src/api/student/documentation/1.0.0/student.json
+web703-strapi-strapi102-1   | To http://githttp101:80/git/foo
+web703-strapi-strapi102-1   |    b1efb25..f479e61  master -> master
+web703-strapi-strapi102-1   | branch 'master' set up to track 'upstream101/master'.
+web703-strapi-strapi102-1   | [2022-12-21 08:14:50.956] http: GET /admin/highlight.js.27913b14.chunk.js (2 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:14:51.008] http: GET /content-manager/components (17 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:14:51.034] http: GET /content-manager/content-types (18 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:14:51.066] http: GET /content-manager/content-types-settings (23 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:14:51.115] http: GET /content-manager/content-types/api::student.student/configuration (17 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:14:51.177] http: GET /content-manager/collection-types/api::student.student?page=1&pageSize=10&sort=name:ASC (16 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:14:53.458] http: GET /content-manager/content-types/plugin::users-permissions.user/configuration (11 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:14:53.528] http: GET /content-manager/collection-types/plugin::users-permissions.user?page=1&pageSize=10&sort=username:ASC (16 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:14:54.037] http: GET /content-manager/collection-types/api::student.student?page=1&pageSize=10&sort=name:ASC (13 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:15:00.641] http: POST /content-manager/collection-types/api::student.student (44 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:15:00.722] http: GET /content-manager/collection-types/api::student.student/1 (17 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:15:03.065] http: GET /content-manager/collection-types/api::student.student/1/actions/numberOfDraftRelations (14 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:15:03.128] http: POST /content-manager/collection-types/api::student.student/1/actions/publish (31 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:15:07.883] http: GET /content-manager/collection-types/api::student.student?page=1&pageSize=10&sort=name:ASC (16 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:17:52.018] http: GET /content-manager/collection-types/api::student.student/1 (15 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:17:54.604] http: GET /content-type-builder/components (8 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:17:54.622] http: GET /content-type-builder/content-types (13 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:17:54.636] http: GET /content-type-builder/reserved-names (10 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:18:13.742] info: File changed: /app/src/api/student/content-types/student/schema.json
+web703-strapi-strapi102-1   | [2022-12-21 08:18:13.743] http: PUT /content-type-builder/content-types/api::student.student (43 ms) 201
+web703-strapi-strapi102-1   | The server is restarting
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   |  Project information
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   | ┌────────────────────┬──────────────────────────────────────────────────┐
+web703-strapi-strapi102-1   | │ Time               │ Wed Dec 21 2022 08:18:16 GMT+0000 (Coordinated … │
+web703-strapi-strapi102-1   | │ Launched in        │ 1257 ms                                          │
+web703-strapi-strapi102-1   | │ Environment        │ development                                      │
+web703-strapi-strapi102-1   | │ Process PID        │ 229                                              │
+web703-strapi-strapi102-1   | │ Version            │ 4.5.4 (node v18.12.1)                            │
+web703-strapi-strapi102-1   | │ Edition            │ Community                                        │
+web703-strapi-strapi102-1   | └────────────────────┴──────────────────────────────────────────────────┘
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   |  Actions available
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   | Welcome back!
+web703-strapi-strapi102-1   | To manage your project 🚀, go to the administration panel at:
+web703-strapi-strapi102-1   | http://localhost:1337/admin
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   | To access the server ⚡️, go to:
+web703-strapi-strapi102-1   | http://localhost:1337
+web703-strapi-strapi102-1   | 
+web703-strapi-strapi102-1   | [2022-12-21 08:18:16.749] http: HEAD /_health (14 ms) 204
+web703-strapi-strapi102-1   | [2022-12-21 08:18:16.796] http: GET /admin/users/me/permissions (33 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:18:16.828] http: GET /i18n/locales (21 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:18:16.850] http: GET /content-type-builder/components (10 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:18:16.868] http: GET /content-type-builder/content-types (12 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:18:16.882] http: GET /content-type-builder/reserved-names (11 ms) 200
+web703-strapi-strapi102-1   |  M src/api/student/content-types/student/schema.json
+web703-strapi-strapi102-1   |  M src/extensions/documentation/documentation/1.0.0/full_documentation.json
+web703-strapi-strapi102-1   | [master cdb9a89] commit something
+web703-strapi-strapi102-1   |  2 files changed, 21 insertions(+), 2 deletions(-)
+web703-strapi-strapi102-1   | To http://githttp101:80/git/foo
+web703-strapi-strapi102-1   |    f479e61..cdb9a89  master -> master
+web703-strapi-strapi102-1   | branch 'master' set up to track 'upstream101/master'.
+web703-strapi-strapi102-1   | [2022-12-21 08:18:37.927] http: GET /content-manager/components (13 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:18:37.944] http: GET /content-manager/content-types (13 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:18:37.969] http: GET /content-manager/content-types-settings (17 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:18:38.002] http: GET /content-manager/content-types/api::student.student/configuration (9 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:18:38.066] http: GET /content-manager/collection-types/api::student.student?page=1&pageSize=10&sort=name:ASC (22 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:18:40.595] http: GET /content-manager/collection-types/api::student.student/1 (25 ms) 200
+web703-strapi-strapi102-1   | [2022-12-21 08:18:48.012] http: PUT /content-manager/collection-types/api::student.student/1 (49 ms) 200
+^CGracefully stopping... (press Ctrl+C again to force)
+[+] Running 2/2
+ ⠿ Container web703-strapi-strapi102-1   Stopped                                                                                                        10.5s
+ ⠿ Container web703-strapi-githttp101-1  Stopped                                                                                                        10.4s
+canceled

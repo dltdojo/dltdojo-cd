@@ -1,0 +1,41 @@
+version: "3.8"
+services:
+  strapi101:
+    build:
+      context: .
+      target: web703-strapi101
+    command: 
+      - /bin/sh
+      - -c
+      - |
+        env
+        ls -lah /app
+        yarn develop
+    ports:
+      - "1337:1337"
+  box101:
+    image: busybox:1.35.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        echo "🌽" > /home/corn-bob
+        echo "50" >> /home/corn-bob
+        echo "💰" > /home/money-bob
+        echo "100" >> /home/money-bob
+        mkdir /home/cgi-bin
+        cat <<\EOF > /home/cgi-bin/api
+        #!/bin/sh
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        echo "BOB: list asset"
+        cat /home/corn-bob
+        cat /home/money-bob
+        echo ""
+        EOF
+        chmod 700 /home/cgi-bin/api
+        date
+        echo "Testing Endpoint is http://localhost:8075/cgi-bin/api"
+        busybox httpd -fv -p 3000 -h /home
+    ports:
+      - "8075:3000"

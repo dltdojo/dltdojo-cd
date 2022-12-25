@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" height="428px" preserveAspectRatio="none" style="width:718px;height:428px;background:#FFFFFF;" version="1.1" viewBox="0 0 718 428" width="718px" zoomAndPan="magnify"><defs/><g><!--MD5=[73a01186ee24d75772f5c9f546a2fc16]
+cluster Medium of exchange💰--><g id="cluster_Medium of exchange&#128176;"><rect fill="none" height="324" rx="5" ry="5" style="stroke:#181818;stroke-width:2.0;" width="370" x="336" y="23"/><text fill="#000000" font-family="sans-serif" font-size="28" font-weight="bold" lengthAdjust="spacing" textLength="316.875" x="362.5625" y="59.4799">Medium of exchange&#128176;</text></g><g id="elem_exchange101"><ellipse cx="520.5948" cy="136.7176" fill="#FFFF00" rx="152.5948" ry="35.7176" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="28" lengthAdjust="spacing" textLength="176" x="426.5948" y="147.4575">exchange101</text></g><g id="elem_exchange201"><ellipse cx="520.5948" cy="278.7176" fill="#0000FF" rx="152.5948" ry="35.7176" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="28" lengthAdjust="spacing" textLength="176" x="426.5948" y="289.4575">exchange201</text></g><!--MD5=[8e36e8bcb951c7385246966ef326582c]
+entity bob--><g id="elem_bob"><ellipse cx="46" cy="28" fill="#FF0000" rx="16" ry="16" style="stroke:#181818;stroke-width:1.0;"/><path d="M46,44 L46,98 M20,60 L72,60 M46,98 L20,128 M46,98 L72,128 " fill="none" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="28" lengthAdjust="spacing" textLength="68" x="12" y="163.4799">&#127805;&#127815;</text></g><!--MD5=[f152b445e5bcee5e5394952cb1476aeb]
+entity alice--><g id="elem_alice"><ellipse cx="46" cy="262" fill="#008000" rx="16" ry="16" style="stroke:#181818;stroke-width:1.0;"/><path d="M46,278 L46,332 M20,294 L72,294 M46,332 L20,362 M46,332 L72,362 " fill="none" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="28" lengthAdjust="spacing" textLength="68" x="12" y="397.4799">&#128019;&#128004;</text></g><!--MD5=[b1c14dd16d2dddaf1a05bb7f7d9b5c69]
+link bob to exchange101--><g id="link_bob_exchange101"><path d="M80.4,91.8 C129.06,93.24 223.84,96.86 304,105 C330.02,107.64 357.7,111.2 384.26,114.98 " fill="none" id="bob-to-exchange101" style="stroke:#181818;stroke-width:2.0;"/><polygon fill="#181818" points="394.76,116.5,378.085,106.0146,384.8622,115.0738,375.803,121.8511,394.76,116.5" style="stroke:#181818;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="26" lengthAdjust="spacing" textLength="154" x="145" y="87.16">&#127805;&#127815;=?&#128019;&#128004;</text></g><!--MD5=[d5c75cebf3403a710c97cb8792e9c79f]
+link alice to exchange101--><g id="link_alice_exchange101"><path d="M80.46,328.54 C134.48,332.46 242.92,331.84 304,273 C325.74,252.06 299.76,229.4 320,207 C338.26,186.8 362.72,172.44 388.22,162.2 " fill="none" id="alice-to-exchange101" style="stroke:#181818;stroke-width:2.0;"/><polygon fill="#181818" points="397.64,158.62,377.9729,157.522,388.2897,162.1657,383.646,172.4825,397.64,158.62" style="stroke:#181818;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="26" lengthAdjust="spacing" textLength="154" x="145" y="265.16">&#128019;&#128004;=?&#127805;&#127815;</text></g><!--MD5=[1e81511a69bb799dad22c6588a674495]
+link bob to exchange201--><g id="link_bob_exchange201"><path d="M80.18,119.94 C97.04,133.9 118.6,149.96 140,161 C187.12,185.3 314.56,223.04 408.7,249.26 " fill="none" id="bob-to-exchange201" style="stroke:#181818;stroke-width:2.0;"/><polygon fill="#181818" points="418.86,252.08,403.6368,239.5799,409.2203,249.4198,399.3804,255.0034,418.86,252.08" style="stroke:#181818;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="26" lengthAdjust="spacing" textLength="160" x="142" y="153.16">&#127805;&#127815;=3.14&#128176;</text></g><!--MD5=[e73567926342e142288662f4ea77ddc8]
+link alice to exchange201--><g id="link_alice_exchange201"><path d="M80.82,357.3 C97.18,371.16 118.12,385.8 140,393 C209.22,415.82 233.26,410.6 304,393 C361.42,378.72 420.36,345.96 461.96,319.2 " fill="none" id="alice-to-exchange201" style="stroke:#181818;stroke-width:2.0;"/><polygon fill="#181818" points="470.58,313.58,451.1322,316.7079,462.2028,319.0409,459.8697,330.1115,470.58,313.58" style="stroke:#181818;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="26" lengthAdjust="spacing" textLength="160" x="142" y="385.16">&#128019;&#128004;=6.89&#128176;</text></g><!--MD5=[d7e5c7c2f68d501c8eb0bfddcbf14dc7]
+@startuml d101-exchange
+left to right direction
+scale 2
+actor bob as "🌽🍇" #red
+actor alice as "🐓🐄" #green
+rectangle "Medium of exchange💰" {
+    usecase exchange101 #yellow
+    usecase exchange201 #blue
+}
+bob - -> exchange101 : "🌽🍇=?🐓🐄"
+alice - -> exchange101 : "🐓🐄=?🌽🍇"
+bob - -> exchange201 : "🌽🍇=3.14💰"
+alice - -> exchange201 : "🐓🐄=6.89💰"
+@enduml
+
+PlantUML version 1.2022.7(Tue Aug 23 01:01:30 CST 2022)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: zh
+Country: TW
+--></g></svg>

@@ -1,0 +1,14 @@
+@startuml d101-exchange
+left to right direction
+scale 2
+actor bob as "🌽🍇" #red
+actor alice as "🐓🐄" #green
+rectangle "Medium of exchange💰" {
+    usecase exchange101 #yellow
+    usecase exchange201 #blue
+}
+bob --> exchange101 : "🌽🍇=?🐓🐄"
+alice --> exchange101 : "🐓🐄=?🌽🍇"
+bob --> exchange201 : "🌽🍇=3.14💰"
+alice --> exchange201 : "🐓🐄=6.89💰"
+@enduml

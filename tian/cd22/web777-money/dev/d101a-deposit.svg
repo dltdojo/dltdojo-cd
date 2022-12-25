@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" height="862px" preserveAspectRatio="none" style="width:640px;height:862px;background:#FFFFFF;" version="1.1" viewBox="0 0 640 862" width="640px" zoomAndPan="magnify"><defs/><g><!--MD5=[f003f3b5eb60c06bab7c98d3aff298d5]
+cluster Account responsibility--><g id="cluster_Account responsibility"><rect fill="none" height="96" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:1.0;" width="423" x="7" y="376.5"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="153" x="142" y="394.7399">Account responsibility</text></g><!--MD5=[d18b055aab58064b8355a9356a6538d0]
+cluster Deposit responsibility--><g id="cluster_Deposit responsibility"><rect fill="none" height="99" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:1.0;" width="230" x="209" y="646.5"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="150" x="249" y="664.7399">Deposit responsibility</text></g><g id="elem_get_deposits"><ellipse cx="110.9653" cy="435.9931" fill="#F1F1F1" rx="87.9653" ry="19.9931" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="120" x="47.9653" y="441.363">UC 3: Get deposits</text></g><g id="elem_close_deposit"><ellipse cx="324.213" cy="435.9426" fill="#F1F1F1" rx="90.213" ry="20.4426" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="126" x="258.213" y="441.3126">UC 4: Close deposit</text></g><g id="elem_deposit_end"><ellipse cx="323.8077" cy="707.6615" fill="#F1F1F1" rx="98.8077" ry="22.1615" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="148" x="246.8077" y="713.0315">UC 5: Withdraw money</text></g><!--MD5=[7e4c127a05bd27e533c47e139fcb3c25]
+entity bank--><g id="elem_bank"><ellipse cx="465" cy="14" fill="#F1F1F1" rx="8" ry="8" style="stroke:#181818;stroke-width:0.5;"/><path d="M465,22 L465,49 M452,30 L478,30 M465,49 L452,64 M465,49 L478,64 " fill="none" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="37" x="446.5" y="81.7399">BANK</text></g><!--MD5=[5efd806f285230177069469d847ad47a]
+entity account--><g id="elem_account"><ellipse cx="330" cy="258" fill="#F1F1F1" rx="8" ry="8" style="stroke:#181818;stroke-width:0.5;"/><path d="M330,266 L330,293 M317,274 L343,274 M330,293 L317,308 M330,293 L343,308 " fill="none" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="65" x="297.5" y="325.7399">ACCOUNT</text></g><!--MD5=[2a4654f26658b4032a4c864dd31888cc]
+entity deposit--><g id="elem_deposit"><ellipse cx="324" cy="528" fill="#F1F1F1" rx="8" ry="8" style="stroke:#181818;stroke-width:0.5;"/><path d="M324,536 L324,563 M311,544 L337,544 M324,563 L311,578 M324,563 L337,578 " fill="none" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="57" x="295.5" y="595.7399">DEPOSIT</text></g><g id="elem_create_account"><ellipse cx="383.0555" cy="167.7111" fill="#F1F1F1" rx="94.0555" ry="21.2111" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="136" x="312.0555" y="173.0811">UC 1: Create account</text></g><g id="elem_create_deposit"><ellipse cx="541.8908" cy="435.9782" fill="#F1F1F1" rx="92.8908" ry="20.9782" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="133" x="472.3908" y="441.3481">UC 2: Create deposit</text></g><g id="elem_get_interest_rates"><ellipse cx="324.1132" cy="833.8226" fill="#F1F1F1" rx="99.6132" ry="22.3226" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="150" x="246.1132" y="839.1926">UC 6: Get interest rates</text></g><!--MD5=[030504125822bfdaa34b0c34ab31d7b2]
+link bank to create_account--><g id="link_bank_create_account"><path d="M446.39,73.73 C432.34,94.3 413.21,122.29 399.65,142.13 " fill="none" id="bank-to-create_account" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="396.68,146.48,405.0544,141.2964,399.4962,142.3486,398.4441,136.7904,396.68,146.48" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[23eebfb4d7f04749f643b9894dd7ece0]
+link bank to create_deposit--><g id="link_bank_create_deposit"><path d="M478.02,85.61 C483.79,103.95 490.32,126.19 495,146.5 C517.96,246.14 533.89,367.66 539.64,414.89 " fill="none" id="bank-create_deposit" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[c5e2b66a6505e2a769fc34df7dd4c494]
+link create_account to account--><g id="link_create_account_account"><path d="M374.13,188.59 C367.39,203.84 357.87,225.39 349.4,244.58 " fill="none" id="create_account-to-account" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="347.27,249.4,354.5594,242.7769,349.2861,244.8245,347.2385,239.5512,347.27,249.4" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[1fd597144b335b13f81fb4443bc5c799]
+link create_deposit to deposit--><g id="link_create_deposit_deposit"><path d="M508.42,455.72 C467.44,478.55 398.58,516.93 357.6,539.77 " fill="none" id="create_deposit-to-deposit" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="352.75,542.48,362.5565,541.5677,357.1113,540.0348,358.6442,534.5896,352.75,542.48" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[7ceee336fd315bfb53e6c4b900faea78]
+link account to create_deposit--><g id="link_account_create_deposit"><path d="M362.66,312.76 C404.13,341.02 474.96,389.3 514.04,415.94 " fill="none" id="account-create_deposit" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[fb6176d2f39869dfa39b4d15bb118ef7]
+link account to close_deposit--><g id="link_account_close_deposit"><path d="M328.38,329.6 C327.31,355.29 325.95,388.12 325.03,410.26 " fill="none" id="account-to-close_deposit" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="324.82,415.37,329.2017,406.5495,325.0341,410.3746,321.209,406.207,324.82,415.37" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[e4378f366a43e528fcabecc14fb1ac57]
+link account to get_deposits--><g id="link_account_get_deposits"><path d="M297.21,312.13 C255.54,339.63 184.07,386.79 142.84,413.99 " fill="none" id="account-to-get_deposits" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="138.46,416.88,148.1738,415.2544,142.6312,414.123,143.7626,408.5804,138.46,416.88" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[d8858d9a62467650b042f58ec450fe0e]
+link get_deposits to deposit--><g id="link_get_deposits_deposit"><path d="M142.43,454.93 C182.02,477.51 249.76,516.15 290.36,539.31 " fill="none" id="get_deposits-to-deposit" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="295.18,542.06,289.3363,534.1321,290.8344,539.587,285.3795,541.0851,295.18,542.06" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[e39fd0bd420d72df798d49f7fd231349]
+link close_deposit to deposit--><g id="link_close_deposit_deposit"><path d="M324,456.52 C324,472.04 324,494.35 324,514.15 " fill="none" id="close_deposit-to-deposit" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="324,519.39,328,510.39,324,514.39,320,510.39,324,519.39" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[bee88a0b486efdf4231b7276ed247196]
+link deposit to deposit_end--><g id="link_deposit_deposit_end"><path d="M324,599.63 C324,625.12 324,657.69 324,680.14 " fill="none" id="deposit-to-deposit_end" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="324,685.34,328,676.34,324,680.34,320,676.34,324,685.34" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[641d62197f0221bc9496c7c09c78f5af]
+link deposit_end to get_interest_rates--><g id="link_deposit_end_get_interest_rates"><path d="M324,729.62 C324,750.78 324,783.4 324,806.33 " fill="none" id="deposit_end-to-get_interest_rates" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="324,811.36,328,802.36,324,806.36,320,802.36,324,811.36" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="46" x="325" y="777.58">include</text></g><!--MD5=[7949f2befd172176432a95c6ce45325c]
+@startuml d101a-deposit
+' https://github.com/mumot1999/sdm-bank/blob/4f32a5298fd8188c5ebcc22e18e980c44ad5a2af/packages/bank-system/docs/usecase.plantuml
+
+!$a  = 0
+
+!procedure $uc($name, $desc)
+!$a = $a + 1
+usecase $name as "UC $a: $desc"
+!endprocedure
+
+skinparam packageStyle rectangle
+actor BANK as bank
+actor ACCOUNT as account
+actor DEPOSIT as deposit
+
+$uc(create_account, "Create account")
+$uc(create_deposit, "Create deposit")
+
+rectangle "Account responsibility" {
+    $uc(get_deposits, "Get deposits")
+    $uc(close_deposit, "Close deposit")
+}
+
+rectangle "Deposit responsibility" {
+    $uc(deposit_end, "Withdraw money")
+}
+
+$uc(get_interest_rates, "Get interest rates")
+
+bank - -> create_account
+bank - - create_deposit
+create_account - -> account
+create_deposit - -> deposit
+account - - create_deposit
+account - -> close_deposit
+account - -> get_deposits
+get_deposits - -> deposit
+close_deposit - -> deposit
+deposit - -> deposit_end
+
+deposit_end ..> get_interest_rates : include
+@enduml
+
+@startuml d101a-deposit
+
+
+
+skinparam packageStyle rectangle
+actor BANK as bank
+actor ACCOUNT as account
+actor DEPOSIT as deposit
+
+usecase create_account as "UC 1: Create account"
+usecase create_deposit as "UC 2: Create deposit"
+
+rectangle "Account responsibility" {
+    usecase get_deposits as "UC 3: Get deposits"
+    usecase close_deposit as "UC 4: Close deposit"
+}
+
+rectangle "Deposit responsibility" {
+    usecase deposit_end as "UC 5: Withdraw money"
+}
+
+usecase get_interest_rates as "UC 6: Get interest rates"
+
+bank - -> create_account
+bank - - create_deposit
+create_account - -> account
+create_deposit - -> deposit
+account - - create_deposit
+account - -> close_deposit
+account - -> get_deposits
+get_deposits - -> deposit
+close_deposit - -> deposit
+deposit - -> deposit_end
+
+deposit_end ..> get_interest_rates : include
+@enduml
+
+PlantUML version 1.2022.7(Tue Aug 23 01:01:30 CST 2022)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: zh
+Country: TW
+--></g></svg>

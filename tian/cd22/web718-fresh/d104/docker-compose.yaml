@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+  deno101:
+    # image: denoland/deno:1.29.1
+    build: .
+    environment:
+      - DENO_DEPLOYMENT_ID=prod101
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        cd /app
+        deno run --allow-net=0.0.0.0:8000 \
+        --allow-env=DENO_DEPLOYMENT_ID \
+        --allow-read=/app --allow-write=/root/.cache,/tmp \
+        --allow-run=/bin/deno,/root/.cache/esbuild/bin/esbuild-linux-64@0.14.51 \
+        main.ts &
+        sleep 1
+        echo "Endpoint = http://localhost:8903"
+        wait
+    volumes:
+      - .:/app:ro
+    ports:
+      - 8903:8000

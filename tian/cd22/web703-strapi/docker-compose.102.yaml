@@ -1,0 +1,80 @@
+version: "3.8"
+services:
+  strapi102:
+    build:
+      context: .
+      target: web703-strapi101
+    command: 
+      - /bin/sh
+      - -c
+      - |
+        env
+        sleep 10
+        ls -lah /app
+        git config --global user.email "foo1001@testing.local"
+        git config --global user.name "FooName1001"
+        cd /app
+        git init -q
+        git remote add upstream101 http://githttp101:80/git/foo
+        git remote -v
+        git add . && git commit -m 'init commit'
+        git pull
+        git push --set-upstream upstream101 master
+        strapi develop &
+        while true
+        do
+          if [ -n "$(git status --porcelain)" ]; then
+            git status --porcelain
+            git add .
+            git commit -m 'commit something'
+            git push --set-upstream upstream101 master
+          fi
+          sleep 10
+        done
+    ports:
+      - "1337:1337"
+  githttp101:
+    build:
+      context: .
+      target: web703-githttp101
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        env
+        id
+        mkdir -p /app/repo/foo
+        git config --system http.receivepack true
+        git config --system http.uploadpack true
+        git config --system user.email "gitserver@dev.local"
+        git config --system user.name "Git Server"
+        git config --global user.email "you@example.com"
+        git config --global user.name "Your Name"
+        mkdir -p /app/repo/foo; cd /app/repo/foo &&  git init --bare -q && echo "strapi project 1234" > description
+        cd /app/repo/foo
+        ls -alh
+        git branch
+        #
+        # https://github.com/ryan0x44/local-git-server
+        # NOTE: docker compose escape $$ 
+        #
+        cat <<\EOF > /etc/lighttpd/lighttpd.conf
+        server.document-root = "/app/repo"
+        server.modules += ( "mod_alias", "mod_cgi", "mod_setenv" )
+        $$HTTP["host"] =~ "" { 
+          alias.url += ( "/git" => "/usr/libexec/git-core/git-http-backend")
+          $$HTTP["url"] =~ "^/git" {
+            cgi.assign = ( "" => "" )
+            setenv.add-environment = (
+              "GIT_PROJECT_ROOT" => "/app/repo",
+              "GIT_HTTP_EXPORT_ALL" => "1"
+            )
+          }
+        }
+        EOF
+        echo "git instaweb /app/repo/foo to port 1234 and mapping to http://localhost:9080"
+        cd /app/repo/foo &&  git instaweb
+        echo "git http push port 80"
+        lighttpd -D -f /etc/lighttpd/lighttpd.conf
+    ports:
+      - 9080:1234
