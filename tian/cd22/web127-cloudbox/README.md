@@ -42,7 +42,7 @@ cat <<"ENND" > /home/cgi-bin/sed
 eval "${QUERY_STRING//&/;}"
 echo "Content-type: text/plain; charset=utf-8"
 echo ""
-echo -n $content | sed 's|root|foo|g'
+echo -n $content | sed 's!root!foo!g'
 echo ""
 ENND
 cat <<"ENND" > /home/cgi-bin/wc
@@ -58,17 +58,17 @@ chmod 700 /home/cgi-bin/wc
 httpd -fv -p 3000 -h /home &
 sleep 2
 echo "T1"
-cat /etc/passwd | sed 's|bin|foo|g' | grep root
+cat /etc/passwd | sed 's!bin!foo!g' | grep root
 echo "T2"
-cat /etc/passwd | sed 's|bin|foo|g' | grep root | wc -m
+cat /etc/passwd | sed 's!bin!foo!g' | grep root | wc -m
 echo "T3"
-cat /etc/passwd | sed 's|bin|foo|g' | grep root | \
+cat /etc/passwd | sed 's!bin!foo!g' | grep root | \
   (read var1; wget -qO- "http://localhost:3000/cgi-bin/sed?content=$var1")
 echo "T4"
-cat /etc/passwd | sed 's|bin|foo|g' | grep root | tee /tmp/foo | \
+cat /etc/passwd | sed 's!bin!foo!g' | grep root | tee /tmp/foo | \
   (read var1; wget -qO- "http://localhost:3000/cgi-bin/sed?content=$var1") | wc -m
 echo "T5"
-cat /etc/passwd | sed 's|bin|foo|g' | grep root | tee /tmp/foo | \
+cat /etc/passwd | sed 's!bin!foo!g' | grep root | tee /tmp/foo | \
   (read var1; wget -qO- "http://localhost:3000/cgi-bin/sed?content=$var1") | tee /tmp/foo2 | \
   (read var1; wget -qO- "http://localhost:3000/cgi-bin/wc?content=$var1")
 EOF
@@ -91,8 +91,7 @@ cat <<"ENND" > /home/cgi-bin/sed
 eval "${QUERY_STRING//&/;}"
 echo "Content-type: text/plain; charset=utf-8"
 echo ""
-echo $content | sed 's|root|foo|g'
-echo ""
+echo -n $content | sed 's!root!foo!g'
 ENND
 mkdir -p /home2/cgi-bin
 cat <<"ENND" > /home2/cgi-bin/wc
@@ -100,29 +99,59 @@ cat <<"ENND" > /home2/cgi-bin/wc
 eval "${QUERY_STRING//&/;}"
 echo "Content-type: text/plain; charset=utf-8"
 echo ""
-echo $content | wc -m
-echo ""
+echo -n $content | wc -m
 ENND
 chmod 700 /home/cgi-bin/sed
 httpd -fv -p 3000 -h /home &
 chmod 700 /home2/cgi-bin/wc
 httpd -fv -p 3001 -h /home2 &
 sleep 3
-echo "1"
-cat /etc/passwd | sed 's|bin|foo|g' | grep root
-echo "2"
-cat /etc/passwd | sed 's|bin|foo|g' | grep root | wc -m
-echo "3"
-cat /etc/passwd | sed 's|bin|foo|g' | grep root | \
-  (read var1; wget -qO- "http://localhost:3000/cgi-bin/sed?content=$var1")
-echo "4"
-cat /etc/passwd | sed 's|bin|foo|g' | grep root | tee /tmp/foo | \
-  (read var1; wget -qO- "http://localhost:3000/cgi-bin/sed?content=$var1") | wc -m
-echo "5"
-cat /etc/passwd | sed 's|bin|foo|g' | grep root | tee /tmp/foo | \
-  (read var1; wget -qO- "http://localhost:3000/cgi-bin/sed?content=$var1") | tee /tmp/foo2 | \
-  (read var1; wget -qO- "http://localhost:3001/cgi-bin/wc?content=$var1")
+echo "T1"
+cat /etc/passwd | sed 's!bin!foo!g' | grep root
+echo "T2"
+cat /etc/passwd | sed 's!bin!foo!g' | grep root | wc -m
+cat <<"ENND" | tee foo.sh | sed 's!|!|_service_mesh_or_mulit_runtimes_|!g' 
+echo "T3"
+alias sed_srv='(read var1; wget -qO- "http://localhost:3000/cgi-bin/sed?content=$var1")'
+cat /etc/passwd | sed 's!bin!foo!g' | grep root | sed_srv
+echo
+echo "T4"
+cat /etc/passwd | sed 's!bin!foo!g' | grep root | tee /tmp/foo | sed_srv | wc -m
+echo "T5"
+alias wc_srv='(read var1; wget -qO- "http://localhost:3001/cgi-bin/wc?content=$var1")'
+cat /etc/passwd | sed 's!bin!foo!g' | grep root | tee /tmp/foo | sed_srv | tee /tmp/foo2 | wc_srv
+ENND
+sh foo.sh
 EOF
+```
+
+output
+
+```sh
+HOSTNAME=1031a893f27d
+SHLVL=1
+HOME=/root
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+PWD=/
+T1
+root:x:0:0:root:/root:/foo/sh
+T2
+30
+echo "T3"
+alias sed_srv='(read var1; wget -qO- "http://localhost:3000/cgi-bin/sed?content=$var1")'
+cat /etc/passwd |_service_mesh_or_mulit_runtimes_| sed 's!bin!foo!g' |_service_mesh_or_mulit_runtimes_| grep root |_service_mesh_or_mulit_runtimes_| sed_srv
+echo
+echo "T4"
+cat /etc/passwd |_service_mesh_or_mulit_runtimes_| sed 's!bin!foo!g' |_service_mesh_or_mulit_runtimes_| grep root |_service_mesh_or_mulit_runtimes_| tee /tmp/foo |_service_mesh_or_mulit_runtimes_| sed_srv |_service_mesh_or_mulit_runtimes_| wc -m
+echo "T5"
+alias wc_srv='(read var1; wget -qO- "http://localhost:3001/cgi-bin/wc?content=$var1")'
+cat /etc/passwd |_service_mesh_or_mulit_runtimes_| sed 's!bin!foo!g' |_service_mesh_or_mulit_runtimes_| grep root |_service_mesh_or_mulit_runtimes_| tee /tmp/foo |_service_mesh_or_mulit_runtimes_| sed_srv |_service_mesh_or_mulit_runtimes_| tee /tmp/foo2 |_service_mesh_or_mulit_runtimes_| wc_srv
+T3
+foo:x:0:0:foo:/foo:/foo/sh
+T4
+26
+T5
+26
 ```
 
 # TODO
