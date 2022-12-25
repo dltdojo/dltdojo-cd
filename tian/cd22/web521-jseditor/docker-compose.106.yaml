@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  deno106:
+    image: denoland/deno:1.29.1
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        cd /app
+        deno run --allow-net --allow-read --allow-env main.ts &
+        sleep 3
+        date
+        echo "Endpoint1 is http://localhost:8311/d106"
+        echo "Endpoint2 is http://localhost:8311/d106XYZ"
+        echo "Endpoint2 is http://localhost:8311/d106ABC"
+        wait
+    ports:
+      - 8311:3000
+    volumes:
+      - ./d106.ts:/app/main.ts:ro
+      - ./d106-mod.ts:/app/d106-mod.ts:ro

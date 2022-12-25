@@ -34,7 +34,7 @@ docker compose -f docker-compose.102.yaml up
 docker compose -f docker-compose.103.yaml up
 ```
 
-# 104 🎄 import live code js
+# 104 🐿️ import live code js
 
 - 直接將樣板套用與啟動都轉給匯入模組提供。
 - CSS 從 Tailwind 換成 Twind https://twind.dev/
@@ -90,5 +90,33 @@ services:
     ports:
       - 8300:3000
 EOF
+```
+
+
+# 106 🍳 sha1
+
+- crypto.subtle.digest 範例，同時將編輯區加寬，這編輯器主要做瀏覽器端的 javascript 簡易測試，不是以編輯版面 HTML/CSS 為主要目的。
+- SubtleCrypto.digest() - Web APIs | MDN https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
+- NIST宣布美國聯邦政府2030年12月31日後停用SHA-1加密演算法 | iThome https://www.ithome.com.tw/news/154769
+- 改成多版面型態如 https://blackpink-cd22-web521.deno.dev/d106
+- http://localhost:3000/d106
+
+```sh
+docker compose -f docker-compose.106.yaml up
+```
+
+
+# 107 🌤️ JWT (X)
+
+- http://localhost:3000/d107
+- https://github.com/timonson/djwt
+- Loading module from “https://deno.land/x/djwt@v2.8/mod.ts” was blocked because of a disallowed MIME type (“application/typescript”).
+- Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at https://deno.land/x/djwt@v2.8/mod.ts. (Reason: CORS request did not succeed). Status code: (null).
+- 測試 jwt 在瀏覽器中，無法直接匯入 typescript 需要轉換類似 fresh 的服務端 bundles are generated with esbuild JIT 作法。
+- https://github.com/denoland/fresh/blob/885d71d8239eaa58c5bba8f9b573d141edacdb2c/src/server/bundle.ts#L87
+
+
+```sh
+deno run -A --watch d107.ts
 ```
 
