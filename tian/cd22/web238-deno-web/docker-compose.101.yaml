@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  strapi102:
+    image: denoland/deno:alpine-1.29.1
+    working_dir: /app
+    command: 
+      - /bin/sh
+      - -c
+      - |
+        env
+        deno run -A main.tsx
+    ports:
+      - "8300:8000"
+    volumes:
+      - ./d101.tsx:/app/main.tsx
