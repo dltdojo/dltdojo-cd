@@ -1,0 +1,80 @@
+version: "3.8"
+services:
+  srht106:
+    build:
+      context: .
+      target: web168-git106
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        env
+        id
+        sleep 10
+        cat > /etc/sr.ht/config.ini <<EOF
+        [sr.ht]
+        site-name=dev-local
+        site-info=https://sourcehut.org
+        site-blurb=the hacker's forge
+        environment=production
+        owner-name=DevLocalFoo
+        owner-email=sir@dev.local
+        service-key=9d1111ef4f56885497013461c1f33bd14776cbf47bfc4c3d0060030da5087e19
+        network-key=AezXMrVA0FBsh6m9fALyd8kg97SO7XXSqaCsHrYq6hE=
+        [meta.sr.ht]
+        origin=http://meta.localhost:5000
+        connection-string=postgresql://sourcehut:sourcehut@pg101/metasrht?sslmode=disable
+        migrate-on-upgrade=yes
+        webhooks=redis://redis101:6379/1
+        welcome-emails=no
+        [meta.sr.ht::settings]
+        registration=yes
+        onboarding-redirect=http://git.localhost:5001
+        [meta.sr.ht::aliases]
+        #
+        [meta.sr.ht::billing]
+        enabled=no
+        [git.sr.ht]
+        origin=http://git.localhost:5001
+        oauth-client-id=git-oauth-client101
+        oauth-client-secret=....CHANGEME.....
+        connection-string=postgresql://sourcehut:sourcehut@pg101/gitsrht?sslmode=disable
+        repos=/var/lib/git/
+        post-update-script=/usr/bin/gitsrht-update-hook
+        webhooks=redis://redis101:6379/1
+        outgoing-domain=
+        [webhooks]
+        private-key=viBVebYlleVMECsTyh4utxiHCo+qo4fNis3y8hFd8KY=
+        EOF
+        metasrht-initdb
+        gitsrht-initdb
+        gunicorn gitsrht.app:app -b 0.0.0.0:5001 -c /etc/sr.ht/git.sr.ht.gunicorn.conf.py -D
+        # API need SMTP config
+        #metasrht-api -b 0.0.0.0:5100 &
+        #gitsrht-api -b 0.0.0.0:5101 &
+        gunicorn metasrht.app:app -c /etc/sr.ht/meta.sr.ht.gunicorn.conf.py -b 0.0.0.0:5000
+    ports:
+      - 5000:5000 # meta
+      - 5001:5001 # git
+  redis101:
+    image: redis:7-alpine
+  pg101:
+    image: postgres:15.1
+    environment:
+      POSTGRES_USER: sourcehut
+      POSTGRES_PASSWORD: sourcehut
+    entrypoint: sh
+    command:
+      - -c 
+      - |
+        env
+        date
+        cat <<"EOF" > /docker-entrypoint-initdb.d/initdb.sql
+        CREATE USER metasrht_admin;
+        CREATE DATABASE metasrht;
+        GRANT ALL PRIVILEGES ON DATABASE metasrht TO metasrht_admin;
+        CREATE USER gitsrht_admin;
+        CREATE DATABASE gitsrht;
+        GRANT ALL PRIVILEGES ON DATABASE gitsrht TO gitsrht_admin;
+        EOF
+        docker-entrypoint.sh postgres

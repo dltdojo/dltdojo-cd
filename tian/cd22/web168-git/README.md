@@ -46,7 +46,85 @@ vscode 內建有 git 支援，目前版本測試時 chrome 環境會比 firefox 
 docker compose -f docker-compose.102.yaml up
 ```
 
-# 📪 201 git http backend
+# 🌸 103 gitpod vscode gitweb http-backend
+
+內建一個無權限的 git protocol over http (git-http-backend) 服務與 git instaweb 程式碼 http 瀏覽服務。
+
+- vscode http://localhost:3000/?folder=/home/workspace/foo
+- gitweb http://localhost:9080
+
+```sh
+docker compose -f docker-compose.103.yaml up
+```
+
+# 104 🍀 deno version of git-http-backend (X)
+
+- 不建議做，除非有特殊需求需要介入不然建議直接用 lighttpd
+- 需要將 git-http-backend 輸出轉成 Response 型態，沒有直接輸出 Uint8Array
+- fetch 功能可以生成  Response 型態，只是沒有 fetchFromUint8Array 功能。
+- fetchFromUint8Array 自刻需要切開兩部份等於做 fetch 的部份工作。 Let's code a web server from scratch with NodeJS Streams! | Codementor https://www.codementor.io/@ziad-saab/let-s-code-a-web-server-from-scratch-with-nodejs-streams-h4uc9utji
+- Fetch Standard https://fetch.spec.whatwg.org/
+- fetchFromUint8Array 可參考 https://github.com/denoland/deno/blob/43b6390629ad62edbeca3b884ccee53422876a1a/ext/fetch/26_fetch.js#L429
+- 不是單一 cgi-bin 還需服務靜態檔案，故適合用在 lighttpd
+- fuubi/node-git-http-backend https://github.com/fuubi/node-git-http-backend
+- nvdnkpr/git-http-backend: serve a git repository over http https://github.com/nvdnkpr/git-http-backend
+- giorgi94/git-http-backend-nodejs: git http backend on node js https://github.com/giorgi94/git-http-backend-nodejs
+- Practical Guide: Learn How to Use .pipe() in Node.js - Become A Better Programmer https://www.becomebetterprogrammer.com/what-does-pipe-mean-in-node-js-how-to-use-it-practical-guide/
+- A beginner’s guide to streams in Deno | The JS runtimes https://medium.com/deno-the-complete-reference/a-beginners-guide-to-streams-in-deno-760d51750763
+
+```sh
+docker compose -f docker-compose.104.yaml up
+```
+
+
+# 105 🍲 golang version of git-http-backend
+
+- asim/git-http-backend: Git Smart HTTP in Go https://github.com/asim/git-http-backend
+- gitweb http://localhost:9080
+
+```sh
+docker compose -f docker-compose.105.yaml up
+```
+
+# 106 🦉 sourcehut (X)
+
+- sourcehut hub https://sr.ht/
+- 主要參考 https://github.com/UlyC/sourcehut-docker
+- https://man.sr.ht/git.sr.ht/installation.md
+- Package Repositories - man.sr.ht https://man.sr.ht/packages.md
+- https://git.sr.ht/~sircmpwn/git.sr.ht/tree/master
+- https://github.com/agorgl/srht-infra
+
+
+```sh
+docker compose -f docker-compose.106.yaml up
+```
+
+測試過程不成功，登入得到 cookie 但是網頁無法出現，使用 UlyC/sourcehut-docker 版本可以登入轉到 meta.local/profile，可能是 nginx 的設定需要加入。
+
+- http://meta.localhost:5000
+- http://git.localhost:5001
+
+```sh
+srht-keygen network
+Secret key: AezXMrVA0FBsh6m9fALyd8kg97SO7XXSqaCsHrYq6hE=
+
+srht-keygen service
+Secret key: 9d1111ef4f56885497013461c1f33bd14776cbf47bfc4c3d0060030da5087e19
+
+srht-keygen webhook
+Private key: viBVebYlleVMECsTyh4utxiHCo+qo4fNis3y8hFd8KY=
+Public key: OxsggN0XXzIPNjPlg383qcHcU+jnCjbgiU/XT3PdrGY=
+```
+
+create a admin
+
+```sh
+# OxsggN0XXzIPNjP
+metasrht-manageuser -e alice@dev.local -t admin alice
+```
+
+# 201 📪 git http backend
 
 git 如果是多方共用必須提供遠端存取協定，這裡使用簡化無權限控制的 cgi 模式的 git http backend 作法來支援 Git Http Service。
 
@@ -142,12 +220,9 @@ kubectl apply -f https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/
 
 沿用 k205 但是換掉 configmap 需要作兩件事：
 
-- 產生新的 configmap cm-init-sh-206
-- path-cm-gitsrv 換掉舊的用新的 cm-init-sh-206 蓋過去。(其實同名 cm-init-sh 也不會衝到，因為前面會被加上 stag)
-- 光 patch gitsrv 不夠，vscode 初始化需要直接使用內部網址，故會出現 Could not resolve host: gitsrv205.default.svc.cluster.local 錯誤，因這裡的內部服務被改名為 service/stag-gitsrv205，如果原始沒有配置參數可改，只能直接改 vscode-init.sh。不然就是不加上 prefix。
+- 產生新的 configmap cm-init-sh 行為 behavior 選為 replace
+- 光換 gitsrv 不夠，vscode 初始化需要直接使用內部網址，故會出現 Could not resolve host: gitsrv205.default.svc.cluster.local 錯誤，因這裡的內部服務被改名為 service/stag-gitsrv205，如果原始沒有配置參數可改，只能直接改 vscode-init.sh。不然就是不加上 prefix。
 - 另外改良 205 使用 sleep 模式常常因為 gitsrv 未就位失敗。
-
-注意只有改 gitsrv 所以 vscode 的配置會沿用舊的版本，所以會有 cm-init-sh 與 cm-init-sh-206 同時存在。
 
 - vscode http://vscode205.localhost:8300/?folder=/home/workspace/foo
 
@@ -157,13 +232,6 @@ kubectl apply -f https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/
 kubectl apply -k k206/base --dry-run=client -o yaml > k206-base.yaml
 kubectl apply -k k206/staging --dry-run=client -o yaml > k206-staging.yaml
 kubectl apply -k k206/staging
-```
-
-單一檔案
-
-```sh
-kubectl apply -f https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/cd22/web168-git/k206-base.yaml
-kubectl apply -f https://raw.githubusercontent.com/dltdojo/dltdojo-cd/main/tian/cd22/web168-git/k206-staging.yaml
 ```
 
 # 🏈 207 gitweb and git instaweb
@@ -239,6 +307,14 @@ GitOps 流程關鍵在 No kubectl, no scripts （NKNS）這句。要注意的�
 為何 k8s 比較常見是因為其原生具備 Declarative Management 機制，只要 kubectl apply 即可修正狀態。
 
 
+
+# 🌽 302 argocd and local gitsrv
+
+利用 k206 基礎：
+
+- 利用自建 gitsrv 安裝並同步 https://github.com/argoproj/argocd-example-apps/tree/master/guestbook
+- 不考慮憑證問題
+- 使用 Port Forwarding 
 
 # 30x CI: argo workflow
 

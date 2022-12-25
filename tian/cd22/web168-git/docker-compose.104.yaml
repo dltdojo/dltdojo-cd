@@ -1,0 +1,57 @@
+version: "3.8"
+services:
+  githttp201:
+    build:
+      context: .
+      target: busybox101
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        env
+        id
+        mkdir -p /app/repo/foo
+        git config --global user.email "you@example.com"
+        git config --global user.name "Your Name"
+        cd /app/repo/foo
+        echo $(date) > README.md
+        git config --global user.email "foo1001@testing.local"
+        git config --global user.name "FooName1001"
+        git init -q
+        git add .
+        git commit -m 'first commit'
+        curl -sv --retry 10 --retry-all-errors http://githttp101:80/
+        git remote add upstream101 http://githttp101:80/foo
+        git remote -v
+        git pull
+        git push --set-upstream upstream101 master
+  githttp101:
+    build:
+      context: .
+      target: web168-git104
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        env
+        id
+        mkdir -p /app/repo/foo
+        git config --system http.receivepack true
+        git config --system http.uploadpack true
+        git config --system user.email "gitserver@dev.local"
+        git config --system user.name "Git Server"
+        git config --global user.email "you@example.com"
+        git config --global user.name "Your Name"
+        mkdir -p /app/repo/foo; cd /app/repo/foo &&  git init --bare -q && echo "foo project 1234" > description
+        cd /app/repo/foo
+        ls -alh
+        git branch
+        echo "git instaweb /app/repo/foo to port 1234 and mapping to http://localhost:9080"
+        cd /app/repo/foo &&  git instaweb
+        echo "git remote add upstream101 http://githttp101:80/foo"
+        ls -alh /usr/libexec/git-core/git-http-backend
+        cd /app && deno run -A main.ts
+    ports:
+      - 9080:1234
+    volumes:
+      - ./d104.ts:/app/main.ts

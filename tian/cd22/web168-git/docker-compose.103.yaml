@@ -1,0 +1,79 @@
+version: "3.8"
+services:
+  vscode101:
+    image: gitpod/openvscode-server:1.73.1
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        env
+        id
+        cat<<EOF >> /home/workspace/.bashrc
+        alias la='ls -lah'
+        EOF
+        mkdir /home/workspace/foo
+        cd /home/workspace/foo
+        echo $(date) > README.md
+        git config --global user.email "foo1001@testing.local"
+        git config --global user.name "FooName1001"
+        git init -q
+        git add .
+        git commit -m 'first commit'
+        curl -sv --retry 10 --retry-all-errors http://githttp101:80/
+        git remote add upstream101 http://githttp101:80/git/foo
+        git remote -v
+        git pull
+        git push --set-upstream upstream101 master
+        /home/.openvscode-server/bin/openvscode-server --host 0.0.0.0 --without-connection-token &
+        sleep 5
+        echo "open http://localhost:3000/?folder=/home/workspace/foo"
+        wait
+    ports:
+      - 3000:3000
+    #volumes:
+    #  - .:/home/workspace:cached
+  githttp101:
+    build:
+      context: .
+      target: k207-gitsrv
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        env
+        id
+        mkdir -p /app/repo/foo
+        git config --system http.receivepack true
+        git config --system http.uploadpack true
+        git config --system user.email "gitserver@dev.local"
+        git config --system user.name "Git Server"
+        git config --global user.email "you@example.com"
+        git config --global user.name "Your Name"
+        mkdir -p /app/repo/foo; cd /app/repo/foo &&  git init --bare -q && echo "foo project 1234" > description
+        cd /app/repo/foo
+        ls -alh
+        git branch
+        #
+        # https://github.com/ryan0x44/local-git-server
+        # NOTE: docker compose escape $$ 
+        #
+        cat <<\EOF > /etc/lighttpd/lighttpd.conf
+        server.document-root = "/app/repo"
+        server.modules += ( "mod_alias", "mod_cgi", "mod_setenv" )
+        $$HTTP["host"] =~ "" { 
+          alias.url += ( "/git" => "/usr/libexec/git-core/git-http-backend")
+          $$HTTP["url"] =~ "^/git" {
+            cgi.assign = ( "" => "" )
+            setenv.add-environment = (
+              "GIT_PROJECT_ROOT" => "/app/repo",
+              "GIT_HTTP_EXPORT_ALL" => "1"
+            )
+          }
+        }
+        EOF
+        echo "git instaweb /app/repo/foo to port 1234 and mapping to http://localhost:9080"
+        cd /app/repo/foo &&  git instaweb
+        echo "git remote add upstream101 http://githttp101:80/git/foo"
+        lighttpd -D -f /etc/lighttpd/lighttpd.conf
+    ports:
+      - 9080:1234
