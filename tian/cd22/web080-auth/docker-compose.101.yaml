@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+  deno101:
+    # image: denoland/deno:1.29.1
+    build:
+      context: .
+      target: web080-authn101
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        cd /app
+        deno run --allow-net main.ts &
+        sleep 1
+        echo "Endpoint = http://localhost:8901"
+        wait
+    volumes:
+      - ./d101-authn.ts:/app/main.ts:ro
+    ports:
+      - 8901:3000

@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+  deno105:
+    # image: denoland/deno:1.29.1
+    build:
+      context: .
+      target: web080-authn105
+    working_dir: /app
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        deno run --allow-net main.tsx &
+        sleep 1
+        echo "Endpoint = http://localhost:8901"
+        wait
+    volumes:
+      - ./d105.tsx:/app/main.tsx:ro
+    ports:
+      - 8901:8000
