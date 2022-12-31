@@ -1,0 +1,110 @@
+version: "3.8"
+services:
+  box101:
+    image: busybox:1.35.0-glibc
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        mkdir -p /home/cgi-bin
+        cat <<"ENND" > /home/cgi-bin/sed
+        #!/bin/sh
+        eval "$${QUERY_STRING//&/;}"
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        echo -n $$content | sed 's|root|foo|g'
+        ENND
+        chmod 700 /home/cgi-bin/sed
+        httpd -fv -p 3000 -h /home
+  box102:
+    image: busybox:1.34.1
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        mkdir -p /home/cgi-bin
+        cat <<"ENND" > /home/cgi-bin/wc
+        #!/bin/sh
+        eval "$${QUERY_STRING//&/;}"
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        echo -n $$content | wc -m
+        ENND
+        chmod 700 /home/cgi-bin/wc
+        httpd -fv -p 3000 -h /home
+  box103:
+    image: busybox:1.35.0-musl
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        sleep 10
+        cat <<"ENND" | tee foo.sh | sed 's!|!|_istio_envoy_sidecar_networking_|!g' 
+        alias sed_srv='(read var1; wget -qO- "http://localhost:10000/cgi-bin/sed?content=$$var1")'
+        alias wc_srv='(read var1; wget -qO- "http://box102:3000/cgi-bin/wc?content=$$var1")'
+        echo "T1: istio-envoy-sidecar proxy box101/cgi-bin/sed"
+        cat /etc/passwd | sed 's!bin!foo!g' | grep root | sed_srv
+        echo
+        echo "T2"
+        cat /etc/passwd | sed 's!bin!foo!g' | grep root | sed_srv | wc_srv
+        echo
+        ENND
+        sh foo.sh
+        tail -f /dev/null
+  box103-envoy-sidecar:
+    image: istio/proxyv2:1.14.6-debug
+    network_mode: "service:box103"
+    entrypoint: sh
+    working_dir: /app
+    command:
+      - -c 
+      - |
+        env
+        cat <<"ENND" > /app/envoy-bootstrap.yaml
+        admin:
+          address:
+            socket_address: { address: 127.0.0.1, port_value: 9901 }
+
+        static_resources:
+          listeners:
+          - name: listener_0
+            address:
+              socket_address: { address: 127.0.0.1, port_value: 10000 }
+            filter_chains:
+            - filters:
+              - name: envoy.filters.network.http_connection_manager
+                typed_config:
+                  "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                  stat_prefix: ingress_http
+                  codec_type: AUTO
+                  route_config:
+                    name: local_route
+                    virtual_hosts:
+                    - name: local_service
+                      domains: ["*"]
+                      routes:
+                      - match: { prefix: "/" }
+                        route: { cluster: box101_service }
+                  http_filters:
+                  - name: envoy.filters.http.router
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+          clusters:
+          - name: box101_service
+            connect_timeout: 0.25s
+            type: STRICT_DNS
+            lb_policy: ROUND_ROBIN
+            load_assignment:
+              cluster_name: box101_service
+              endpoints:
+              - lb_endpoints:
+                - endpoint:
+                    address:
+                      socket_address:
+                        address: box101
+                        port_value: 3000
+        ENND
+        envoy -c /app/envoy-bootstrap.yaml

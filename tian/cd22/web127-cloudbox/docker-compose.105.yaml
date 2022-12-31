@@ -1,0 +1,92 @@
+version: "3.8"
+services:
+  box101:
+    image: busybox:1.35.0-glibc
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        mkdir -p /home/cgi-bin
+        cat <<"ENND" > /home/cgi-bin/sed
+        #!/bin/sh
+        eval "$${QUERY_STRING//&/;}"
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        echo -n $$content | sed 's|root|foo|g'
+        ENND
+        chmod 700 /home/cgi-bin/sed
+        httpd -fv -p 3000 -h /home &
+        sleep 20
+        exit
+  box102:
+    image: busybox:1.34.1
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        mkdir -p /home/cgi-bin
+        cat <<"ENND" > /home/cgi-bin/wc
+        #!/bin/sh
+        eval "$${QUERY_STRING//&/;}"
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        echo -n $$content | wc -m
+        ENND
+        chmod 700 /home/cgi-bin/wc
+        httpd -fv -p 3000 -h /home &
+        sleep 20
+        exit
+  box103:
+    image: busybox:1.35.0-musl
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        sleep 5
+        cat <<"ENND" | tee foo.sh | sed 's!|!|_docker_compose_lifecycle_networking_|!g' 
+        echo "T1"
+        alias sed_srv='(read var1; wget -qO- "http://localhost:3700/cgi-bin/srv-sed?content=$$var1")'
+        cat /etc/passwd | sed 's!bin!foo!g' | grep root | sed_srv
+        echo
+        echo "T2"
+        cat /etc/passwd | sed 's!bin!foo!g' | grep root | tee /tmp/foo | sed_srv | wc -m
+        echo "T3"
+        alias wc_srv='(read var1; wget -qO- "http://localhost:3700/cgi-bin/srv-wc?content=$$var1")'
+        cat /etc/passwd | sed 's!bin!foo!g' | grep root | tee /tmp/foo | sed_srv | tee /tmp/foo2 | wc_srv
+        ENND
+        sh foo.sh
+  box103-sidecar:
+    image: busybox:1.35.0
+    network_mode: "service:box103"
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        mkdir -p /home/cgi-bin
+        cat <<"ENND" > /home/cgi-bin/srv-wc
+        #!/bin/sh
+        eval "$${QUERY_STRING//&/;}"
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        #
+        # https://en.wikipedia.org/wiki/Reverse_proxy
+        # istio 5 tasks: Traffic Management, Security, Policy Enforcement, Observability and Extensibility
+        #
+        wget -qO- "http://box102:3000/cgi-bin/wc?content=$$content"
+        ENND
+        chmod 700 /home/cgi-bin/srv-wc
+        cat <<"ENND" > /home/cgi-bin/srv-sed
+        #!/bin/sh
+        eval "$${QUERY_STRING//&/;}"
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        wget -qO- "http://box101:3000/cgi-bin/sed?content=$$content"
+        ENND
+        chmod 700 /home/cgi-bin/srv-sed
+        httpd -fv -p 3700 -h /home &
+        sleep 20
+        exit
