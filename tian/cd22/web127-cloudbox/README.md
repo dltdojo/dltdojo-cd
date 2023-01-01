@@ -374,6 +374,69 @@ docker compose -f docker-compose.110.yaml up
 docker compose -f docker-compose.111.yaml up
 ```
 
+# 112 🦄 Fortran word count microservice
+
+- 在一堆 sidecar 中置入計算字數的 fortran 微服務
+- [wc in Fortran Wiki](https://fortranwiki.org/fortran/show/wc)
+- [Fortran and Docker: How to Combine Legacy Code with Cutting-Edge Components | by Data@Urban | Medium](https://urban-institute.medium.com/fortran-and-docker-how-to-combine-legacy-code-with-cutting-edge-components-35e934b15023)
+- [(2074) NEW! Most Popular Programming Languages 1965 - 2022 - YouTube](https://www.youtube.com/watch?v=qQXXI5QFUfw)
+
+直接 docker 內測試勉安裝
+
+```sh
+$ docker run -it --rm debian:bullseye 
+
+apt update && apt install -y gcc gfortran
+cat <<EOF > test.f90
+program main
+    implicit none
+    character(len=100) :: a
+    read *, a
+    print *, "input = ", a
+    WRITE(*,'(I0)') len_trim(a)
+end
+EOF
+gfortran -o foo test.f90
+echo ABC123456789 | ./foo
+```
+
+計字數fortran 微服務由 busybox httpd cgi 轉接，除了自己服務，也可利用 box103-sidecar 或是 box104-host-proxy 代理。
+
+```yaml
+  box102:
+    build:
+      context: .
+      target: web127-cbox112
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        cat <<ENND > /tmp/test.f90
+        program main
+            implicit none
+            character(len=100) :: a
+            read *, a
+            ! print *, "input = ", a
+            WRITE(*,'(I0)') len_trim(a)
+        end
+        ENND
+        cat /tmp/test.f90
+        gfortran -o /bin/wcf90 /tmp/test.f90
+        chmod 700 /bin/wcf90
+        mkdir -p /home/cgi-bin
+        cat <<"ENND" > /home/cgi-bin/wc
+        #!/bin/sh
+        eval "$${QUERY_STRING//&/;}"
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        echo -n $$content | wcf90
+        ENND
+        chmod 700 /home/cgi-bin/wc
+        busybox httpd -fv -p 3000 -h /home
+```
+
+
 # 201 🦈 web1 composer http app to rule them all
 
 - web1 composer = shell-app-and-http-app-composer 應用服務編排的轉化，一開始服務簡單可從單機殼上編排介接，後來服務的需求呈現爆炸性發展，服務轉換到本機殼與多機網路服務（主要是 http 協定應用服務）編排介接

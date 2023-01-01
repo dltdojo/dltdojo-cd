@@ -1,0 +1,183 @@
+version: "3.8"
+services:
+  box101:
+    #image: busybox:1.35.0-glibc
+    build:
+      context: .
+      target: web127-cbox111-static
+    network_mode: "service:box101-sidecar"
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        mkdir -p /home/cgi-bin
+        cat <<"ENND" > /home/cgi-bin/sed
+        #!/bin/sh
+        eval "$${QUERY_STRING//&/;}"
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        echo -n $$content | sed 's|root|foo|g'
+        ENND
+        chmod 700 /home/cgi-bin/sed
+        httpd -fv -p 3000 -h /home
+  box101-sidecar:
+    #image: busybox:1.35.0-glibc
+    build:
+      context: .
+      target: web127-cbox111-cgr
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        # nc -lvk -p 3200 -e nc localhost 3000
+        nc -lvk -p 3200 -e nc localhost 3000
+  box102:
+    #image: busybox:1.34.1
+    build:
+      context: .
+      target: web127-cbox112
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        cat <<ENND > /tmp/test.f90
+        program main
+            implicit none
+            character(len=100) :: a
+            read *, a
+            ! print *, "input = ", a
+            WRITE(*,'(I0)') len_trim(a)
+        end
+        ENND
+        cat /tmp/test.f90
+        gfortran -o /bin/wcf90 /tmp/test.f90
+        chmod 700 /bin/wcf90
+        mkdir -p /home/cgi-bin
+        cat <<"ENND" > /home/cgi-bin/wc
+        #!/bin/sh
+        eval "$${QUERY_STRING//&/;}"
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        echo -n $$content | wcf90
+        ENND
+        chmod 700 /home/cgi-bin/wc
+        busybox httpd -fv -p 3000 -h /home
+  nc101:
+    # image: busybox:1.34.1
+    build:
+      context: .
+      target: web127-cbox111-deno-wasmtime
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        deno -V
+        wasmtime -V
+        cat <<"ENND" > /tmp/index.sh
+        #!/bin/sh
+        echo "HTTP/1.1 200 OK"
+        echo "Content-Type: text/html; charset=UTF-8"
+        echo "Server: netcat"
+        echo
+        echo "<!doctype html>"
+        echo "<html><body><h1>Date: $$(date)</h1></body></html>"
+        ENND
+        chmod 700 /tmp/index.sh
+        nc -lvk -p 3500 -e /tmp/index.sh &
+        sleep 30
+        exit
+  box103:
+    image: busybox:1.35.0-musl
+    network_mode: "service:box103-sidecar"
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        sleep 2
+        cat <<"ENND" | tee foo.sh | sed 's!|!|X|!g' 
+        echo "T1 sidecar sed"
+        alias sed_srv='(read var1; wget -qO- "http://localhost:3700/cgi-bin/srv-sed-mesh?content=$$var1")'
+        cat /etc/passwd | sed 's!bin!foo!g' | grep root | sed_srv
+        echo
+        echo "T2 local wc"
+        cat /etc/passwd | sed 's!bin!foo!g' | grep root | tee /tmp/foo | sed_srv | wc -m
+        echo "T3 sidecar wc"
+        alias wc_sidecar='(read var1; wget -qO- "http://localhost:3700/cgi-bin/srv-wc?content=$$var1")'
+        cat /etc/passwd | sed 's!bin!foo!g' | grep root | tee /tmp/foo | sed_srv | tee /tmp/foo2 | wc_sidecar
+        echo "T4 perhost proxy wc"
+        alias wc_srv_perhost='(read var1; wget -qO- "http://box104-host-proxy:3900/cgi-bin/srv-wc?content=$$var1")'
+        cat /etc/passwd | sed 's!bin!foo!g' | grep root | tee /tmp/foo | sed_srv | tee /tmp/foo2 | wc_srv_perhost
+        echo
+        echo "T5 direct netcat"
+        alias date_srv_wget='wget -qO- "http://nc101:3500/"'
+        alias date_srv_netcat="printf 'GET / HTTP/1.1\r\nHost: nc101\r\n\r\n' | nc nc101 3500"
+        date_srv_wget
+        sleep 2
+        date_srv_netcat
+        ENND
+        sh foo.sh
+  box103-sidecar:
+    #image: busybox:1.35.0
+    build:
+      context: .
+      target: web127-cbox111-git-lighttpd
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        git --version
+        lighttpd -V
+        mkdir -p /home/cgi-bin
+        cat <<"ENND" > /home/cgi-bin/srv-wc
+        #!/bin/sh
+        eval "$${QUERY_STRING//&/;}"
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        wget -qO- "http://box102:3000/cgi-bin/wc?content=$$content"
+        ENND
+        chmod 700 /home/cgi-bin/srv-wc
+        #
+        # service mesh : sidecar pair
+        # https://en.wikipedia.org/wiki/Reverse_proxy
+        # istio 5 tasks: Traffic Management, Security, Policy Enforcement, Observability and Extensibility
+        #
+        cat <<"ENND" > /home/cgi-bin/srv-sed-mesh
+        #!/bin/sh
+        eval "$${QUERY_STRING//&/;}"
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        wget -T 1 -qO- "http://box101-sidecar:3200/cgi-bin/sed?content=$$content"
+        ENND
+        chmod 700 /home/cgi-bin/srv-sed-mesh
+        httpd -fv -p 3700 -h /home
+  box104-host-proxy:
+    image: busybox:1.35.0
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        mkdir -p /home/cgi-bin
+        cat <<"ENND" > /home/cgi-bin/srv-wc
+        #!/bin/sh
+        eval "$${QUERY_STRING//&/;}"
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        wget -qO- "http://box102:3000/cgi-bin/wc?content=$$content"
+        ENND
+        chmod 700 /home/cgi-bin/srv-wc
+        cat <<"ENND" > /home/cgi-bin/srv-sed
+        #!/bin/sh
+        eval "$${QUERY_STRING//&/;}"
+        echo "Content-type: text/plain; charset=utf-8"
+        echo ""
+        wget -qO- "http://box101:3000/cgi-bin/sed?content=$$content"
+        ENND
+        chmod 700 /home/cgi-bin/srv-sed
+        httpd -fv -p 3900 -h /home

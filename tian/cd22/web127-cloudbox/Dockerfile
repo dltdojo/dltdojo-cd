@@ -58,3 +58,6 @@ RUN <<"ENND"
 /bin/busybox --install /bin
 ldconfig
 ENND
+
+FROM debian:bullseye as web127-cbox112
+RUN apt update && apt install -y gcc gfortran busybox
