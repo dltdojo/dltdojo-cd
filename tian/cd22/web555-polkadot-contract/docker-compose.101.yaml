@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  box101:
+    build:
+      context: .
+      target: web555-101
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        substrate-contracts-node
