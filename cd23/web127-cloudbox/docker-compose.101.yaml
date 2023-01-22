@@ -1,0 +1,19 @@
+version: "3.8"
+services:
+  box101:
+    image: busybox:1.36.0-glibc
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        echo
+        cat /etc/passwd
+        echo
+        cat /etc/passwd | sed 's|bin|foo|g'
+        echo
+        cat /etc/passwd | sed 's|bin|foo|g' | grep foo
+        echo
+        cat /etc/passwd | sed 's|bin|foo|g' | grep foo | base64
+        echo
+        cat /etc/passwd | sed 's|bin|foo|g' | tee passwd2 ; cat passwd2
