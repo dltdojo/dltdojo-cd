@@ -2,7 +2,7 @@
 
 FROM gcr.io/distroless/cc-debian11 AS web127-deno-wasmtime
 COPY --from=busybox:1.36.0-glibc /bin/busybox /bin/busybox
-COPY --from=denoland/deno:distroless-1.29.4 /bin/deno /bin/deno
+COPY --from=denoland/deno:distroless-1.30.0 /bin/deno /bin/deno
 SHELL ["/bin/busybox", "sh" , "-c"]
 RUN <<"ENND"
 /bin/busybox --install /bin
