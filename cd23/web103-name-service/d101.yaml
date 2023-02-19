@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+  pg101.dev101:
+    image: postgres:15.1
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: pass101
+      POSTGRES_DB: test_db
+    ports:
+      - "5433:5432"
+  psql101:
+    image: postgres:15.1
+    command:
+      - sh
+      - -c 
+      - |
+        env
+        sleep 20
+        date
+        psql postgres://admin:pass101@pg101.dev101:5432/test_db -l
+        cat <<EOF > /tmp/test.sql
+        CREATE TABLE IF NOT EXISTS todos ( id SERIAL PRIMARY KEY, title TEXT NOT NULL);
+        INSERT INTO todos (title) VALUES ('FOO');
+        EOF
+        psql postgres://admin:pass101@pg101.dev101:5432/test_db -f /tmp/test.sql
+  adminer.dev101:
+    depends_on:
+      - pg101.dev101
+    image: adminer:4.8.1
+    restart: always
+    ports:
+      - 8091:8080
