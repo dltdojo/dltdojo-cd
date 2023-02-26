@@ -1,6 +1,7 @@
 #!/bin/sh
 DENO_VERSION=1.31.1
-APPTS_URL=https://raw.githubusercontent.com/dltdojo/dltdojo-cd/v0.1.3/cd23/dafu/app.ts
+CD23_VERSION=0.1.4
+APPTS_URL=https://raw.githubusercontent.com/dltdojo/dltdojo-cd/v$CD23_VERSION/cd23/dafu/app.ts
 ALLOW_ENV=XDG_DATA_HOME,HOME
 ALLOW_READ=/root/.local/share/dax,/bin/deno,/usr/bin/deno,/tmp,/app
 ALLOW_WRITE=/root/.local/share/dax

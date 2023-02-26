@@ -2,6 +2,9 @@ import { Command } from "npm:commander";
 import { readAll } from "https://deno.land/std@0.177.0/streams/read_all.ts";
 import { DemoCiliumIngressNodePort } from "./k8s.ts";
 
+/**
+ * @deprecated since version 0.1.4
+ */
 export class BaseCliCommander {
   program = new Command();
 
