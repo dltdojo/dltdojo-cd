@@ -1,7 +1,8 @@
 #!/bin/sh
 DENO_VERSION=1.31.1
-CD23_VERSION=0.1.4
-APPTS_URL=https://raw.githubusercontent.com/dltdojo/dltdojo-cd/v$CD23_VERSION/cd23/dafu/app.ts
+#CD23_VERSION=v0.1.4
+CD23_VERSION=main
+APPTS_URL=https://raw.githubusercontent.com/dltdojo/dltdojo-cd/$CD23_VERSION/cd23/dafu/app.ts
 ALLOW_ENV=XDG_DATA_HOME,HOME
 ALLOW_READ=/root/.local/share/dax,/bin/deno,/usr/bin/deno,/tmp,/app
 ALLOW_WRITE=/root/.local/share/dax
@@ -18,14 +19,14 @@ deno run --allow-env=$ALLOW_ENV \
   --allow-net=$ALLOW_NET \
   --allow-read=$ALLOW_READ  \
   --allow-write=$ALLOW_WRITE \
-  $APPTS_URL
+  $APPTS_URL help
 EOF
 
 echo "==> 2"
 
 docker run -it --rm --workdir=/app denoland/deno:$DENO_VERSION run \
   --allow-env=$ALLOW_ENV --allow-net=$ALLOW_NET --allow-read=$ALLOW_READ  --allow-write=$ALLOW_WRITE \
-  $APPTS_URL
+  $APPTS_URL help
 
 echo "==> 3"
 
@@ -39,4 +40,4 @@ EOF
 
 docker run -it --rm $DENO_IMG run \
   --allow-env=$ALLOW_ENV --allow-net=$ALLOW_NET --allow-read=$ALLOW_READ  --allow-write=$ALLOW_WRITE \
-  $APPTS_URL
+  $APPTS_URL help

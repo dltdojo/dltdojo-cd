@@ -13,8 +13,12 @@ export class Kapp {
   }
 }
 
+const addCd23Labels = (...metadatas) => {
+  metadatas.forEach((v) => v.addLabel("dltdojo.org/cd23", "dafu"));
+};
+
 export const getWhoamiDeplyAndSvc = (chart: Chart) => {
-  const svc = new Deployment(chart, "whoami", {
+  const deploy = new Deployment(chart, "whoami", {
     replicas: 2,
     containers: [{
       image: "traefik/whoami",
@@ -23,7 +27,8 @@ export const getWhoamiDeplyAndSvc = (chart: Chart) => {
         ensureNonRoot: false,
       },
     }],
-  }).exposeViaService({
+  });
+  const svc = deploy.exposeViaService({
     ports: [
       {
         port: 80,
@@ -31,11 +36,12 @@ export const getWhoamiDeplyAndSvc = (chart: Chart) => {
     ],
   });
 
+  addCd23Labels(deploy.metadata, deploy.podMetadata, svc.metadata)
   return svc;
 };
 
 export const getNginxDeplyAndSvc = (chart: Chart) => {
-  const svc = new Deployment(chart, "nginx", {
+  const deploy = new Deployment(chart, "nginx", {
     replicas: 2,
     containers: [{
       image: "nginx",
@@ -45,14 +51,15 @@ export const getNginxDeplyAndSvc = (chart: Chart) => {
         readOnlyRootFilesystem: false,
       },
     }],
-  }).exposeViaService({
+  })
+  const svc = deploy.exposeViaService({
     ports: [
       {
         port: 80,
       },
     ],
   });
-
+  addCd23Labels(deploy.metadata, deploy.podMetadata, svc.metadata)
   return svc;
 };
 
@@ -67,6 +74,8 @@ export const getNodePortIngress = (chart: Chart) => {
       },
     },
   });
+
+  addCd23Labels(ingress.metadata)
 
   // IngressClassName only in cdk8splus26/k8s/IngressSpec.go
   // https://github.com/search?q=org%3Acdk8s-team+ingressClassName&type=code

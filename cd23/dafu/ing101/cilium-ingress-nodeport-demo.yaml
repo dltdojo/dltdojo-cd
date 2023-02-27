@@ -1,0 +1,174 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dltdojo.org/cd23: dafu
+  name: ing101-whoami-c8f3703b
+spec:
+  minReadySeconds: 0
+  progressDeadlineSeconds: 600
+  replicas: 2
+  selector:
+    matchLabels:
+      cdk8s.io/metadata.addr: ing101-whoami-c8d711e5
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        cdk8s.io/metadata.addr: ing101-whoami-c8d711e5
+        dltdojo.org/cd23: dafu
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - image: traefik/whoami
+          imagePullPolicy: Always
+          name: main
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: 1500m
+              memory: 2048Mi
+            requests:
+              cpu: 1000m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: false
+          startupProbe:
+            failureThreshold: 3
+            tcpSocket:
+              port: 80
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      securityContext:
+        fsGroupChangePolicy: Always
+        runAsNonRoot: true
+      setHostnameAsFQDN: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    dltdojo.org/cd23: dafu
+  name: ing101-whoami-service-c8f1f172
+spec:
+  externalIPs: []
+  ports:
+    - port: 80
+  selector:
+    cdk8s.io/metadata.addr: ing101-whoami-c8d711e5
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dltdojo.org/cd23: dafu
+  name: ing101-nginx-c8e4e853
+spec:
+  minReadySeconds: 0
+  progressDeadlineSeconds: 600
+  replicas: 2
+  selector:
+    matchLabels:
+      cdk8s.io/metadata.addr: ing101-nginx-c8b56bb9
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        cdk8s.io/metadata.addr: ing101-nginx-c8b56bb9
+        dltdojo.org/cd23: dafu
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - image: nginx
+          imagePullPolicy: Always
+          name: main
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: 1500m
+              memory: 2048Mi
+            requests:
+              cpu: 1000m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
+          startupProbe:
+            failureThreshold: 3
+            tcpSocket:
+              port: 80
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      securityContext:
+        fsGroupChangePolicy: Always
+        runAsNonRoot: true
+      setHostnameAsFQDN: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    dltdojo.org/cd23: dafu
+  name: ing101-nginx-service-c8554b95
+spec:
+  externalIPs: []
+  ports:
+    - port: 80
+  selector:
+    cdk8s.io/metadata.addr: ing101-nginx-c8b56bb9
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    io.cilium.ingress/insecure-node-port: "32080"
+    io.cilium.ingress/loadbalancer-mode: dedicated
+    io.cilium.ingress/service-type: NodePort
+  labels:
+    dltdojo.org/cd23: dafu
+  name: ing101-ing-c80aaa38
+spec:
+  defaultBackend:
+    service:
+      name: ing101-whoami-service-c8f1f172
+      port:
+        number: 80
+  ingressClassName: cilium
+  rules:
+    - host: dev101.default.svc
+      http:
+        paths:
+          - backend:
+              service:
+                name: ing101-whoami-service-c8f1f172
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+    - host: dev201.default.svc
+      http:
+        paths:
+          - backend:
+              service:
+                name: ing101-nginx-service-c8554b95
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
