@@ -57,20 +57,45 @@ const handleRunLevel = async (
   }
 };
 
-const fnArgCurl = z.object({
+const argDevCurl = z.object({
   url: z.string().url(),
+  image: z.string().min(5).default("curlimages/curl:7.88.1"),
 });
 
-const handleCurl = async (fnArg: z.infer<typeof fnArgCurl>) => {
-  fnArgCurl.parse(fnArg);
-  // 
+export const genRanString = () => {
+  return Math.random().toString(36).substring(2, 7);
+};
+
+const devCurl = async (fnArg: z.input<typeof argDevCurl>) => {
+  const x = argDevCurl.parse(fnArg);
+  //
   // [run commands don't return when using kubectl 1.22.x · Issue #1098 · kubernetes/kubectl](https://github.com/kubernetes/kubectl/issues/1098)
   //
-  await $`KUBECTL_COMMAND_HEADERS=false kubectl run -it --rm debug-${Math.random().toString(36).substring(2,7)} \
-  --image=curlimages/curl:7.88.1 \
+  await $`KUBECTL_COMMAND_HEADERS=false kubectl run -it --rm debug-${genRanString()} \
+  --image=${x.image} \
   --restart=Never \
   --timeout=10s \
-  -- sh -c 'env; curl -v --connect-timeout 5 ${fnArg.url}'`;
+  -- sh -c 'date; id; env; curl -v --connect-timeout 5 ${x.url}'`;
+};
+
+const shTesting = `#!/bin/sh
+env
+echo "==> hello sh world"
+id
+date
+busybox | head -1
+`;
+
+const argShellScript = z.object({
+  sh: z.string().min(5).default(shTesting),
+  image: z.string().min(5).default("busybox:1.36"),
+});
+
+const devBusyboxSh = async (fnArg: z.input<typeof argShellScript>) => {
+  const x = argShellScript.parse(fnArg);
+  // await $`echo ${x.image}`;
+  await $`kubectl run -i --rm debug-${genRanString()} --image=${x.image} -- sh`
+    .stdinText(x.sh);
 };
 
 const ing101 = new Command()
@@ -122,13 +147,27 @@ const bar = new Command()
     console.log(args);
   });
 
-const curl = new Command()
+const cmdCurl = new Command()
   .description("curl in k8s")
+  .option("--image <val:string>", "The image for the curl container.")
   .arguments("<url:string>")
   .action(async (options, ...args) => {
-    await handleCurl({
-      url: args[0]
-    })
+    await devCurl({
+      url: args[0],
+      image: options.image
+    });
+  });
+
+const cmdBusyboxSh = new Command()
+  .description("busybox sh in k8s.")
+  .option("--image <val:string>", "The image for the container to run shell script.")
+  .option("-i, --stdin [stdin:boolean]", "Read shell script from stdin.")
+  .action(async (options, ...args) => {
+    let sh = undefined;
+    if (options.stdin) {
+      sh = new TextDecoder().decode(await readAll(Deno.stdin));
+    }
+    await devBusyboxSh({ sh, image: options.image });
   });
 
 export const CliffyCmd = new Command()
@@ -145,7 +184,8 @@ export const CliffyCmd = new Command()
     default: "info" as const,
   })
   .command("ing101", ing101)
-  .command("curl", curl)
+  .command("dev-curl", cmdCurl)
+  .command("dev-sh", cmdBusyboxSh)
   .command("foo", foo)
   // Child command 2.
   .command("bar", bar)
