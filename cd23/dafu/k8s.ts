@@ -1,5 +1,17 @@
-import { ApiObject, App, Chart, JsonPatch } from "npm:cdk8s";
-import { Deployment, Ingress, IngressBackend } from "npm:cdk8s-plus-25";
+import {
+  ApiObject,
+  ApiObjectMetadataDefinition,
+  App,
+  Chart,
+  JsonPatch,
+} from "npm:cdk8s";
+import {
+  Deployment,
+  Ingress,
+  IngressBackend,
+  Service,
+} from "npm:cdk8s-plus-25";
+import { z } from "https://deno.land/x/zod@v3.20.5/mod.ts";
 
 export class Kapp {
   app: App;
@@ -13,53 +25,56 @@ export class Kapp {
   }
 }
 
-const addCd23Labels = (...metadatas) => {
-  metadatas.forEach((v) => v.addLabel("dltdojo.org/cd23", "dafu"));
+const fnArgLabel = z.object({
+  key: z.string().min(5),
+  value: z.string().min(3),
+});
+
+const LabelCd23: z.infer<typeof fnArgLabel> = {
+  key: "dltdojo.org/cd23",
+  value: "dafu101",
 };
 
-export const getWhoamiDeplyAndSvc = (chart: Chart) => {
-  const deploy = new Deployment(chart, "whoami", {
-    replicas: 2,
-    containers: [{
-      image: "traefik/whoami",
-      portNumber: 80,
-      securityContext: {
-        ensureNonRoot: false,
-      },
-    }],
-  });
-  const svc = deploy.exposeViaService({
-    ports: [
-      {
-        port: 80,
-      },
-    ],
-  });
-
-  addCd23Labels(deploy.metadata, deploy.podMetadata, svc.metadata)
-  return svc;
+const addCd23Labels = (
+  label: z.infer<typeof fnArgLabel>,
+  ...metadatas: ApiObjectMetadataDefinition[]
+) => {
+  fnArgLabel.parse(label);
+  metadatas.forEach((v) => v.addLabel(label.key, label.value));
 };
 
-export const getNginxDeplyAndSvc = (chart: Chart) => {
-  const deploy = new Deployment(chart, "nginx", {
+const fnArgDevDeploy = z.object({
+  img: z.string().min(5),
+  portNumber: z.number().gte(80),
+  svcDnsId: z.string().min(3),
+});
+
+export const getDevDeplyAndSvc = (chart: Chart, fnarg: z.infer<typeof fnArgDevDeploy>) => {
+  fnArgDevDeploy.parse(fnarg);
+  const deploy = new Deployment(chart, fnarg.img, {
     replicas: 2,
     containers: [{
-      image: "nginx",
-      portNumber: 80,
+      image: fnarg.img,
+      portNumber: fnarg.portNumber,
       securityContext: {
         ensureNonRoot: false,
         readOnlyRootFilesystem: false,
       },
     }],
-  })
-  const svc = deploy.exposeViaService({
+  });
+  const svc = new Service(chart, fnarg.svcDnsId, {
+    metadata: {
+      name: fnarg.svcDnsId,
+    },
+    selector: deploy,
     ports: [
       {
-        port: 80,
+        port: fnarg.portNumber,
       },
     ],
   });
-  addCd23Labels(deploy.metadata, deploy.podMetadata, svc.metadata)
+
+  addCd23Labels(LabelCd23, deploy.metadata, deploy.podMetadata, svc.metadata);
   return svc;
 };
 
@@ -75,7 +90,7 @@ export const getNodePortIngress = (chart: Chart) => {
     },
   });
 
-  addCd23Labels(ingress.metadata)
+  addCd23Labels(LabelCd23, ingress.metadata);
 
   // IngressClassName only in cdk8splus26/k8s/IngressSpec.go
   // https://github.com/search?q=org%3Acdk8s-team+ingressClassName&type=code
@@ -93,8 +108,16 @@ export class DemoCiliumIngressNodePort {
   constructor(name: string) {
     this.appName = name || "k101";
     this.kapp = new Kapp(this.appName);
-    const svcWhoami = getWhoamiDeplyAndSvc(this.kapp.chart);
-    const svcNginx = getNginxDeplyAndSvc(this.kapp.chart);
+    const svcWhoami = getDevDeplyAndSvc(this.kapp.chart, {
+      img: "traefik/whoami:v1.8.7",
+      portNumber: 80,
+      svcDnsId: "dev101",
+    });
+    const svcNginx = getDevDeplyAndSvc(this.kapp.chart, {
+      img: "nginx:stable-alpine",
+      portNumber: 80,
+      svcDnsId: "dev201",
+    });
     //
     // https://docs.cilium.io/en/stable/network/servicemesh/ingress/
     // https://docs.cilium.io/en/stable/network/servicemesh/http/

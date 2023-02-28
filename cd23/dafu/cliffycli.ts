@@ -25,25 +25,23 @@ const fnArgRunHandle = z.object({
   dir: z.string().min(1),
 });
 
-type FnArgRunHandle = z.infer<typeof fnArgRunHandle>;
-
 const handleRunLevel = async (
   lv: ConfRunLevel,
-  fnarg: FnArgRunHandle,
+  fnarg: z.infer<typeof fnArgRunHandle>,
 ) => {
-  fnArgRunHandle.parse(fnarg)
-  const confDir = $.path(fnarg.dir)
-  const confFile = confDir.join(fnarg.filename)
+  fnArgRunHandle.parse(fnarg);
+  const confDir = $.path(fnarg.dir);
+  const confFile = confDir.join(fnarg.filename);
   switch (lv) {
     case ConfRunLevel.dryrun:
       console.log(fnarg.confContent);
       break;
     case ConfRunLevel.write:
       console.log(`write conf to ${fnarg.filename}`);
-      if(!confDir.isDir()){
+      if (!confDir.isDir()) {
         confDir.mkdirSync();
       }
-      confFile.writeTextSync(fnarg.confContent)
+      confFile.writeTextSync(fnarg.confContent);
       break;
     case ConfRunLevel.apply:
       console.log(`apply -f ${confFile}`);
@@ -58,6 +56,23 @@ const handleRunLevel = async (
       break;
   }
 };
+
+const fnArgCurl = z.object({
+  url: z.string().url(),
+});
+
+const handleCurl = async (fnArg: z.infer<typeof fnArgCurl>) => {
+  fnArgCurl.parse(fnArg);
+  // 
+  // [run commands don't return when using kubectl 1.22.x · Issue #1098 · kubernetes/kubectl](https://github.com/kubernetes/kubectl/issues/1098)
+  //
+  await $`KUBECTL_COMMAND_HEADERS=false kubectl run -it --rm debug-${Math.random().toString(36).substring(2,7)} \
+  --image=curlimages/curl:7.88.1 \
+  --restart=Never \
+  --timeout=10s \
+  -- sh -c 'env; curl -v --connect-timeout 5 ${fnArg.url}'`;
+};
+
 const ing101 = new Command()
   .description("cilium ingress controller example")
   .option("-f, --foo", "Foo option.")
@@ -107,6 +122,15 @@ const bar = new Command()
     console.log(args);
   });
 
+const curl = new Command()
+  .description("curl in k8s")
+  .arguments("<url:string>")
+  .action(async (options, ...args) => {
+    await handleCurl({
+      url: args[0]
+    })
+  });
+
 export const CliffyCmd = new Command()
   .name("dafu")
   .version("0.1.0")
@@ -121,6 +145,7 @@ export const CliffyCmd = new Command()
     default: "info" as const,
   })
   .command("ing101", ing101)
+  .command("curl", curl)
   .command("foo", foo)
   // Child command 2.
   .command("bar", bar)
