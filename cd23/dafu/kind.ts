@@ -17,10 +17,10 @@ const KindConfRegistry = z.object({
 });
 
 export class KindYaml {
-  body: any;
+  #body: any;
   constructor(farg: z.input<typeof KindConf>) {
     const x = KindConf.parse(farg);
-    this.body = parse(`apiVersion: kind.x-k8s.io/v1alpha4
+    this.#body = parse(`apiVersion: kind.x-k8s.io/v1alpha4
 kind: Cluster
 name: ${x.kindName}
 nodes:
@@ -36,10 +36,10 @@ nodes:
     const patchArray = [
       `[plugins."io.containerd.grpc.v1.cri".registry.mirrors."${arg.registryHost}:${arg.registryPort}"]\n  endpoint = ["http://${arg.registryHost}:${arg.registryPort}"]`,
     ];
-    this.body.containerdConfigPatches = patchArray;
+    this.#body.containerdConfigPatches = patchArray;
   }
 
   get yaml() {
-    return stringify(this.body);
+    return stringify(this.#body);
   }
 }

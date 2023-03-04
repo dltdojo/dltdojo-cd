@@ -37,6 +37,38 @@ export const ensureAuthenticated = async (req:any, res:any, next:any) => {
 
 - https://github.com/sigstore/sigstore/blob/f3c233997094a529aeddfdaa0cf640655df13e2c/pkg/oauth/oidc/interactive.go#L56
 
+後端 redirectUrl 收到後，後端須依據拿到的 req.query.code 去 token_endpoint 拿 id_token
+
+```ts
+const tokenUrl: string = `${issuer}/v1/token`;
+const code: string = req.query.code;
+
+const headers = new Headers();
+headers.append('Accept', 'application/json');
+headers.append('Authorization', `Basic ${btoa(clientId + ':' + clientSecret)}`);
+headers.append('Content-Type', 'application/x-www-form-urlencoded');
+
+const response = await fetch(tokenUrl, {
+  method: 'POST',
+  headers: headers,
+  body: `grant_type=authorization_code&redirect_uri=${encodeURIComponent(redirectUrl)}&code=${code}`
+});
+
+const data = await response.json();
+if (!response.ok) {
+  res.send(data);
+} else {
+  const user = parseJwt(data.id_token);
+  req.app.locals.user = user;
+  req.app.locals.isAuthenticated = true;
+  res.location(req.query.state.split(':')[1] || '/').sendStatus(302);
+}
+```
+
+整理一下，依據 .well-known/openid-configuration 資訊
+
+- 開始後端需要讓前端轉到 IDP authorization_endpoint 並加上需要參數，其中的 redirectUrl 需要轉到可驗證端點，這裡是同一個服務走下去。
+- 轉回後換成後端拿這個內容的 code 在編寫部份設定後往 IDP token_endpoint 取得 id_token 鑑別身分無誤。
 
 其它
 

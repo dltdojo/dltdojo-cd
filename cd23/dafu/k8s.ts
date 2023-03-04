@@ -15,14 +15,14 @@ import { ConfigureFile, Dockerfiles, ShellScripts } from "./shellscript.ts";
 import { CONF, K8S_SERVICE } from "./appconf.ts";
 
 export class Kapp {
-  app: App;
+  #app: App;
   chart: Chart;
   constructor(chartId = "c101") {
-    this.app = new App();
-    this.chart = new Chart(this.app, chartId);
+    this.#app = new App();
+    this.chart = new Chart(this.#app, chartId);
   }
   get yaml(): string {
-    return this.app.synthYaml();
+    return this.#app.synthYaml();
   }
 }
 
