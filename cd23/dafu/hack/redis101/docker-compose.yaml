@@ -1,0 +1,63 @@
+version: "3.9"
+services:
+  redis101:
+    image: "redis:7-alpine"
+    command:
+      - sh
+      - -c
+      - |
+        date
+        cat <<'EOF' > /etc/redis.config
+        bind 0.0.0.0
+        protected-mode no
+        EOF
+        redis-server /etc/redis.config
+  redis-cli:
+    image: "redis:7-alpine"
+    command:
+      - sh
+      - -c
+      - |
+        date
+        sleep 5
+        redis-cli -h redis101 SET mykey "Hello World"
+        redis-cli -h redis101 GET mykey
+  redis-deno-npm:
+    image: denoland/deno:1.31.1
+    command:
+      - sh
+      - -c
+      - |
+        date
+        sleep 5
+        deno --version
+        deno run -A - <<'EOF'
+        import { createClient } from "npm:redis@4.6.5";
+        const client = createClient({
+            url: "redis://redis101:6379",
+        });
+        await client.connect();
+        await client.set('foo101', 'hello world1234');
+        const cached_foo101 = await client.get('foo101');
+        console.log(cached_foo101)
+        client.disconnect()
+        EOF
+  redis-deno:
+    image: denoland/deno:1.31.1
+    command:
+      - sh
+      - -c
+      - |
+        date
+        sleep 7
+        deno --version
+        deno run -A - <<'EOF'
+        import { connect } from "https://deno.land/x/redis/mod.ts";
+        const redis = await connect({
+          hostname: "redis101",
+          port: 6379,
+        });
+        const ok = await redis.set("hoge", "fuga");
+        const fuga = await redis.get("hoge");
+        console.log(fuga)
+        EOF
