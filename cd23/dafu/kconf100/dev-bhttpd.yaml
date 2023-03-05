@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: c101-busybox1.36-c8b4949f
+spec:
+  minReadySeconds: 0
+  progressDeadlineSeconds: 600
+  replicas: 1
+  selector:
+    matchLabels:
+      cdk8s.io/metadata.addr: c101-busybox1.36-c8ddf1cc
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        cdk8s.io/metadata.addr: c101-busybox1.36-c8ddf1cc
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - args:
+            - sh
+            - -c
+            - |-
+              #!/bin/sh
+              id
+              env
+              date
+              busybox | head -1
+              mkdir /www
+              echo "<html><head><title>HELLO WORLD</title></head><body><h1>HELLO WORLD</h1></body></html>" > /www/index.html
+              busybox httpd -fv -h /www -p 3000
+          image: busybox:1.36
+          imagePullPolicy: Always
+          name: main
+          ports:
+            - containerPort: 3000
+          resources:
+            limits:
+              cpu: 100m
+              memory: 64Mi
+            requests:
+              cpu: 50m
+              memory: 32Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
+          startupProbe:
+            failureThreshold: 3
+            tcpSocket:
+              port: 3000
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      securityContext:
+        fsGroupChangePolicy: Always
+        runAsNonRoot: true
+      setHostnameAsFQDN: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bhttpd136
+spec:
+  externalIPs: []
+  ports:
+    - port: 3000
+  selector:
+    cdk8s.io/metadata.addr: c101-busybox1.36-c8ddf1cc
+  type: ClusterIP

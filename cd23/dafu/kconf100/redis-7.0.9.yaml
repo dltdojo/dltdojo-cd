@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: c101-cm101-c8f236a7
+data:
+  redis-config: |-
+    # Redis configuration file
+    bind 0.0.0.0
+    protected-mode no
+    maxmemory 2mb
+    maxmemory-policy allkeys-lru
+immutable: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: c101-redis7.0.9-alpine3.17-c8da4422
+spec:
+  minReadySeconds: 0
+  progressDeadlineSeconds: 600
+  replicas: 1
+  selector:
+    matchLabels:
+      cdk8s.io/metadata.addr: c101-redis7.0.9-alpine3.17-c8786c1d
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        cdk8s.io/metadata.addr: c101-redis7.0.9-alpine3.17-c8786c1d
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - command:
+            - redis-server
+            - /redis-master/redis.conf
+          env:
+            - name: MASTER
+              value: "true"
+          image: redis:7.0.9-alpine3.17
+          imagePullPolicy: Always
+          name: main
+          ports:
+            - containerPort: 6379
+          resources:
+            limits:
+              cpu: 100m
+              memory: 64Mi
+            requests:
+              cpu: 50m
+              memory: 32Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
+          startupProbe:
+            failureThreshold: 3
+            tcpSocket:
+              port: 6379
+          volumeMounts:
+            - mountPath: /redis-master
+              name: configmap-c101-cm101-c8f236a7
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      securityContext:
+        fsGroupChangePolicy: Always
+        runAsNonRoot: true
+      setHostnameAsFQDN: false
+      volumes:
+        - configMap:
+            items:
+              - key: redis-config
+                mode: 444
+                path: redis.conf
+            name: c101-cm101-c8f236a7
+          name: configmap-c101-cm101-c8f236a7
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis101
+spec:
+  externalIPs: []
+  ports:
+    - port: 6379
+  selector:
+    cdk8s.io/metadata.addr: c101-redis7.0.9-alpine3.17-c8786c1d
+  type: ClusterIP

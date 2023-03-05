@@ -1,6 +1,7 @@
 import { ApiObject, App, Chart, Duration, JsonPatch, Size } from "npm:cdk8s";
 import {
   ConfigMap,
+  ContainerResources,
   Cpu,
   Deployment,
   EnvValue,
@@ -26,6 +27,29 @@ export class Kapp {
   }
 }
 
+const Resource = {
+  C100: {
+    cpu: {
+      limit: Cpu.millis(100),
+      request: Cpu.millis(50),
+    },
+    memory: {
+      limit: Size.mebibytes(64),
+      request: Size.mebibytes(32),
+    },
+  },
+  C1000: {
+    cpu: {
+      limit: Cpu.millis(1000),
+      request: Cpu.millis(500),
+    },
+    memory: {
+      limit: Size.mebibytes(640),
+      request: Size.mebibytes(320),
+    },
+  },
+};
+
 const ArgDevDeploy = z.object({
   img: z.string().min(5),
   portNumber: z.number().gte(80),
@@ -39,6 +63,7 @@ export const addDevDeplyAndSvc = (
   envs?: {
     [name: string]: EnvValue;
   },
+  res?: ContainerResources,
 ) => {
   const x = ArgDevDeploy.parse(farg);
   const deploy = new Deployment(chart, x.img, {
@@ -51,16 +76,7 @@ export const addDevDeplyAndSvc = (
         ensureNonRoot: false,
         readOnlyRootFilesystem: false,
       },
-      resources: {
-        cpu: {
-          limit: Cpu.millis(100),
-          request: Cpu.millis(50),
-        },
-        memory: {
-          limit: Size.mebibytes(64),
-          request: Size.mebibytes(32),
-        },
-      },
+      resources: res ?? Resource.C100,
     }],
   });
 
@@ -126,6 +142,39 @@ const SupportTools = {
 };
 
 export const InfraServices = {
+
+  //
+  // helm template vault hashicorp/vault -n default --set "server.dev.enabled=true" --set "injector.enabled=false" --set "csi.enabled=false" > vault.yaml
+  //
+  DeploySvcVaultDevOnly: () => {
+    const kapp = new Kapp();
+    // VAULT_DEV_ROOT_TOKEN_ID=myroot
+    // - name: SKIP_CHOWN value: "true"
+    // - name: SKIP_SETCAP value: "true"
+    // 重點是 VAULT_API_ADDR 牽涉到 oidc well-known/openid-configuration 的 host:port 位置。
+    const envVariable = {
+      "VAULT_DEV_ROOT_TOKEN_ID": EnvValue.fromValue("myroot"),
+      "SKIP_CHOWN": EnvValue.fromValue("true"),
+      "SKIP_SETCAP": EnvValue.fromValue("true"),
+      "VAULT_DEV_LISTEN_ADDRESS": EnvValue.fromValue("[::]:8200"),
+      "VAULT_API_ADDR": EnvValue.fromValue("http://vault101.default.svc:8200")
+    };
+    const { deploy, svc } = addDevDeplyAndSvc(
+      kapp.chart,
+      {
+        replicas: 1,
+        img: K8S_SERVICE.VAULT_IMG,
+        portNumber: 8200,
+        svcDnsId: K8S_SERVICE.VAULT_SRV_ID,
+      },
+      envVariable,
+      Resource.C1000,
+    );
+
+    SupportTools.addContainerSh(deploy, 0, ShellScripts.VaultDev);
+    return kapp.yaml;
+  },
+
   DeploySvcRedis: () => {
     // https://hub.docker.com/_/redis/tags
     // 7.0.9-alpine3.17

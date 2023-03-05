@@ -78,3 +78,11 @@ if (!response.ok) {
 - https://github.com/dltdojo/dltdojo-cd/blob/e955a6fa2f41a4fec837ecd042963d4b044b7603/cd22/web090-passkeys/d104-authn.ts
 - [Dashport: A Login Solution for Deno | by Sam Portelance | The Startup | Medium](https://medium.com/swlh/dashport-a-login-solution-for-deno-574df45d9927)
 - [oslabs-beta/dashport: Local and OAuth authentication middleware for Deno](https://github.com/oslabs-beta/dashport)
+
+
+# vault
+
+```sh
+deno run -A app.ts xxx-vault -t save
+helm template vault hashicorp/vault -n default --set "server.dev.enabled=true" --set "injector.enabled=false" --set "csi.enabled=false" > vault-helm.yaml
+```

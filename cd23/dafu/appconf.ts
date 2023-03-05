@@ -17,5 +17,8 @@ export const K8S_SERVICE = {
     REDIS_FILENAME: 'redis-7.0.9.yaml',
     REDIS_IMG: "redis:7.0.9-alpine3.17",
     REDIS_SRV_ID: "redis101",
+    VAULT_FILENAME: 'vault-1.12.3.yaml',
+    VAULT_IMG: "vault:1.12.3",
+    VAULT_SRV_ID: "vault101",
     DENO_IMG_101: 'denoland/deno:1.31.1'
 }

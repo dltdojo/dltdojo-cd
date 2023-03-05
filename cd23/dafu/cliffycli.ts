@@ -4,7 +4,12 @@ import {
   HelpCommand,
 } from "https://deno.land/x/cliffy@v0.25.7/command/mod.ts";
 import { readAll } from "https://deno.land/std@0.177.0/streams/read_all.ts";
-import { DevHttpServices, InfraServices, jobKanikoBuild, TJobReq } from "./k8s.ts";
+import {
+  DevHttpServices,
+  InfraServices,
+  jobKanikoBuild,
+  TJobReq,
+} from "./k8s.ts";
 import $ from "https://deno.land/x/dax@0.28.0/mod.ts";
 import { z } from "https://deno.land/x/zod@v3.20.5/mod.ts";
 import { CONF, K8S_SERVICE } from "./appconf.ts";
@@ -115,7 +120,6 @@ const KindTool = {
     }),
 };
 
-
 const K8sServices = {
   CmdBhttpWhoAmi: new Command()
     .description("whoami sub-command.")
@@ -141,12 +145,11 @@ const K8sServices = {
     .description("install keda")
     .type("handle-level", confHandleType)
     .option("-t, --type <val:handle-level>", "conf handle type")
-    .action(async (options, ...args) => {
-
-      let content = undefined
+    .action(async (options) => {
+      let content = undefined;
 
       if (options.type === "save") {
-        content = await $.request(K8S_SERVICE.KEDA_URL_DEPLOYMENT).text()
+        content = await $.request(K8S_SERVICE.KEDA_URL_DEPLOYMENT).text();
       }
 
       await confOperate({
@@ -161,9 +164,8 @@ const K8sServices = {
     .description("install redis")
     .type("handle-level", confHandleType)
     .option("-t, --type <val:handle-level>", "conf handle type")
-    .action(async (options, ...args) => {
-
-      let content = InfraServices.DeploySvcRedis()
+    .action(async (options) => {
+      const content = InfraServices.DeploySvcRedis();
 
       await confOperate({
         cli: "kubectl",
@@ -172,8 +174,21 @@ const K8sServices = {
         filename: K8S_SERVICE.REDIS_FILENAME,
       });
     }),
-}
+  CmdVault: new Command()
+    .description("install vault dev")
+    .type("handle-level", confHandleType)
+    .option("-t, --type <val:handle-level>", "conf handle type")
+    .action(async (options) => {
+      const content = InfraServices.DeploySvcVaultDevOnly();
 
+      await confOperate({
+        cli: "kubectl",
+        type: options.type,
+        content,
+        filename: K8S_SERVICE.VAULT_FILENAME,
+      });
+    }),
+};
 
 const DockerTool = {
   CmdSetupRegistry: new Command()
@@ -194,68 +209,90 @@ const DockerTool = {
       await $.sleep(1000);
 
       await $`docker network inspect kind`;
-    })
+    }),
+};
 
-}
-
-
-const CmdTestTool = {
-
+const TestTool = {
   CmdDenoRedis: new Command()
-  .description("xxx in k8s")
-  .action(async (options, ...args) => {
-    const tsRedisClient = $.path("./redis-client-nodejs.ts")
-    await DevTool.DevDenoTs({ sh: tsRedisClient.textSync(), image: K8S_SERVICE.DENO_IMG_101 });
-  }),
+    .description("Redis Testing")
+    .action(async (options, ...args) => {
+      const tsRedisClient = $.path("./redis-client-nodejs.ts");
+      await DevTool.DevDenoTs({
+        sh: tsRedisClient.textSync(),
+        image: K8S_SERVICE.DENO_IMG_101,
+      });
+    }),
 
-  TestBuildImage: async (imgRegistryHost: string, imgRepoName: string, imgTag: string, testsh: string) => {
+  CmdVaultOidc: new Command()
+    .description("Vault/OIDC Testing")
+    .action(async () => {
+      await DevTool.DevCurl({
+        url:
+          "http://vault101.default.svc:8200/v1/identity/oidc/provider/my-provider/.well-known/openid-configuration",
+      });
+    }),
+
+  TestBuildImage: async (
+    imgRegistryHost: string,
+    imgRepoName: string,
+    imgTag: string,
+    testsh: string,
+  ) => {
     //  deno run -A app100.ts dev-curl http://registry.local:5001/v2/hellok8s/manifests/0.1.1
     await DevTool.DevCurl({ url: `http://${imgRegistryHost}/v2/_catalog` });
     await DevTool.DevCurl({
-      url:
-        `http://${imgRegistryHost}/v2/${imgRepoName}/manifests/${imgTag}`,
+      url: `http://${imgRegistryHost}/v2/${imgRepoName}/manifests/${imgTag}`,
     });
     await DevTool.DevBusyboxSh({
-      image:
-        `${imgRegistryHost}/${imgRepoName}:${imgTag}`,
+      image: `${imgRegistryHost}/${imgRepoName}:${imgTag}`,
       sh: testsh,
     });
   },
   CmdBhttpWhoAmi: new Command()
     .description("test cmd110")
     .action(async (options, ...args) => {
-      await DevTool.DevCurl({ url: 'http://dev101.default.svc' });
-      await DevTool.DevCurl({ url: 'http://bhttpd136.default.svc:3000' });
-    })
-  ,
+      await DevTool.DevCurl({ url: "http://dev101.default.svc" });
+      await DevTool.DevCurl({ url: "http://bhttpd136.default.svc:3000" });
+    }),
   CmdBuildImgBusybox: new Command()
     .action(async (options, ...args) => {
-      await CmdTestTool.TestBuildImage(CONF.REGISTRY_HOST_PORT_101(), CONF.ERGISTRY_REPO_101, CONF.DEV_BUSYBOX_TAG_101, ShellScripts.BusyboxHello)
+      await TestTool.TestBuildImage(
+        CONF.REGISTRY_HOST_PORT_101(),
+        CONF.ERGISTRY_REPO_101,
+        CONF.DEV_BUSYBOX_TAG_101,
+        ShellScripts.BusyboxHello,
+      );
     }),
 
   CmdBuildImgDenoApk: new Command()
-    .action(async (options, ...args) => {
-      await CmdTestTool.TestBuildImage(CONF.REGISTRY_HOST_PORT_101(), CONF.ERGISTRY_REPO_101, CONF.DEV_DENO_APK_TAG_101, ShellScripts.DenoAlpineGitCurl)
-    })
-}
-
+    .action(async () => {
+      await TestTool.TestBuildImage(
+        CONF.REGISTRY_HOST_PORT_101(),
+        CONF.ERGISTRY_REPO_101,
+        CONF.DEV_DENO_APK_TAG_101,
+        ShellScripts.DenoAlpineGitCurl,
+      );
+    }),
+};
 
 const DevToolType = {
+
   ArgDevCurl: z.object({
     url: z.string().url(),
     image: z.string().min(5).default("curlimages/curl:7.88.1"),
   }),
+  
   ArgShellScript: z.object({
     sh: z.string().min(5).default(ShellScripts.BusyboxHello),
     image: z.string().min(5).default("busybox:1.36"),
-  })
-}
+  }),
+};
 
 const DevTool = {
   CmdInfo: new Command()
     .action(async () => {
-      await $`kind get clusters`.printCommand()
-      await $`kubectl get po,svc,deploy,job -A`.printCommand()
+      await $`kind get clusters`.printCommand();
+      await $`kubectl get po,svc,deploy,job -A`.printCommand();
     }),
 
   DevCurl: async (fnArg: z.input<typeof DevToolType.ArgDevCurl>) => {
@@ -305,11 +342,10 @@ const DevTool = {
         sh = new TextDecoder().decode(await readAll(Deno.stdin));
       }
       await DevTool.DevBusyboxSh({ sh, image: options.image });
-    })
-}
+    }),
+};
 
 const BuildImgTool = {
-
   CmdImgBusybox: new Command()
     .description("kaniko build sub-command.")
     .type("handle-level", confHandleType)
@@ -324,8 +360,7 @@ const BuildImgTool = {
         imgTag,
         dockerFileText,
       );
-    })
-  ,
+    }),
 
   CmdImgApk: new Command()
     .description("kaniko build sub-command.")
@@ -369,8 +404,7 @@ const BuildImgTool = {
     //   await $`kubectl wait --for=condition=complete job/${jobMetadataName} --timeout=300s`;
     //   await handleAfterBuildImage(confJob, testsh);
     // }
-  }
-  ,
+  },
 
   __cmd220BuildImgRaw: new Command()
     .description("kaniko build sub-command.")
@@ -393,9 +427,8 @@ const BuildImgTool = {
       });
       await $.sleep(1000);
       await $`kubectl delete -f kconf100/build100.yaml`;
-    })
-}
-
+    }),
+};
 
 const confRunLevelType = new EnumType(ConfRunLevel);
 
@@ -539,31 +572,33 @@ const cmdCurl = new Command()
   });
 
 export const DafuCmd = new Command()
-.name("dafu")
-.version("0.1.1")
-.description("Command line tool for dltdojo-cd/cd23")
-.meta("deno", Deno.version.deno)
-.meta("v8", Deno.version.v8)
-.meta("typescript", Deno.version.typescript)
-.type("log-level", logLevelType)
-.env("DEBUG=<enable:boolean>", "Enable debug output.")
-.globalOption("-d, --debug", "Enable debug output.")
-.option("-l, --log-level <level:log-level>", "Set log level.", {
-  default: "info" as const,
-})
-.command("info", DevTool.CmdInfo)
-.command("100-kind", KindTool.CmdSetupKind)
-.command("110-bhttp-whoami", K8sServices.CmdBhttpWhoAmi)
-.command("110-bhttp-whoami-test", CmdTestTool.CmdBhttpWhoAmi)
-.command("120-keda", K8sServices.CmdKeda)
-.command("130-redis", K8sServices.CmdRedis)
-.command("130-redis-test", CmdTestTool.CmdDenoRedis)
-.command("200-kind-registry", KindTool.CmdSetupKindRegistry)
-.command("210-docker-registry", DockerTool.CmdSetupRegistry)
-.command("220-buildimg", BuildImgTool.CmdImgBusybox)
-.command("220-buildimg-test", CmdTestTool.CmdBuildImgBusybox)
-.command("221-buildimg-apk", BuildImgTool.CmdImgApk)
-.command("221-buildimg-apk-test", CmdTestTool.CmdBuildImgDenoApk)
-.command("dev-curl", DevTool.CmdCurl)
-.command("dev-sh", DevTool.CmdBusyboxSh)
-.command("help", new HelpCommand().global());
+  .name("dafu")
+  .version("0.1.1")
+  .description("Command line tool for dltdojo-cd/cd23")
+  .meta("deno", Deno.version.deno)
+  .meta("v8", Deno.version.v8)
+  .meta("typescript", Deno.version.typescript)
+  .type("log-level", logLevelType)
+  .env("DEBUG=<enable:boolean>", "Enable debug output.")
+  .globalOption("-d, --debug", "Enable debug output.")
+  .option("-l, --log-level <level:log-level>", "Set log level.", {
+    default: "info" as const,
+  })
+  .command("info", DevTool.CmdInfo)
+  .command("100-kind", KindTool.CmdSetupKind)
+  .command("110-bhttp-whoami", K8sServices.CmdBhttpWhoAmi)
+  .command("110-bhttp-whoami-test", TestTool.CmdBhttpWhoAmi)
+  .command("120-keda", K8sServices.CmdKeda)
+  .command("130-redis", K8sServices.CmdRedis)
+  .command("130-redis-test", TestTool.CmdDenoRedis)
+  .command("140-vault", K8sServices.CmdVault)
+  .command("140-vault-test", TestTool.CmdVaultOidc)
+  .command("200-kind-registry", KindTool.CmdSetupKindRegistry)
+  .command("210-docker-registry", DockerTool.CmdSetupRegistry)
+  .command("220-buildimg", BuildImgTool.CmdImgBusybox)
+  .command("220-buildimg-test", TestTool.CmdBuildImgBusybox)
+  .command("221-buildimg-apk", BuildImgTool.CmdImgApk)
+  .command("221-buildimg-apk-test", TestTool.CmdBuildImgDenoApk)
+  .command("dev-curl", DevTool.CmdCurl)
+  .command("dev-sh", DevTool.CmdBusyboxSh)
+  .command("help", new HelpCommand().global());

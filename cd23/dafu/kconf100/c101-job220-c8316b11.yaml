@@ -1,0 +1,85 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    kaniko.build/repo: hellok8s
+    kaniko.build/tag: 0.1.5-busyboxhello
+  name: c101-job220-c8316b11
+spec:
+  activeDeadlineSeconds: 300
+  template:
+    metadata:
+      labels:
+        cdk8s.io/metadata.addr: c101-job220-c80e6544
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - args:
+            - --dockerfile=Dockerfile
+            - --destination=registry.local:5001/hellok8s:0.1.5-busyboxhello
+            - --context=/worksapce
+            - --insecure
+            - --cache=true
+            - --verbosity=debug
+            - --reproducible
+          image: gcr.io/kaniko-project/executor:latest
+          imagePullPolicy: Always
+          name: main
+          resources:
+            limits:
+              cpu: 1500m
+              memory: 2048Mi
+            requests:
+              cpu: 1000m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
+          volumeMounts:
+            - mountPath: /workspace
+              name: workspace
+      dnsPolicy: ClusterFirst
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - |
+              #!/bin/sh
+              id
+              env
+              date
+              pwd
+              cat <<EOF > /workspace/Dockerfile
+              # busybox
+              FROM busybox:1.36
+              RUN date > /hello
+              EOF
+          image: busybox:1.36
+          imagePullPolicy: Always
+          name: init-0
+          resources:
+            limits:
+              cpu: 1500m
+              memory: 2048Mi
+            requests:
+              cpu: 1000m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: false
+          volumeMounts:
+            - mountPath: /workspace
+              name: workspace
+      restartPolicy: Never
+      securityContext:
+        fsGroupChangePolicy: Always
+        runAsNonRoot: true
+      setHostnameAsFQDN: false
+      volumes:
+        - emptyDir: {}
+          name: workspace
+  ttlSecondsAfterFinished: 300
