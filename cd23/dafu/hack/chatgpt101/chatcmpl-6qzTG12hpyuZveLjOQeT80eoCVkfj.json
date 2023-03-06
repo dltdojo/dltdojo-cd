@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-6qzTG12hpyuZveLjOQeT80eoCVkfj",
+  "object": "chat.completion",
+  "created": 1678087370,
+  "model": "gpt-3.5-turbo-0301",
+  "usage": {
+    "prompt_tokens": 98,
+    "completion_tokens": 324,
+    "total_tokens": 422
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "\n\nTo develop this web app, I would first design the system's architecture using TypeScript. We will have a Frontend which will include the UI/UX components, and the Backend which will consist of the API, database, and server.\n\nFor the Frontend, we would use a framework such as React or Angular, as they provide quick and dynamic rendering. For user authentication, we'll add a login and registration component, which will send HTTP requests to the Backend.\n\nNext, we'll move on to the Backend, where we will use a framework such as NestJS or ExpressJS to create an API that can handle requests from the Frontend. We'll use MongoDB or SQL to store user information, such as username, email, and password.\n\nTo implement roles-based access control, we'll add an authorization middleware to the Backend. This middleware will check each incoming request's JSON web token (JWT) and if the user has the proper role, the request will proceed, and if not, the middleware will reject it. We will also create a separate route for users with admin or company roles, giving them access to related functionalities.\n\nFinally, we will write unit tests to ensure that the app runs as expected, and there are no security vulnerabilities.\n\nTo summarize, the architecture of the web app for registering and saving vehicles would consist of a TypeScript Frontend using React/Angular, a NestJS/ExpressJS Backend with MongoDB/SQL, and a middleware for JWT based security. Users will be assigned roles of admin, user, and company, and access will be granted based on the roles assigned to them."
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

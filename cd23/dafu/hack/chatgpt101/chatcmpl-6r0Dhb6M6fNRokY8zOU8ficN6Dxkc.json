@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-6r0Dhb6M6fNRokY8zOU8ficN6Dxkc",
+  "object": "chat.completion",
+  "created": 1678090249,
+  "model": "gpt-3.5-turbo-0301",
+  "usage": {
+    "prompt_tokens": 792,
+    "completion_tokens": 336,
+    "total_tokens": 1128
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "本文介绍Kubernetes项目的镜像库k8s.gcr.io将于2023年4月3日冻结，Kubernetes及其子项目的镜像不再推送到旧的镜像库中。由于新的镜像库registry.k8s.io已经发布了几个月并对社区和Kubernetes项目有利，因此将现在用新的镜像库来取代旧的镜像库。对于贡献者，如果你是亚项目的维护者，你需要更新你的清单和Helm图表以使用新的镜像库。对于终端用户，1.27的Kubernetes版本不会发布到旧的镜像库中，从4月开始，1.24、1.25和1.26的补丁也不再发布到旧的镜像库中。此外，本文还提供了关于更改时间表的细节。我们建议你一定要确保你的集群不依赖旧的镜像库，因为如果你在旧的镜像库上存在依赖，你的集群可能不安全或者无法正常升级。感谢所有为保证Kubernetes项目的可持续发展做出了努力的贡献者们。"
+      },
+      "finish_reason": null,
+      "index": 0
+    }
+  ]
+}

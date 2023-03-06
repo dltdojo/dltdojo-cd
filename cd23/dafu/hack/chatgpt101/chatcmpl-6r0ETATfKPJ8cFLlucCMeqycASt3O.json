@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-6r0ETATfKPJ8cFLlucCMeqycASt3O",
+  "object": "chat.completion",
+  "created": 1678090297,
+  "model": "gpt-3.5-turbo-0301",
+  "usage": {
+    "prompt_tokens": 796,
+    "completion_tokens": 406,
+    "total_tokens": 1202
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "「k8s.gcr.io」圖片註冊將在2023年4月3日被凍結，這是一個社區擁有的圖像註冊庫，專門用於托管Kubernetes和其相關子項目的容器圖像。將不再推送Kubernetes和相關子項目的更多圖像至該註冊庫。新的registery.k8s.io註冊庫已取代舊註冊庫，並且已於幾個月內普及使用。此更改對維護者意味著需要更新manifests和Helm圖表以使用新的註冊庫。針對最終用戶，1.27的Kubernetes版本將不會在舊的註冊庫中發布。從4月份開始，1.24、1.25和1.26的補丁版本也將不在舊的註冊庫中發布。建議用戶在网络受到限制、想增加集群的可靠性和降低對社區擁有的註冊庫的依賴性，可以考慮托管本地圖像註冊鏡像。建議用戶查看用於它們集群的所有依賴項，以保持集群健康和最新狀態。"
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

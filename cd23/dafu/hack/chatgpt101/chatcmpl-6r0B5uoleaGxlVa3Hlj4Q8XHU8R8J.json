@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-6r0B5uoleaGxlVa3Hlj4Q8XHU8R8J",
+  "object": "chat.completion",
+  "created": 1678090087,
+  "model": "gpt-3.5-turbo-0301",
+  "usage": {
+    "prompt_tokens": 790,
+    "completion_tokens": 215,
+    "total_tokens": 1005
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Kubernetes project has announced that the old registry k8s.gcr.io will be frozen from the 3rd of April 2023, and no further images for Kubernetes and related subprojects will be pushed to the old registry. The new registry registry.k8s.io has been available for several months and has benefits to both the community and the Kubernetes project. End users will no longer be able to access patches and releases on the old registry and will need to update to the new registry. Contributors will need to update their manifests and Helm charts to use the new registry. Setting the default image registry to k8s.gcr.io will fail for new releases of Kubernetes after April. Local image registry mirrors are recommended to increase reliability and remove dependency on the community-owned registry. The timeline of changes has been provided, including the last releases on the old registry for each version of Kubernetes. A command is given to list images used by pods to ensure there are no dependencies on the old registry. Many contributors have been working to ensure the best decisions and communication of plans."
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

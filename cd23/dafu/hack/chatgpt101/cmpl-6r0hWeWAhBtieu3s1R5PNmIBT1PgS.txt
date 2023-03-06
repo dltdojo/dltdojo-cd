@@ -1,0 +1,4 @@
+ The #name property is a private property.
+2. The constructor is a public method.
+3. The getName() method is a public method.
+

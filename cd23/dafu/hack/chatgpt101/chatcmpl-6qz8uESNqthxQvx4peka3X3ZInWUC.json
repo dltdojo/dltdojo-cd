@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-6qz8uESNqthxQvx4peka3X3ZInWUC",
+  "object": "chat.completion",
+  "created": 1678086108,
+  "model": "gpt-3.5-turbo-0301",
+  "usage": {
+    "prompt_tokens": 32,
+    "completion_tokens": 73,
+    "total_tokens": 105
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "\n\nYesterday, I went to the bookshop in Taichung City. \n\nCorrection: \n\n- Changed \"go\" to \"went\" to reflect past tense.\n- Capitalized the \"I\" in \"I went\" to follow proper capitalization rules.\n- Added a comma after \"Yesterday\" to separate the dependent clause from the rest of the sentence."
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

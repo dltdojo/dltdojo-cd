@@ -1,0 +1,19 @@
+{
+  "id": "cmpl-6r0iyeIoPDJdwEXOh6DPUZogEUywU",
+  "object": "text_completion",
+  "created": 1678092188,
+  "model": "code-davinci-002",
+  "choices": [
+    {
+      "text": " The #name property is a private property.\n2. The constructor is a public method.\n3. The getName() method is a public method.\n4. The person variable is an instance of the Person class.\n5. The console.log() method is used to print the name of the person.\n\n",
+      "index": 0,
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 88,
+    "completion_tokens": 68,
+    "total_tokens": 156
+  }
+}

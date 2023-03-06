@@ -1,0 +1,19 @@
+{
+  "id": "cmpl-6r0hWeWAhBtieu3s1R5PNmIBT1PgS",
+  "object": "text_completion",
+  "created": 1678092098,
+  "model": "code-davinci-002",
+  "choices": [
+    {
+      "text": " The #name property is a private property.\n2. The constructor is a public method.\n3. The getName() method is a public method.\n\n",
+      "index": 0,
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 79,
+    "completion_tokens": 35,
+    "total_tokens": 114
+  }
+}

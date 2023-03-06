@@ -1,0 +1,6 @@
+ The #name property is a private property.
+2. The constructor is a public method.
+3. The getName() method is a public method.
+4. The person variable is an instance of the Person class.
+5. The console.log() method is used to print the name of the person.
+
