@@ -14,6 +14,7 @@ import {
 import { z } from "https://deno.land/x/zod@v3.20.5/mod.ts";
 import { ConfigureFile, Dockerfiles, ShellScripts } from "./shellscript.ts";
 import { CONF, K8S_SERVICE } from "./appconf.ts";
+import { nanoid } from 'npm:nanoid';
 
 export class Kapp {
   #app: App;
@@ -26,6 +27,12 @@ export class Kapp {
     return this.#app.synthYaml();
   }
 }
+
+
+const lablesId = {
+  "dltdojo.org/cd23/dafu/genid": nanoid(10)
+}
+
 
 const Resource = {
   C100: {
@@ -67,6 +74,9 @@ export const addDevDeplyAndSvc = (
 ) => {
   const x = ArgDevDeploy.parse(farg);
   const deploy = new Deployment(chart, x.img, {
+    metadata:{
+      labels: lablesId
+    },
     replicas: x.replicas,
     containers: [{
       image: x.img,
@@ -83,6 +93,7 @@ export const addDevDeplyAndSvc = (
   const svc = new Service(chart, x.svcDnsId, {
     metadata: {
       name: x.svcDnsId,
+      labels: lablesId
     },
     selector: deploy,
     ports: [
@@ -97,6 +108,7 @@ export const addDevDeplyAndSvc = (
 export const getNodePortIngress = (chart: Chart) => {
   const ingress = new Ingress(chart, "ing", {
     metadata: {
+      labels: lablesId,
       annotations: {
         "io.cilium.ingress/service-type": "NodePort",
         "io.cilium.ingress/insecure-node-port": "32080",

@@ -15,6 +15,7 @@ import { z } from "https://deno.land/x/zod@v3.20.5/mod.ts";
 import { CONF, K8S_SERVICE } from "./appconf.ts";
 import { KindYaml } from "./kind.ts";
 import { Dockerfiles, ShellScripts } from "./shellscript.ts";
+import { nanoid } from 'npm:nanoid';
 
 const logLevelType = new EnumType(["debug", "info", "warn", "error"]);
 
@@ -32,7 +33,7 @@ const confCliType = new EnumType(CONF_CLI_TYPE);
 
 const ArgRunHandle = z.object({
   id: z.string().min(3).optional().default(
-    `id-${Math.random().toString(36).substring(2, 7)}`,
+    `id-${nanoid(6)}`,
   ),
   type: z.enum(CONF_HANDLE_TYPE).optional().default("print"),
   cli: z.enum(CONF_CLI_TYPE),
@@ -291,6 +292,7 @@ const DevToolType = {
 const DevTool = {
   CmdInfo: new Command()
     .action(async () => {
+      console.log(`> info id: ${nanoid(10)}`)
       await $`kind get clusters`.printCommand();
       await $`kubectl get po,svc,deploy,job -A`.printCommand();
     }),
@@ -300,7 +302,7 @@ const DevTool = {
     //
     // [run commands don't return when using kubectl 1.22.x · Issue #1098 · kubernetes/kubectl](https://github.com/kubernetes/kubectl/issues/1098)
     //
-    await $`KUBECTL_COMMAND_HEADERS=false kubectl run -it --rm debug-${CONF.GenRanString()} \
+    await $`KUBECTL_COMMAND_HEADERS=false kubectl run -it --rm debug-${nanoid(8)} \
       --image=${x.image} \
       --restart=Never \
       --timeout=15s \
@@ -308,13 +310,13 @@ const DevTool = {
   },
   DevBusyboxSh: async (fnArg: z.input<typeof DevToolType.ArgShellScript>) => {
     const x = DevToolType.ArgShellScript.parse(fnArg);
-    await $`kubectl run -i --rm debug-${CONF.GenRanString()} --image=${x.image} -- sh`
+    await $`kubectl run -i --rm debug-${nanoid(8)} --image=${x.image} -- sh`
       .stdinText(x.sh);
   },
 
   DevDenoTs: async (fnArg: z.input<typeof DevToolType.ArgShellScript>) => {
     const x = DevToolType.ArgShellScript.parse(fnArg);
-    await $`kubectl run -i --rm debug-${CONF.GenRanString()} --image=${x.image} -- run -A -`
+    await $`kubectl run -i --rm debug-${nanoid(8)} --image=${x.image} -- run -A -`
       .stdinText(x.sh).printCommand();
   },
 

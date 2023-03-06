@@ -5,9 +5,6 @@ export const CONF = {
     ERGISTRY_REPO_101: 'hellok8s',
     DEV_BUSYBOX_TAG_101: '0.1.5-busyboxhello',
     DEV_DENO_APK_TAG_101: '0.1.5-denoapk',
-    GenRanString: () => {
-        return Math.random().toString(36).substring(2, 7);
-    },
     REGISTRY_HOST_PORT_101: () => `${CONF.REGISTRY_HOST_101}:${CONF.REGISTRY_PORT_101}`
 }
 

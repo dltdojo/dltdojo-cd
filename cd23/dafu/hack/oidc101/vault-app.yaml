@@ -74,7 +74,9 @@ spec:
               vault write identity/oidc/scope/groups   description="The groups scope provides the groups claim using Vault group membership"   template="$(echo $GROUPS_SCOPE_TEMPLATE | base64 -)"
               #
               vault write identity/oidc/provider/my-provider   allowed_client_ids="$CLIENT_ID"   scopes_supported="groups,user"
-
+              CLIENT_SECRET=$(vault read -field=client_secret identity/oidc/client/foo101)
+              echo $CLIENT_ID > /tmp/client-id
+              echo $CLIENT_SECRET > /tmp/client-secret
               # Block on vault
               wait
           env:
