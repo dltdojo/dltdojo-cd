@@ -15,7 +15,7 @@ import { z } from "https://deno.land/x/zod@v3.20.5/mod.ts";
 import { CONF, K8S_SERVICE } from "./appconf.ts";
 import { KindYaml } from "./kind.ts";
 import { Dockerfiles, ShellScripts } from "./shellscript.ts";
-import { nanoid } from 'npm:nanoid';
+import { nanoid } from "npm:nanoid";
 
 const logLevelType = new EnumType(["debug", "info", "warn", "error"]);
 
@@ -29,21 +29,33 @@ enum ConfRunLevel {
 const CONF_HANDLE_TYPE = ["save", "apply", "delete", "print"] as const;
 const CONF_CLI_TYPE = ["kubectl", "kind", "echo"] as const;
 const confHandleType = new EnumType(CONF_HANDLE_TYPE);
-const confCliType = new EnumType(CONF_CLI_TYPE);
 
-const ArgRunHandle = z.object({
-  id: z.string().min(3).optional().default(
-    `id-${nanoid(6)}`,
-  ),
-  type: z.enum(CONF_HANDLE_TYPE).optional().default("print"),
-  cli: z.enum(CONF_CLI_TYPE),
-  content: z.string().min(1).optional(),
-  filename: z.string().min(5),
-  dir: z.string().min(1).default(CONF.KCONF_DIR),
-});
+// const confCliType = new EnumType(CONF_CLI_TYPE);
 
-const confOperate = async (fnarg: z.input<typeof ArgRunHandle>) => {
-  const x = ArgRunHandle.parse(fnarg);
+const Zobjcli = {
+  runHandle: z.object({
+    id: z.string().min(3).optional().default(
+      `id-${nanoid(6)}`,
+    ),
+    type: z.enum(CONF_HANDLE_TYPE).optional().default("print"),
+    cli: z.enum(CONF_CLI_TYPE),
+    content: z.string().min(1).optional(),
+    filename: z.string().min(5),
+    dir: z.string().min(1).default(CONF.KCONF_DIR),
+  }),
+  devCurl: z.object({
+    url: z.string().url(),
+    image: z.string().min(5).default("curlimages/curl:7.88.1"),
+  }),
+
+  shellScript: z.object({
+    sh: z.string().min(5).default(ShellScripts.BusyboxHello),
+    image: z.string().min(5).default("busybox:1.36"),
+  }),
+};
+
+const confOperate = async (fnarg: z.input<typeof Zobjcli.runHandle>) => {
+  const x = Zobjcli.runHandle.parse(fnarg);
   const confDir = $.path(x.dir);
   const confFile = confDir.join(x.filename);
   if (x.type !== "print") console.log(`===> ${x.type} ${confFile}`);
@@ -85,7 +97,7 @@ const KindTool = {
     .description("Kind sub-command.")
     .type("handle-level", confHandleType)
     .option("-t, --type <val:handle-level>", "conf handle type")
-    .action(async (options, ...args) => {
+    .action(async (options) => {
       const kindName = "kind100";
       const aKind = new KindYaml({
         kindName,
@@ -102,7 +114,7 @@ const KindTool = {
     .description("Kind sub-command.")
     .type("handle-level", confHandleType)
     .option("-t, --type <val:handle-level>", "conf handle type")
-    .action(async (options, ...args) => {
+    .action(async (options) => {
       const kindName = "kind200";
       const aKind = new KindYaml({
         kindName,
@@ -126,7 +138,7 @@ const K8sServices = {
     .description("whoami sub-command.")
     .type("handle-level", confHandleType)
     .option("-t, --type <val:handle-level>", "conf handle type")
-    .action(async (options, ...args) => {
+    .action(async (options) => {
       await confOperate({
         cli: "kubectl",
         type: options.type,
@@ -194,7 +206,7 @@ const K8sServices = {
 const DockerTool = {
   CmdSetupRegistry: new Command()
     .description("registry sub-command.")
-    .action(async (options, ...args) => {
+    .action(async () => {
       try {
         await $`docker run -d --restart=always 
                 -p "127.0.0.1:${CONF.REGISTRY_PORT_101}:${CONF.REGISTRY_PORT_101}" 
@@ -216,7 +228,7 @@ const DockerTool = {
 const TestTool = {
   CmdDenoRedis: new Command()
     .description("Redis Testing")
-    .action(async (options, ...args) => {
+    .action(async () => {
       const tsRedisClient = $.path("./redis-client-nodejs.ts");
       await DevTool.DevDenoTs({
         sh: tsRedisClient.textSync(),
@@ -251,14 +263,14 @@ const TestTool = {
   },
   CmdBhttpWhoAmi: new Command()
     .description("test cmd110")
-    .action(async (options, ...args) => {
+    .action(async () => {
       await DevTool.DevCurl({ url: "http://dev101.default.svc" });
       await DevTool.DevCurl({ url: "http://bhttpd136.default.svc:3000" });
     }),
   CmdBuildImgBusybox: new Command()
-    .action(async (options, ...args) => {
+    .action(async () => {
       await TestTool.TestBuildImage(
-        CONF.REGISTRY_HOST_PORT_101(),
+        CONF.REGISTRY_HOST_PORT_101,
         CONF.ERGISTRY_REPO_101,
         CONF.DEV_BUSYBOX_TAG_101,
         ShellScripts.BusyboxHello,
@@ -268,7 +280,7 @@ const TestTool = {
   CmdBuildImgDenoApk: new Command()
     .action(async () => {
       await TestTool.TestBuildImage(
-        CONF.REGISTRY_HOST_PORT_101(),
+        CONF.REGISTRY_HOST_PORT_101,
         CONF.ERGISTRY_REPO_101,
         CONF.DEV_DENO_APK_TAG_101,
         ShellScripts.DenoAlpineGitCurl,
@@ -276,47 +288,38 @@ const TestTool = {
     }),
 };
 
-const DevToolType = {
-
-  ArgDevCurl: z.object({
-    url: z.string().url(),
-    image: z.string().min(5).default("curlimages/curl:7.88.1"),
-  }),
-  
-  ArgShellScript: z.object({
-    sh: z.string().min(5).default(ShellScripts.BusyboxHello),
-    image: z.string().min(5).default("busybox:1.36"),
-  }),
-};
-
 const DevTool = {
   CmdInfo: new Command()
     .action(async () => {
-      console.log(`> info id: ${nanoid(10)}`)
+      console.log(`> info id: ${nanoid(10)}`);
       await $`kind get clusters`.printCommand();
       await $`kubectl get po,svc,deploy,job -A`.printCommand();
     }),
 
-  DevCurl: async (fnArg: z.input<typeof DevToolType.ArgDevCurl>) => {
-    const x = DevToolType.ArgDevCurl.parse(fnArg);
+  DevCurl: async (fnArg: z.input<typeof Zobjcli.devCurl>) => {
+    const x = Zobjcli.devCurl.parse(fnArg);
     //
     // [run commands don't return when using kubectl 1.22.x · Issue #1098 · kubernetes/kubectl](https://github.com/kubernetes/kubectl/issues/1098)
     //
-    await $`KUBECTL_COMMAND_HEADERS=false kubectl run -it --rm debug-${nanoid(8)} \
+    await $`KUBECTL_COMMAND_HEADERS=false kubectl run -it --rm debug-${
+      nanoid(8)
+    } \
       --image=${x.image} \
       --restart=Never \
       --timeout=15s \
       -- sh -c 'date; id; env; curl -v --connect-timeout 10 ${x.url}'`;
   },
-  DevBusyboxSh: async (fnArg: z.input<typeof DevToolType.ArgShellScript>) => {
-    const x = DevToolType.ArgShellScript.parse(fnArg);
+  DevBusyboxSh: async (fnArg: z.input<typeof Zobjcli.shellScript>) => {
+    const x = Zobjcli.shellScript.parse(fnArg);
     await $`kubectl run -i --rm debug-${nanoid(8)} --image=${x.image} -- sh`
       .stdinText(x.sh);
   },
 
-  DevDenoTs: async (fnArg: z.input<typeof DevToolType.ArgShellScript>) => {
-    const x = DevToolType.ArgShellScript.parse(fnArg);
-    await $`kubectl run -i --rm debug-${nanoid(8)} --image=${x.image} -- run -A -`
+  DevDenoTs: async (fnArg: z.input<typeof Zobjcli.shellScript>) => {
+    const x = Zobjcli.shellScript.parse(fnArg);
+    await $`kubectl run -i --rm debug-${
+      nanoid(8)
+    } --image=${x.image} -- run -A -`
       .stdinText(x.sh).printCommand();
   },
 
@@ -338,7 +341,7 @@ const DevTool = {
       "The image for the container to run shell script.",
     )
     .option("-i, --stdin [stdin:boolean]", "Read shell script from stdin.")
-    .action(async (options, ...args) => {
+    .action(async (options) => {
       let sh = undefined;
       if (options.stdin) {
         sh = new TextDecoder().decode(await readAll(Deno.stdin));
@@ -352,7 +355,7 @@ const BuildImgTool = {
     .description("kaniko build sub-command.")
     .type("handle-level", confHandleType)
     .option("-t, --type <val:handle-level>", "conf handle type")
-    .action(async (options, ...args) => {
+    .action(async (options) => {
       const jobName = "job220";
       const imgTag = CONF.DEV_BUSYBOX_TAG_101;
       const dockerFileText = Dockerfiles.BusyboxHello;
@@ -368,7 +371,7 @@ const BuildImgTool = {
     .description("kaniko build sub-command.")
     .type("handle-level", confHandleType)
     .option("-t, --type <val:handle-level>", "conf handle type")
-    .action(async (options, ...args) => {
+    .action(async (options) => {
       const jobName = "job221";
       const imgTag = CONF.DEV_DENO_APK_TAG_101;
       const dockerFileText = Dockerfiles.DenoAlpineGitCurl;
@@ -388,7 +391,7 @@ const BuildImgTool = {
   ) => {
     const confJob: TJobReq = {
       name: jobName,
-      imgRegistryHostAndPort: CONF.REGISTRY_HOST_PORT_101(),
+      imgRegistryHostAndPort: CONF.REGISTRY_HOST_PORT_101,
       imgRepoName: "hellok8s",
       imgTag,
       dockerFileText,
@@ -401,16 +404,11 @@ const BuildImgTool = {
       content: jobYaml,
       filename: `${jobMetadataName}.yaml`,
     });
-
-    // if (type === "apply") {
-    //   await $`kubectl wait --for=condition=complete job/${jobMetadataName} --timeout=300s`;
-    //   await handleAfterBuildImage(confJob, testsh);
-    // }
   },
 
   __cmd220BuildImgRaw: new Command()
     .description("kaniko build sub-command.")
-    .action(async (options, ...args) => {
+    .action(async () => {
       await $`kubectl apply -f kconf100/build100.yaml`;
       await $`kubectl wait --for=condition=ready pod kaniko`;
       await $.sleep(9000);
@@ -493,27 +491,7 @@ const devCurl = async (fnArg: z.input<typeof argDevCurl>) => {
   -- sh -c 'date; id; env; curl -v --connect-timeout 5 ${x.url}'`;
 };
 
-const shTesting = `#!/bin/sh
-env
-echo "==> hello sh world"
-id
-date
-busybox | head -1
-`;
-
-const argShellScript = z.object({
-  sh: z.string().min(5).default(shTesting),
-  image: z.string().min(5).default("busybox:1.36"),
-});
-
-const devBusyboxSh = async (fnArg: z.input<typeof argShellScript>) => {
-  const x = argShellScript.parse(fnArg);
-  // await $`echo ${x.image}`;
-  await $`kubectl run -i --rm debug-${genRanString()} --image=${x.image} -- sh`
-    .stdinText(x.sh);
-};
-
-const ing101 = new Command()
+const _ing101 = new Command()
   .description("cilium ingress controller example")
   .option("-f, --foo", "Foo option.")
   .type("run-type", confRunLevelType)
@@ -524,7 +502,7 @@ const ing101 = new Command()
       default: ConfRunLevel.dryrun as const,
     },
   )
-  .action(async (options, ...args) => {
+  .action(async (options) => {
     const appId = "ing101";
     const confContent = DevHttpServices.DeployCiliumIngressNodePort();
     const filename = "cilium-ingress-nodeport-demo.yaml";
@@ -535,7 +513,7 @@ const ing101 = new Command()
     });
   });
 
-const foo = new Command()
+const _foo = new Command()
   .description("Foo sub-command.")
   .option("-f, --file <file:string>", "read from file ...")
   .option("-i, --stdin [stdin:boolean]", "read from stdin ...", {
@@ -552,17 +530,7 @@ const foo = new Command()
     console.log("Foo command called.");
   });
 
-const bar = new Command()
-  .description("Bar sub-command.")
-  .option("-b, --bar", "Bar option.")
-  .arguments("<input:string> [output:string]")
-  .action((options, ...args) => {
-    console.log("Bar command called.");
-    console.log(options);
-    console.log(args);
-  });
-
-const cmdCurl = new Command()
+const _cmdCurl = new Command()
   .description("curl in k8s")
   .option("--image <val:string>", "The image for the curl container.")
   .arguments("<url:string>")

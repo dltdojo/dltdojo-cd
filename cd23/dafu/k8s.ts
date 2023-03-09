@@ -14,7 +14,7 @@ import {
 import { z } from "https://deno.land/x/zod@v3.20.5/mod.ts";
 import { ConfigureFile, Dockerfiles, ShellScripts } from "./shellscript.ts";
 import { CONF, K8S_SERVICE } from "./appconf.ts";
-import { nanoid } from 'npm:nanoid';
+import { nanoid } from "npm:nanoid";
 
 export class Kapp {
   #app: App;
@@ -28,11 +28,9 @@ export class Kapp {
   }
 }
 
-
 const lablesId = {
-  "dltdojo.org/cd23/dafu/genid": nanoid(10)
-}
-
+  "dltdojo.org/cd23/dafu/genid": nanoid(10),
+};
 
 const Resource = {
   C100: {
@@ -57,25 +55,50 @@ const Resource = {
   },
 };
 
-const ArgDevDeploy = z.object({
-  img: z.string().min(5),
-  portNumber: z.number().gte(80),
-  svcDnsId: z.string().min(3),
-  replicas: z.number().optional().default(1),
-});
+const Zobjk8s = {
+  devDeploy: z.object({
+    img: z.string().min(5),
+    portNumber: z.number().gte(80),
+    svcDnsId: z.string().min(3),
+    replicas: z.number().optional().default(1),
+  }),
+
+  jobReq: z.object({
+    name: z.string().min(5).optional().default("job101"),
+    // destination: z.string().min(5).default('registry.local:5001/hellok8s:v0.0.1'),
+    imgRegistryHostAndPort: z.string().min(5).default(
+      CONF.REGISTRY_HOST_PORT_101,
+    ),
+    imgRepoName: z.string().min(5).default(CONF.ERGISTRY_REPO_101),
+    imgTag: z.string().min(3).default("0.0.1"),
+    jobTTL: z.number().min(60).default(300),
+    jobDeadline: z.number().min(60).default(300),
+    dockerFileText: z.string().min(10).optional(),
+  }),
+
+  jobResp: z.object({
+    jobMetadataName: z.string().min(5),
+    jobYaml: z.string().min(5),
+  }),
+};
+
+export type TJobReq = z.input<typeof Zobjk8s.jobReq>;
+export type TJobResp = z.input<typeof Zobjk8s.jobResp>;
+
+
 
 export const addDevDeplyAndSvc = (
   chart: Chart,
-  farg: z.input<typeof ArgDevDeploy>,
+  farg: z.input<typeof Zobjk8s.devDeploy>,
   envs?: {
     [name: string]: EnvValue;
   },
   res?: ContainerResources,
 ) => {
-  const x = ArgDevDeploy.parse(farg);
+  const x = Zobjk8s.devDeploy.parse(farg);
   const deploy = new Deployment(chart, x.img, {
-    metadata:{
-      labels: lablesId
+    metadata: {
+      labels: lablesId,
     },
     replicas: x.replicas,
     containers: [{
@@ -93,7 +116,7 @@ export const addDevDeplyAndSvc = (
   const svc = new Service(chart, x.svcDnsId, {
     metadata: {
       name: x.svcDnsId,
-      labels: lablesId
+      labels: lablesId,
     },
     selector: deploy,
     ports: [
@@ -154,7 +177,6 @@ const SupportTools = {
 };
 
 export const InfraServices = {
-
   //
   // helm template vault hashicorp/vault -n default --set "server.dev.enabled=true" --set "injector.enabled=false" --set "csi.enabled=false" > vault.yaml
   //
@@ -169,7 +191,7 @@ export const InfraServices = {
       "SKIP_CHOWN": EnvValue.fromValue("true"),
       "SKIP_SETCAP": EnvValue.fromValue("true"),
       "VAULT_DEV_LISTEN_ADDRESS": EnvValue.fromValue("[::]:8200"),
-      "VAULT_API_ADDR": EnvValue.fromValue("http://vault101.default.svc:8200")
+      "VAULT_API_ADDR": EnvValue.fromValue("http://vault101.default.svc:8200"),
     };
     const { deploy, svc } = addDevDeplyAndSvc(
       kapp.chart,
@@ -304,30 +326,12 @@ EOF
 `;
 };
 
-const ArgJobReq = z.object({
-  name: z.string().min(5).optional().default("job101"),
-  // destination: z.string().min(5).default('registry.local:5001/hellok8s:v0.0.1'),
-  imgRegistryHostAndPort: z.string().min(5).default(
-    CONF.REGISTRY_HOST_PORT_101(),
-  ),
-  imgRepoName: z.string().min(5).default(CONF.ERGISTRY_REPO_101),
-  imgTag: z.string().min(3).default("0.0.1"),
-  jobTTL: z.number().min(60).default(300),
-  jobDeadline: z.number().min(60).default(300),
-  dockerFileText: z.string().min(10).optional(),
-});
 
-export type TJobReq = z.input<typeof ArgJobReq>;
-
-const ArgJobResp = z.object({
-  jobMetadataName: z.string().min(5),
-  jobYaml: z.string().min(5),
-});
 
 export const jobKanikoBuild = (
-  farg: z.input<typeof ArgJobReq>,
-): z.infer<typeof ArgJobResp> => {
-  const x = ArgJobReq.parse(farg);
+  farg: TJobReq,
+): TJobResp => {
+  const x = Zobjk8s.jobReq.parse(farg);
   const destination =
     `${x.imgRegistryHostAndPort}/${x.imgRepoName}:${x.imgTag}`;
   const kapp = new Kapp();

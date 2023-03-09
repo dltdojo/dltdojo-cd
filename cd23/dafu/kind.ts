@@ -39,6 +39,10 @@ nodes:
     this.#body.containerdConfigPatches = patchArray;
   }
 
+  get body() {
+    return this.#body
+  }
+
   get yaml() {
     return stringify(this.#body);
   }
