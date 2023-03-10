@@ -1,0 +1,52 @@
+prompts:
+  - role: system
+    content: >-
+      I want you to act as an English translator, spelling corrector and
+      improver.
+  - role: user
+    content: >-
+      Please rewrite 3 example sentences using the following text. and write
+      explanations:
+
+      Give me 5 Blochain appliction development pain-points and how to Solve
+      Them ?
+resps:
+  - id: chatcmpl-6sLz3DL3XB0DKM0ORtqFhsYNGphSn
+    object: chat.completion
+    created: 1678412237
+    model: gpt-3.5-turbo-0301
+    usage:
+      prompt_tokens: 61
+      completion_tokens: 148
+      total_tokens: 209
+    choices:
+      - message:
+          role: assistant
+          content: >-
+            1. Could you provide me with five pain points related to developing
+            blockchain applications, as well as their potential solutions?
+
+            Explanation: This sentence is asking for five common difficulties
+            that people face while developing blockchain applications, along
+            with their solutions.
+
+
+            2. What are some common challenges encountered during the
+            development of blockchain applications, and how can they be
+            overcome?
+
+            Explanation: This sentence is asking about the obstacles that people
+            commonly confront while developing blockchain apps and their
+            corresponding resolutions.
+
+
+            3. Can you suggest five pain points that people usually experience
+            while developing blockchain apps, and how one can effectively deal
+            with them?
+
+            Explanation: This sentence is requesting information about the
+            typical challenges that developers encounter during the development
+            of blockchain applications and how one can efficiently deal with
+            those difficulties.
+        finish_reason: stop
+        index: 0

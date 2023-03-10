@@ -26,23 +26,43 @@ enum ConfRunLevel {
   delete = "delete",
 }
 
-const CONF_HANDLE_TYPE = ["save", "apply", "delete", "print"] as const;
+//const CONF_HANDLE_TYPE = ["save", "apply", "delete", "print"] as const;
+
+
 const CONF_CLI_TYPE = ["kubectl", "kind", "echo"] as const;
-const confHandleType = new EnumType(CONF_HANDLE_TYPE);
+const confRunLevelType = new EnumType(ConfRunLevel);
 
 // const confCliType = new EnumType(CONF_CLI_TYPE);
 
-const Zobjcli = {
-  runHandle: z.object({
-    id: z.string().min(3).optional().default(
-      `id-${nanoid(6)}`,
-    ),
-    type: z.enum(CONF_HANDLE_TYPE).optional().default("print"),
-    cli: z.enum(CONF_CLI_TYPE),
-    content: z.string().min(1).optional(),
+//
+// Zod
+//
+const Zcli = {
+  fnArgRunHandle: z.object({
+    confContent: z.string().min(1),
     filename: z.string().min(5),
-    dir: z.string().min(1).default(CONF.KCONF_DIR),
+    dir: z.string().min(1),
   }),
+
+  runType: z.enum(["save", "apply", "delete", "print"]),
+
+  get EnumRunType() {
+    return this.runType;
+  },
+
+  get runHandle() {
+    return z.object({
+      id: z.string().min(3).optional().default(
+        `id-${nanoid(6)}`,
+      ),
+      type: this.runType.optional().default("print"),
+      cli: z.enum(CONF_CLI_TYPE),
+      content: z.string().min(1).optional(),
+      filename: z.string().min(5),
+      dir: z.string().min(1).default(CONF.KCONF_DIR),
+    });
+  },
+
   devCurl: z.object({
     url: z.string().url(),
     image: z.string().min(5).default("curlimages/curl:7.88.1"),
@@ -54,8 +74,12 @@ const Zobjcli = {
   }),
 };
 
-const confOperate = async (fnarg: z.input<typeof Zobjcli.runHandle>) => {
-  const x = Zobjcli.runHandle.parse(fnarg);
+type ZrunType = z.input<typeof Zcli.runType>;
+type ZshellScript = z.input<typeof Zcli.shellScript>;
+type ZrunHandle = z.input<typeof Zcli.runHandle>;
+
+const confOperate = async (arg: ZrunHandle) => {
+  const x = Zcli.runHandle.parse(arg);
   const confDir = $.path(x.dir);
   const confFile = confDir.join(x.filename);
   if (x.type !== "print") console.log(`===> ${x.type} ${confFile}`);
@@ -92,10 +116,12 @@ const confOperate = async (fnarg: z.input<typeof Zobjcli.runHandle>) => {
   }
 };
 
+const enumRunForCli = new EnumType(Zcli.runType.options);
+
 const KindTool = {
   CmdSetupKind: new Command()
     .description("Kind sub-command.")
-    .type("handle-level", confHandleType)
+    .type("handle-level", enumRunForCli)
     .option("-t, --type <val:handle-level>", "conf handle type")
     .action(async (options) => {
       const kindName = "kind100";
@@ -112,7 +138,7 @@ const KindTool = {
     }),
   CmdSetupKindRegistry: new Command()
     .description("Kind sub-command.")
-    .type("handle-level", confHandleType)
+    .type("handle-level", enumRunForCli)
     .option("-t, --type <val:handle-level>", "conf handle type")
     .action(async (options) => {
       const kindName = "kind200";
@@ -136,7 +162,7 @@ const KindTool = {
 const K8sServices = {
   CmdBhttpWhoAmi: new Command()
     .description("whoami sub-command.")
-    .type("handle-level", confHandleType)
+    .type("handle-level", enumRunForCli)
     .option("-t, --type <val:handle-level>", "conf handle type")
     .action(async (options) => {
       await confOperate({
@@ -156,7 +182,7 @@ const K8sServices = {
 
   CmdKeda: new Command()
     .description("install keda")
-    .type("handle-level", confHandleType)
+    .type("handle-level", enumRunForCli)
     .option("-t, --type <val:handle-level>", "conf handle type")
     .action(async (options) => {
       let content = undefined;
@@ -175,11 +201,10 @@ const K8sServices = {
 
   CmdRedis: new Command()
     .description("install redis")
-    .type("handle-level", confHandleType)
+    .type("handle-level", enumRunForCli)
     .option("-t, --type <val:handle-level>", "conf handle type")
     .action(async (options) => {
       const content = InfraServices.DeploySvcRedis();
-
       await confOperate({
         cli: "kubectl",
         type: options.type,
@@ -189,7 +214,7 @@ const K8sServices = {
     }),
   CmdVault: new Command()
     .description("install vault dev")
-    .type("handle-level", confHandleType)
+    .type("handle-level", enumRunForCli)
     .option("-t, --type <val:handle-level>", "conf handle type")
     .action(async (options) => {
       const content = InfraServices.DeploySvcVaultDevOnly();
@@ -296,8 +321,8 @@ const DevTool = {
       await $`kubectl get po,svc,deploy,job -A`.printCommand();
     }),
 
-  DevCurl: async (fnArg: z.input<typeof Zobjcli.devCurl>) => {
-    const x = Zobjcli.devCurl.parse(fnArg);
+  DevCurl: async (arg: z.input<typeof Zcli.devCurl>) => {
+    const x = Zcli.devCurl.parse(arg);
     //
     // [run commands don't return when using kubectl 1.22.x · Issue #1098 · kubernetes/kubectl](https://github.com/kubernetes/kubectl/issues/1098)
     //
@@ -309,14 +334,14 @@ const DevTool = {
       --timeout=15s \
       -- sh -c 'date; id; env; curl -v --connect-timeout 10 ${x.url}'`;
   },
-  DevBusyboxSh: async (fnArg: z.input<typeof Zobjcli.shellScript>) => {
-    const x = Zobjcli.shellScript.parse(fnArg);
+  DevBusyboxSh: async (arg: ZshellScript) => {
+    const x = Zcli.shellScript.parse(arg);
     await $`kubectl run -i --rm debug-${nanoid(8)} --image=${x.image} -- sh`
       .stdinText(x.sh);
   },
 
-  DevDenoTs: async (fnArg: z.input<typeof Zobjcli.shellScript>) => {
-    const x = Zobjcli.shellScript.parse(fnArg);
+  DevDenoTs: async (arg: ZshellScript) => {
+    const x = Zcli.shellScript.parse(arg);
     await $`kubectl run -i --rm debug-${
       nanoid(8)
     } --image=${x.image} -- run -A -`
@@ -353,7 +378,7 @@ const DevTool = {
 const BuildImgTool = {
   CmdImgBusybox: new Command()
     .description("kaniko build sub-command.")
-    .type("handle-level", confHandleType)
+    .type("handle-level", enumRunForCli)
     .option("-t, --type <val:handle-level>", "conf handle type")
     .action(async (options) => {
       const jobName = "job220";
@@ -369,7 +394,7 @@ const BuildImgTool = {
 
   CmdImgApk: new Command()
     .description("kaniko build sub-command.")
-    .type("handle-level", confHandleType)
+    .type("handle-level", enumRunForCli)
     .option("-t, --type <val:handle-level>", "conf handle type")
     .action(async (options) => {
       const jobName = "job221";
@@ -430,31 +455,23 @@ const BuildImgTool = {
     }),
 };
 
-const confRunLevelType = new EnumType(ConfRunLevel);
-
-const fnArgRunHandle = z.object({
-  confContent: z.string().min(1),
-  filename: z.string().min(5),
-  dir: z.string().min(1),
-});
-
 const handleRunLevel = async (
   lv: ConfRunLevel,
-  fnarg: z.infer<typeof fnArgRunHandle>,
+  arg: z.infer<typeof Zcli.fnArgRunHandle>,
 ) => {
-  fnArgRunHandle.parse(fnarg);
-  const confDir = $.path(fnarg.dir);
-  const confFile = confDir.join(fnarg.filename);
+  const x = Zcli.fnArgRunHandle.parse(arg);
+  const confDir = $.path(x.dir);
+  const confFile = confDir.join(x.filename);
   switch (lv) {
     case ConfRunLevel.dryrun:
-      console.log(fnarg.confContent);
+      console.log(x.confContent);
       break;
     case ConfRunLevel.write:
-      console.log(`write conf to ${fnarg.filename}`);
+      console.log(`write conf to ${x.filename}`);
       if (!confDir.isDir()) {
         confDir.mkdirSync();
       }
-      confFile.writeTextSync(fnarg.confContent);
+      confFile.writeTextSync(x.confContent);
       break;
     case ConfRunLevel.apply:
       console.log(`apply -f ${confFile}`);
@@ -465,7 +482,7 @@ const handleRunLevel = async (
       await $`kubectl delete -f ${confFile}`;
       break;
     default:
-      console.log(fnarg.confContent);
+      console.log(x.confContent);
       break;
   }
 };
