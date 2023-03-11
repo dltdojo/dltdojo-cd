@@ -1,3 +1,4 @@
+import "https://deno.land/std@0.178.0/dotenv/load.ts";
 import {
   Command,
   EnumType,
@@ -12,6 +13,27 @@ import {
   httpBatchLink,
   loggerLink,
 } from "npm:@trpc/client";
+
+const Zapp0 = {
+  roleFoo: z.enum(["system", "user", "assistant"]),
+  env: z.object({
+    FOOAPP_PORT: z.coerce.number().min(80).optional().default(8000),
+  }),
+};
+
+const Env0 = Zapp0.env.parse(Deno.env.toObject());
+
+const _Zapp = {
+  messageFoo: z.object({
+    role: Zapp0.roleFoo,
+    content: z.string().min(1),
+  }),
+  messageRecordFoo: z.record(
+    Zapp0.roleFoo,
+    z.string(),
+  ),
+  EnumRoleFoo: Zapp0.roleFoo.enum,
+};
 
 const TempDb = {
   id: 1,
@@ -28,8 +50,8 @@ const TempDb = {
 const sleep = (ms = 100) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const TrpcClient = {
-  async run() {
-    const url = "http://127.0.0.1:8000/trpc";
+  async run(url: string) {
+    // const url = `http://127.0.0.1:${EnvDa.FOOAPP_PORT}/trpc`;
 
     const proxy = createTRPCProxyClient<AppRouter>({
       links: [loggerLink(), httpBatchLink({ url })],
@@ -60,8 +82,8 @@ const TrpcClient = {
 };
 
 const TrpcInit = {
-  trpc: initTRPC.create()
-}
+  trpc: initTRPC.create(),
+};
 
 const TrpcRouter = {
   postRouter: TrpcInit.trpc.router({
@@ -77,24 +99,26 @@ const TrpcRouter = {
       }),
     listPosts: TrpcInit.trpc.procedure.query(() => TempDb.db.posts),
   }),
-}
+};
 
 const TrpcAppRouter = {
   appRouter: TrpcInit.trpc.router({
-      post: TrpcRouter.postRouter,
-      hello: TrpcInit.trpc.procedure.input(z.string().nullish()).query(
-        ({ input }) => {
-          return `hello ${input ?? "world"}`;
-        },
-      ),
-    }),
-}
+    post: TrpcRouter.postRouter,
+    hello: TrpcInit.trpc.procedure.input(z.string().nullish()).query(
+      ({ input }) => {
+        return `hello ${input ?? "world"}`;
+      },
+    ),
+  }),
+};
 
 export type AppRouter = typeof TrpcAppRouter.appRouter;
 
 const TrpcServer = {
-  serve() {
-    serve(this.handler);
+  serve(port: number) {
+    serve(this.handler, {
+      port,
+    });
   },
 
   handler(request: Request) {
@@ -113,29 +137,8 @@ const TrpcServer = {
   },
 };
 
-const Zapp = {
-  role: z.enum(["system", "user", "assistant"]),
-  get message() {
-    return z.object({
-      role: this.role,
-      content: z.string().min(1),
-    });
-  },
-
-  get messageRecord() {
-    return z.record(
-      this.role,
-      z.string(),
-    );
-  },
-
-  get EnumRole() {
-    return this.role.enum;
-  },
-};
-
 const CliffyCli = {
-  enumRole: new EnumType(Zapp.role.options),
+  enumRole: new EnumType(Zapp0.roleFoo.options),
 };
 
 const cmdFoo = new Command()
@@ -149,18 +152,28 @@ const cmdFoo = new Command()
   .option("-z, --zhtw", "translate to zhTW")
   .action((options, ...args) => {
     console.log(options, args);
+    console.log(Env0);
   });
 
 const cmdServer = new Command()
   .description("server")
-  .action(() => {
-    TrpcServer.serve();
+  .option(
+    "-p, --port <port:integer>",
+    "the port number.",
+  )
+  .action((options) => {
+    TrpcServer.serve(options.port ?? Env0.FOOAPP_PORT);
   });
 
 const cmdClient = new Command()
   .description("client")
-  .action(() => {
-    TrpcClient.run();
+  .option(
+    "-u, --url <url:string>",
+    "trpc service url",
+  )
+  .action((options) => {
+    const trpcUrl = options.url ?? `http://127.0.0.1:${Env0.FOOAPP_PORT}/trpc`;
+    TrpcClient.run(trpcUrl);
   });
 
 await new Command()
