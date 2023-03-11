@@ -1,0 +1,20 @@
+# VAULT
+VAULT_OIDC_CLIENT_ID=XXXXXXXXXXXXXXXX
+VAULT_OIDC_CLIENT_SECRET=XXXXXXXXXXXXXXXXXX
+VAULT_OIDC_ISSUER=http://vault101.default.svc:8200/v1/identity/oidc/provider/my-provider
+VAULT_OIDC_CALLBACK=http://localhost:8000/callback-vault
+# GITHUB
+GITHUB_OIDC_CLIENT_ID=XXXXXXXXXXXXXXXX
+GITHUB_OIDC_CLIENT_SECRET=XXXXXXXXXXXXXXXXXX
+GITHUB_OIDC_ISSUER=https://github.com
+GITHUB_OIDC_CALLBACK=http://localhost:8000/callback
+# MICROSOFT AZURE
+MICROSOFT_OIDC_CLIENT_ID=xxxxxxxxx-xxxx-xxx-xxxxx-xxxxxxxxxx
+MICROSOFT_CLIENT_SECRET=xxxxxxxxxxxxxxxxxxxxxx
+MICROSOFT_OIDC_ISSUER=https://login.microsoftonline.com/xxxxxxxxxxx-xxxxx-xxxx-xxxxx-xxxxxxxxxx/v2.0
+MICROSOFT_OIDC_CALLBACK=http://localhost:8000/callback-azure
+# Google 
+GOOGLE_OIDC_CLIENT_ID=XXXXXXXXXx-XXXXXXXXXXxxx.apps.googleusercontent.com
+GOOGLE_OIDC_CLIENT_SECRET=GOCXXX-XXXXXXXXXXXXXXXXXXXXX
+GOOGLE_OIDC_ISSUER=https://accounts.google.com
+GOOGLE_OIDC_CALLBACK=http://localhost:8000/callback-google
