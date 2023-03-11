@@ -1,0 +1,40 @@
+[
+  {
+    "type": "paragraph",
+    "raw": "Sure, here's a sample YAML file for deploying an nginx web server with two pods:",
+    "text": "Sure, here's a sample YAML file for deploying an nginx web server with two pods:",
+    "tokens": [
+      {
+        "type": "text",
+        "raw": "Sure, here's a sample YAML file for deploying an nginx web server with two pods:",
+        "text": "Sure, here&#39;s a sample YAML file for deploying an nginx web server with two pods:"
+      }
+    ]
+  },
+  {
+    "type": "space",
+    "raw": "\n\n"
+  },
+  {
+    "type": "code",
+    "raw": "```\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: nginx-deployment\n  labels:\n    app: nginx\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: nginx\n  template:\n    metadata:\n      labels:\n        app: nginx\n    spec:\n      containers:\n      - name: nginx-container\n        image: nginx:latest\n        ports:\n        - containerPort: 80\n```",
+    "lang": "",
+    "text": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: nginx-deployment\n  labels:\n    app: nginx\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: nginx\n  template:\n    metadata:\n      labels:\n        app: nginx\n    spec:\n      containers:\n      - name: nginx-container\n        image: nginx:latest\n        ports:\n        - containerPort: 80"
+  },
+  {
+    "type": "space",
+    "raw": "\n\n"
+  },
+  {
+    "type": "paragraph",
+    "raw": "This YAML file specifies a deployment with the name \"nginx-deployment\" that will create two replicas (pods) of the nginx web server. It includes a selector that matches the label \"app: nginx\" to determine which pods are part of this deployment. The template section defines the pod template that will be used to create each replica, including the container specification for the nginx web server with port 80 exposed.",
+    "text": "This YAML file specifies a deployment with the name \"nginx-deployment\" that will create two replicas (pods) of the nginx web server. It includes a selector that matches the label \"app: nginx\" to determine which pods are part of this deployment. The template section defines the pod template that will be used to create each replica, including the container specification for the nginx web server with port 80 exposed.",
+    "tokens": [
+      {
+        "type": "text",
+        "raw": "This YAML file specifies a deployment with the name \"nginx-deployment\" that will create two replicas (pods) of the nginx web server. It includes a selector that matches the label \"app: nginx\" to determine which pods are part of this deployment. The template section defines the pod template that will be used to create each replica, including the container specification for the nginx web server with port 80 exposed.",
+        "text": "This YAML file specifies a deployment with the name &quot;nginx-deployment&quot; that will create two replicas (pods) of the nginx web server. It includes a selector that matches the label &quot;app: nginx&quot; to determine which pods are part of this deployment. The template section defines the pod template that will be used to create each replica, including the container specification for the nginx web server with port 80 exposed."
+      }
+    ]
+  }
+]

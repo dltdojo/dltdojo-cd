@@ -1,0 +1,40 @@
+[
+  {
+    "type": "paragraph",
+    "raw": "Sure, here's a sample ERC20 smart contract written in Solidity:",
+    "text": "Sure, here's a sample ERC20 smart contract written in Solidity:",
+    "tokens": [
+      {
+        "type": "text",
+        "raw": "Sure, here's a sample ERC20 smart contract written in Solidity:",
+        "text": "Sure, here&#39;s a sample ERC20 smart contract written in Solidity:"
+      }
+    ]
+  },
+  {
+    "type": "space",
+    "raw": "\n\n"
+  },
+  {
+    "type": "code",
+    "raw": "```\npragma solidity ^0.8.0;\n\ncontract MyToken {\n    string public name;\n    string public symbol;\n    uint8 public decimals;\n    uint256 public totalSupply;\n\n    mapping(address => uint256) public balanceOf;\n    mapping(address => mapping(address => uint256)) public allowance;\n\n    event Transfer(address indexed from, address indexed to, uint256 value);\n    event Approval(address indexed owner, address indexed spender, uint256 value);\n\n    constructor(string memory _name, string memory _symbol, uint8 _decimals, uint256 _totalSupply) {\n        name = _name;\n        symbol = _symbol;\n        decimals = _decimals;\n        totalSupply = _totalSupply;\n        balanceOf[msg.sender] = totalSupply;\n        emit Transfer(address(0), msg.sender, totalSupply);\n    }\n\n    function transfer(address _to, uint256 _value) public returns (bool success) {\n        require(_to != address(0), \"Invalid address\");\n        require(balanceOf[msg.sender] >= _value, \"Insufficient balance\");\n        balanceOf[msg.sender] -= _value;\n        balanceOf[_to] += _value;\n        emit Transfer(msg.sender, _to, _value);\n        return true;\n    }\n\n    function approve(address _spender, uint256 _value) public returns (bool success) {\n        require(_spender != address(0), \"Invalid address\");\n        allowance[msg.sender][_spender] = _value;\n        emit Approval(msg.sender, _spender, _value);\n        return true;\n    }\n\n    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {\n        require(_to != address(0), \"Invalid address\");\n        require(balanceOf[_from] >= _value, \"Insufficient balance\");\n        require(allowance[_from][msg.sender] >= _value, \"Insufficient allowance\");\n        balanceOf[_from] -= _value;\n        balanceOf[_to] += _value;\n        allowance[_from][msg.sender] -= _value;\n        emit Transfer(_from, _to, _value);\n        return true;\n    }\n}\n```",
+    "lang": "",
+    "text": "pragma solidity ^0.8.0;\n\ncontract MyToken {\n    string public name;\n    string public symbol;\n    uint8 public decimals;\n    uint256 public totalSupply;\n\n    mapping(address => uint256) public balanceOf;\n    mapping(address => mapping(address => uint256)) public allowance;\n\n    event Transfer(address indexed from, address indexed to, uint256 value);\n    event Approval(address indexed owner, address indexed spender, uint256 value);\n\n    constructor(string memory _name, string memory _symbol, uint8 _decimals, uint256 _totalSupply) {\n        name = _name;\n        symbol = _symbol;\n        decimals = _decimals;\n        totalSupply = _totalSupply;\n        balanceOf[msg.sender] = totalSupply;\n        emit Transfer(address(0), msg.sender, totalSupply);\n    }\n\n    function transfer(address _to, uint256 _value) public returns (bool success) {\n        require(_to != address(0), \"Invalid address\");\n        require(balanceOf[msg.sender] >= _value, \"Insufficient balance\");\n        balanceOf[msg.sender] -= _value;\n        balanceOf[_to] += _value;\n        emit Transfer(msg.sender, _to, _value);\n        return true;\n    }\n\n    function approve(address _spender, uint256 _value) public returns (bool success) {\n        require(_spender != address(0), \"Invalid address\");\n        allowance[msg.sender][_spender] = _value;\n        emit Approval(msg.sender, _spender, _value);\n        return true;\n    }\n\n    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {\n        require(_to != address(0), \"Invalid address\");\n        require(balanceOf[_from] >= _value, \"Insufficient balance\");\n        require(allowance[_from][msg.sender] >= _value, \"Insufficient allowance\");\n        balanceOf[_from] -= _value;\n        balanceOf[_to] += _value;\n        allowance[_from][msg.sender] -= _value;\n        emit Transfer(_from, _to, _value);\n        return true;\n    }\n}"
+  },
+  {
+    "type": "space",
+    "raw": "\n\n"
+  },
+  {
+    "type": "paragraph",
+    "raw": "This is a simple ERC20 token contract that allows users to transfer tokens to each other, approve others to spend their tokens on their behalf, and transfer tokens on behalf of others if they have been approved to do so. The contract also includes some basic functionality to keep track of the total supply of tokens and each user's balance.",
+    "text": "This is a simple ERC20 token contract that allows users to transfer tokens to each other, approve others to spend their tokens on their behalf, and transfer tokens on behalf of others if they have been approved to do so. The contract also includes some basic functionality to keep track of the total supply of tokens and each user's balance.",
+    "tokens": [
+      {
+        "type": "text",
+        "raw": "This is a simple ERC20 token contract that allows users to transfer tokens to each other, approve others to spend their tokens on their behalf, and transfer tokens on behalf of others if they have been approved to do so. The contract also includes some basic functionality to keep track of the total supply of tokens and each user's balance.",
+        "text": "This is a simple ERC20 token contract that allows users to transfer tokens to each other, approve others to spend their tokens on their behalf, and transfer tokens on behalf of others if they have been approved to do so. The contract also includes some basic functionality to keep track of the total supply of tokens and each user&#39;s balance."
+      }
+    ]
+  }
+]
