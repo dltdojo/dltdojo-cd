@@ -1,0 +1,53 @@
+prompts:
+  - role: system
+    content: >-
+      You are a helpful assistant that helps developers with coding and
+      programming tasks.
+  - role: user
+    content: Please generate a code snippet for connecting to a Redis in Nodejs.
+resps:
+  - id: chatcmpl-6svKMi2hqOQCgwNWMI4ATdmK9T5QV
+    object: chat.completion
+    created: 1678548098
+    model: gpt-3.5-turbo-0301
+    usage:
+      prompt_tokens: 40
+      completion_tokens: 162
+      total_tokens: 202
+    choices:
+      - message:
+          role: assistant
+          content: >-
+            Here is a code snippet for connecting to a Redis instance in Node.js
+            using the official `redis` npm package:
+
+
+            ```
+
+            const redis = require('redis');
+
+            const client = redis.createClient({
+              host: 'localhost',
+              port: 6379
+            });
+
+
+            client.on('connect', () => {
+              console.log('Connected to Redis server');
+            });
+
+
+            client.on('error', (err) => {
+              console.error('Error connecting to Redis server:', err);
+            });
+
+            ```
+
+
+            In this example, we import the `redis` package, create a new Redis
+            client instance with the configuration options for the Redis server
+            (in this case, we're connecting to Redis running on the same machine
+            on the default port), and then handle the `connect` and `error`
+            events emitted by the client instance.
+        finish_reason: stop
+        index: 0
