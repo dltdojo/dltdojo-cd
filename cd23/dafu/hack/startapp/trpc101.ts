@@ -81,14 +81,16 @@ const TrpcClient = {
   },
 };
 
-const TrpcInit = {
+const Trpc0 = {
   trpc: initTRPC.create(),
+  zPostInput: z.object({title: z.string().min(3)}),
+  zHelloInput: z.string().nullish()
 };
 
 const TrpcRouter = {
-  postRouter: TrpcInit.trpc.router({
-    createPost: TrpcInit.trpc.procedure
-      .input(z.object({ title: z.string() }))
+  post: Trpc0.trpc.router({
+    createPost: Trpc0.trpc.procedure
+      .input(Trpc0.zPostInput)
       .mutation(({ input }) => {
         const post = {
           id: ++TempDb.id,
@@ -97,18 +99,19 @@ const TrpcRouter = {
         TempDb.db.posts.push(post);
         return post;
       }),
-    listPosts: TrpcInit.trpc.procedure.query(() => TempDb.db.posts),
+    listPosts: Trpc0.trpc.procedure.query(() => TempDb.db.posts),
   }),
+  hello: Trpc0.trpc.procedure.input(Trpc0.zHelloInput).query(
+    ({ input }) => {
+      return `hello ${input ?? "world"}`;
+    },
+  ),
 };
 
 const TrpcAppRouter = {
-  appRouter: TrpcInit.trpc.router({
-    post: TrpcRouter.postRouter,
-    hello: TrpcInit.trpc.procedure.input(z.string().nullish()).query(
-      ({ input }) => {
-        return `hello ${input ?? "world"}`;
-      },
-    ),
+  appRouter: Trpc0.trpc.router({
+    post: TrpcRouter.post,
+    hello: TrpcRouter.hello,
   }),
 };
 
@@ -159,10 +162,11 @@ const cmdServer = new Command()
   .description("server")
   .option(
     "-p, --port <port:integer>",
-    "the port number.",
+    "set the server's port or env FOOAPP_PORT",
+    { default: Env0.FOOAPP_PORT },
   )
   .action((options) => {
-    TrpcServer.serve(options.port ?? Env0.FOOAPP_PORT);
+    TrpcServer.serve(options.port);
   });
 
 const cmdClient = new Command()
