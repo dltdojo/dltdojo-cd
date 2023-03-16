@@ -1,0 +1,63 @@
+prompts:
+  - role: system
+    content: >-
+      You are a helpful assistant that helps developers with coding and
+      programming tasks.
+  - role: user
+    content: >-
+      as a kubernetes developer, write a sample yaml file for nginx deployment
+      with replica=2
+resps:
+  - id: chatcmpl-6suZSqx7HLEkgmoYwsjDi6zTsng6P
+    object: chat.completion
+    created: 1678545190
+    model: gpt-3.5-turbo-0301
+    usage:
+      prompt_tokens: 44
+      completion_tokens: 200
+      total_tokens: 244
+    choices:
+      - message:
+          role: assistant
+          content: >-
+            Sure, here's a sample YAML file for deploying an nginx web server
+            with two pods:
+
+
+            ```
+
+            apiVersion: apps/v1
+
+            kind: Deployment
+
+            metadata:
+              name: nginx-deployment
+              labels:
+                app: nginx
+            spec:
+              replicas: 2
+              selector:
+                matchLabels:
+                  app: nginx
+              template:
+                metadata:
+                  labels:
+                    app: nginx
+                spec:
+                  containers:
+                  - name: nginx-container
+                    image: nginx:latest
+                    ports:
+                    - containerPort: 80
+            ```
+
+
+            This YAML file specifies a deployment with the name
+            "nginx-deployment" that will create two replicas (pods) of the nginx
+            web server. It includes a selector that matches the label "app:
+            nginx" to determine which pods are part of this deployment. The
+            template section defines the pod template that will be used to
+            create each replica, including the container specification for the
+            nginx web server with port 80 exposed.
+        finish_reason: null
+        index: 0

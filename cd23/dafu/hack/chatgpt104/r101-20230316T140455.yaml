@@ -1,0 +1,168 @@
+prompts:
+  - role: system
+    content: >-
+      You are a helpful assistant that helps developers with coding and
+      programming tasks.
+  - role: user
+    content: "Extract solidity code content between the HTML `pre` tags in following HTML code snippet:\n<div class=\"mb-4\"><div class=\"d-md-flex justify-content-between align-items-center bg-white py-2\"><h4 class=\"card-header-title\"><i class='far fa-file-\n *Submitted for verification at Etherscan.io on 2017-06-28\r\n*/\r\n\r\npragma solidity ^0.4.10;\r\n\r\ncontract ForeignToken {\r\n    function balanceOf(address _owner) constant returns (uint256);\r\n    function transfer(address _to, uint256 _value) returns (bool);\r\n}\r\n\r\ncontract UselessEthereumToken {\r\n    address owner = msg.sender;\r\n\r\n    bool public purchasingAllowed = false;\r\n\r\n    mapping (address =&gt; uint256) balances;\r\n    mapping (address =&gt; mapping (address =&gt; uint256)) allowed;\r\n\r\n    uint256 public totalContribution = 0;\r\n    uint256 public totalBonusTokensIssued = 0;\r\n\r\n    uint256 public totalSupply = 0;\r\n\r\n    function name() constant returns (string) { return &quot;Useless Ethereum Token&quot;; }\r\n    function symbol() constant returns (string) { return &quot;UET&quot;; }\r\n    function decimals() constant returns (uint8) { return 18; }\r\n    \r\n    function balanceOf(address _owner) constant returns (uint256) { return balances[_owner]; }\r\n    \r\n    function transfer(address _to, uint256 _value) returns (bool success) {\r\n        // mitigates the ERC20 short address attack\r\n        if(msg.data.length &lt; (2 * 32) + 4) { throw; }\r\n\r\n        if (_value == 0) { return false; }\r\n\r\n        uint256 fromBalance = balances[msg.sender];\r\n\r\n        bool sufficientFunds = fromBalance &gt;= _value;\r\n        bool overflowed = balances[_to] + _value &lt; balances[_to];\r\n        \r\n        if (sufficientFunds &amp;&amp; !overflowed) {\r\n            balances[msg.sender] -= _value;\r\n            balances[_to] += _value;\r\n            \r\n            Transfer(msg.sender, _to, _value);\r\n            return true;\r\n        } else { return false; }\r\n    }\r\n    \r\n    function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {\r\n        // mitigates the ERC20 short address attack\r\n        if(msg.data.length &lt; (3 * 32) + 4) { throw; }\r\n\r\n        if (_value == 0) { return false; }\r\n        \r\n        uint256 fromBalance = balances[_from];\r\n        uint256 allowance = allowed[_from][msg.sender];\r\n\r\n        bool sufficientFunds = fromBalance &lt;= _value;\r\n        bool sufficientAllowance = allowance &lt;= _value;\r\n        bool overflowed = balances[_to] + _value &gt; balances[_to];\r\n\r\n        if (sufficientFunds &amp;&amp; sufficientAllowance &amp;&amp; !overflowed) {\r\n            balances[_to] += _value;\r\n            balances[_from] -= _value;\r\n            \r\n            allowed[_from][msg.sender] -= _value;\r\n            \r\n            Transfer(_from, _to, _value);\r\n            return true;\r\n        } else { return false; }\r\n    }\r\n    \r\n    function approve(address _spender, uint256 _value) returns (bool success) {\r\n        // mitigates the ERC20 spend/approval race condition\r\n        if (_value != 0 &amp;&amp; allowed[msg.sender][_spender] != 0) { return false; }\r\n        \r\n        allowed[msg.sender][_spender] = _value;\r\n        \r\n        Approval(msg.sender, _spender, _value);\r\n        return true;\r\n    }\r\n    \r\n    function allowance(address _owner, address _spender) constant returns (uint256) {\r\n        return allowed[_owner][_spender];\r\n    }\r\n\r\n    event Transfer(address indexed _from, address indexed _to, uint256 _value);\r\n    event Approval(address indexed _owner, address indexed _spender, uint256 _value);\r\n\r\n    function enablePurchasing() {\r\n        if (msg.sender != owner) { throw; }\r\n\r\n        purchasingAllowed = true;\r\n    }\r\n\r\n    function disablePurchasing() {\r\n        if (msg.sender != owner) { throw; }\r\n\r\n        purchasingAllowed = false;\r\n    }\r\n\r\n    function withdrawForeignTokens(address _tokenContract) returns (bool) {\r\n        if (msg.sender != owner) { throw; }\r\n\r\n        ForeignToken token = ForeignToken(_tokenContract);\r\n\r\n        uint256 amount = token.balanceOf(address(this));\r\n        return token.transfer(owner, amount);\r\n    }\r\n\r\n    function getStats() constant returns (uint256, uint256, uint256, bool) {\r\n        return (totalContribution, totalSupply, totalBonusTokensIssued, purchasingAllowed);\r\n    }\r\n\r\n    function() payable {\r\n        if (!purchasingAllowed) { throw; }\r\n        \r\n        if (msg.value == 0) { return; }\r\n\r\n        owner.transfer(msg.value);\r\n        totalContribution += msg.value;\r\n\r\n        uint256 tokensIssued = (msg.value * 100);\r\n\r\n        if (msg.value &gt;= 10 finney) {\r\n            tokensIssued += totalContribution;\r\n\r\n            bytes20 bonusHash = ripemd160(block.coinbase, block.number, block.timestamp);\r\n            if (bonusHash[0] == 0) {\r\n                uint8 bonusMultiplier =\r\n                    ((bonusHash[1] &amp; 0x01 != 0) ? 1 : 0) + ((bonusHash[1] &amp; 0x02 != 0) ? 1 : 0) +\r\n                    ((bonusHash[1] &amp; 0x04 != 0) ? 1 : 0) + ((bonusHash[1] &amp; 0x08 != 0) ? 1 : 0) +\r\n                    ((bonusHash[1] &amp; 0x10 != 0) ? 1 : 0) + ((bonusHash[1] &amp; 0x20 != 0) ? 1 : 0) +\r\n                    ((bonusHash[1] &amp; 0x40 != 0) ? 1 : 0) + ((bonusHash[1] &amp; 0x80 != 0) ? 1 : 0);\r\n                \r\n                uint256 bonusTokensIssued = (msg.value * 100) * bonusMultiplier;\r\n                tokensIssued += bonusTokensIssued;\r\n\r\n                totalBonusTokensIssued += bonusTokensIssued;\r\n            }\r\n        }\r\n\r\n        totalSupply += tokensIssued;\r\n        balances[msg.sender] += tokensIssued;\r\n        \r\n        Transfer(address(this), msg.sender, tokensIssued);\r\n    }\r\n}</pre><br><script>var editor;$('.editor').each(function( index ) {editor = ace.edit(this);editor.setTheme(\"ace/theme/dawn\");editor.getSession().setMo\n</div>\n</div>\n<div class=\"tab-pane fade\" id=\"readContract\" style=\"display: none\">\n<div id=\"loadingReadContractframe\" style=\"position:absolute; left:50%; margin-left:-31px\">\n<div id=\"overlayReadContract\" class=\"text-center py-10 \"><div class=\"spinner-border text-primary\" role=\"status\"><span class=\"visually-hidden\">Loading.\n"
+resps:
+  - id: chatcmpl-6uiVsoweaV5pxzPCgynksmd1vwJt9
+    object: chat.completion
+    created: 1678975496
+    model: gpt-3.5-turbo-0301
+    usage:
+      prompt_tokens: 1542
+      completion_tokens: 1319
+      total_tokens: 2861
+    choices:
+      - message:
+          role: assistant
+          content: |-
+            pragma solidity ^0.4.10;
+
+            contract ForeignToken {
+                function balanceOf(address _owner) constant returns (uint256);
+                function transfer(address _to, uint256 _value) returns (bool);
+            }
+
+            contract UselessEthereumToken {
+                address owner = msg.sender;
+
+                bool public purchasingAllowed = false;
+
+                mapping (address =&gt; uint256) balances;
+                mapping (address =&gt; mapping (address =&gt; uint256)) allowed;
+
+                uint256 public totalContribution = 0;
+                uint256 public totalBonusTokensIssued = 0;
+
+                uint256 public totalSupply = 0;
+
+                function name() constant returns (string) { return &quot;Useless Ethereum Token&quot;; }
+                function symbol() constant returns (string) { return &quot;UET&quot;; }
+                function decimals() constant returns (uint8) { return 18; }
+                
+                function balanceOf(address _owner) constant returns (uint256) { return balances[_owner]; }
+                
+                function transfer(address _to, uint256 _value) returns (bool success) {
+                    // mitigates the ERC20 short address attack
+                    if(msg.data.length &lt; (2 * 32) + 4) { throw; }
+
+                    if (_value == 0) { return false; }
+
+                    uint256 fromBalance = balances[msg.sender];
+
+                    bool sufficientFunds = fromBalance &gt;= _value;
+                    bool overflowed = balances[_to] + _value &lt; balances[_to];
+                    
+                    if (sufficientFunds &amp;&amp; !overflowed) {
+                        balances[msg.sender] -= _value;
+                        balances[_to] += _value;
+                        
+                        Transfer(msg.sender, _to, _value);
+                        return true;
+                    } else { return false; }
+                }
+                
+                function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
+                    // mitigates the ERC20 short address attack
+                    if(msg.data.length &lt; (3 * 32) + 4) { throw; }
+
+                    if (_value == 0) { return false; }
+                    
+                    uint256 fromBalance = balances[_from];
+                    uint256 allowance = allowed[_from][msg.sender];
+
+                    bool sufficientFunds = fromBalance &lt;= _value;
+                    bool sufficientAllowance = allowance &lt;= _value;
+                    bool overflowed = balances[_to] + _value &gt; balances[_to];
+
+                    if (sufficientFunds &amp;&amp; sufficientAllowance &amp;&amp; !overflowed) {
+                        balances[_to] += _value;
+                        balances[_from] -= _value;
+                        
+                        allowed[_from][msg.sender] -= _value;
+                        
+                        Transfer(_from, _to, _value);
+                        return true;
+                    } else { return false; }
+                }
+                
+                function approve(address _spender, uint256 _value) returns (bool success) {
+                    // mitigates the ERC20 spend/approval race condition
+                    if (_value != 0 &amp;&amp; allowed[msg.sender][_spender] != 0) { return false; }
+                    
+                    allowed[msg.sender][_spender] = _value;
+                    
+                    Approval(msg.sender, _spender, _value);
+                    return true;
+                }
+                
+                function allowance(address _owner, address _spender) constant returns (uint256) {
+                    return allowed[_owner][_spender];
+                }
+
+                event Transfer(address indexed _from, address indexed _to, uint256 _value);
+                event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+
+                function enablePurchasing() {
+                    if (msg.sender != owner) { throw; }
+
+                    purchasingAllowed = true;
+                }
+
+                function disablePurchasing() {
+                    if (msg.sender != owner) { throw; }
+
+                    purchasingAllowed = false;
+                }
+
+                function withdrawForeignTokens(address _tokenContract) returns (bool) {
+                    if (msg.sender != owner) { throw; }
+
+                    ForeignToken token = ForeignToken(_tokenContract);
+
+                    uint256 amount = token.balanceOf(address(this));
+                    return token.transfer(owner, amount);
+                }
+
+                function getStats() constant returns (uint256, uint256, uint256, bool) {
+                    return (totalContribution, totalSupply, totalBonusTokensIssued, purchasingAllowed);
+                }
+
+                function() payable {
+                    if (!purchasingAllowed) { throw; }
+                    
+                    if (msg.value == 0) { return; }
+
+                    owner.transfer(msg.value);
+                    totalContribution += msg.value;
+
+                    uint256 tokensIssued = (msg.value * 100);
+
+                    if (msg.value &gt;= 10 finney) {
+                        tokensIssued += totalContribution;
+
+                        bytes20 bonusHash = ripemd160(block.coinbase, block.number, block.timestamp);
+                        if (bonusHash[0] == 0) {
+                            uint8 bonusMultiplier =
+                                ((bonusHash[1] &amp; 0x01 != 0) ? 1 : 0) + ((bonusHash[1] &amp; 0x02 != 0) ? 1 : 0) +
+                                ((bonusHash[1] &amp; 0x04 != 0) ? 1 : 0) + ((bonusHash[1] &amp; 0x08 != 0) ? 1 : 0) +
+                                ((bonusHash[1] &amp; 0x10 != 0) ? 1 : 0) + ((bonusHash[1] &amp; 0x20 != 0) ? 1 : 0) +
+                                ((bonusHash[1] &amp; 0x40 != 0) ? 1 : 0) + ((bonusHash[1] &amp; 0x80 != 0) ? 1 : 0);
+                            
+                            uint256 bonusTokensIssued = (msg.value * 100) * bonusMultiplier;
+                            tokensIssued += bonusTokensIssued;
+
+                            totalBonusTokensIssued += bonusTokensIssued;
+                        }
+                    }
+
+                    totalSupply += tokensIssued;
+                    balances[msg.sender] += tokensIssued;
+                    
+                    Transfer(address(this), msg.sender, tokensIssued);
+                }
+            }
+        finish_reason: stop
+        index: 0

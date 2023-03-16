@@ -1,0 +1,91 @@
+prompts:
+  - role: system
+    content: >-
+      You are a helpful assistant that helps developers with coding and
+      programming tasks.
+  - role: user
+    content: |-
+      explain the following shell script:
+      #!/bin/bash
+      TEMP_HTML="$(mktemp)"
+      TEMP_MD="$(mktemp).md"
+      README=html-code.md
+      SCRIPT=html-code.sh
+
+      md_code_block() {
+          echo -e "\n## $1\n" >> $README
+          echo -e "\n$(date)\n" >> $README
+          echo -e "\`\`\`$2\n" >> $README
+          cat $3 >> $README
+          echo -e "\n\`\`\`\n" >> $README
+      }
+
+      script_explain() {
+        md_code_block "explain shell script" "sh" $SCRIPT
+        echo -e "\n## chatgpt response\n" >> $README
+        cat $SCRIPT | deno run -A app.ts chatgpt -r code -m 'explain the following shell script:' -i >> $README
+      }
+
+      curl_html_code_snippet() {
+          curl -s "https://etherscan.io/address/0x27f706edde3aD952EF647Dd67E24e38CD0803DD6#code" | grep -A 150 -B 4 "pragma solidity" | cut -c 1-150
+      }
+
+      review_solidity_code() {
+          echo -e "$(curl_html_code_snippet)" > $TEMP_HTML
+          md_code_block "html code snippet" "text" $TEMP_HTML
+          echo -e "\n## chatgpt response\n" >> $README
+          cat $TEMP_HTML | deno run -A app.ts chatgpt -r code -m 'Extract solidity code content between the HTML `pre` tags in following HTML code snippet:' -i > $TEMP_MD
+          cat $TEMP_MD >> $README
+          sleep 2
+          echo -e "\n## explain solidity contract\n" >> $README
+          cat $TEMP_MD | deno run -A app.ts chatgpt -r code -m 'Explain the following solidity contract:' -i >> $README
+          sleep 2
+          echo -e "\n## review solidity contract\n" >> $README
+          cat $TEMP_MD | deno run -A app.ts chatgpt -r code -m 'Review the following solidity contract and let me known if there are any security vulnderabilities?' -i >> $README
+      }
+
+      echo -e "\n# $(date)\n" >> $README
+      script_explain
+      review_solidity_code
+resps:
+  - id: chatcmpl-6uiVhDYtm9zCP279vk6kjvMIaZNHX
+    object: chat.completion
+    created: 1678975485
+    model: gpt-3.5-turbo-0301
+    usage:
+      prompt_tokens: 540
+      completion_tokens: 239
+      total_tokens: 779
+    choices:
+      - message:
+          role: assistant
+          content: >-
+            This script is designed to retrieve a Solidity contract from a
+            specific URL, then extract the code from the HTML page using curl
+            command, and then review and explain the Solidity code using a
+            natural language processing API. 
+
+
+            The script creates temp files to store the HTML and markdown code
+            snippets. It also defines two functions:
+
+
+            - `md_code_block()` function takes three parameters: a title,
+            language, and file path of the code snippet to be added to the
+            markdown file. It adds a markdown code block format to the `README`
+            file with the given parameters.
+
+            - `script_explain()` function takes no parameter. It calls
+            `md_code_block()` function to explain the shell script using a
+            markdown code block format. It also sends the shell script to a
+            natural language processing API, `chatgpt`, to extract a response,
+            which is also added to the `README` file.
+
+
+            Finally, the script appends date to the `README` file, calls
+            `script_explain()` function to explain the Shell script, and then
+            calls `review_solidity_code()` function to extract, review, and
+            explain Solidity contract. The output is stored in the `README`
+            file.
+        finish_reason: stop
+        index: 0

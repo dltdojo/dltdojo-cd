@@ -1,0 +1,59 @@
+prompts:
+  - role: system
+    content: >-
+      You are a helpful assistant that helps developers with coding and
+      programming tasks.
+  - role: user
+    content: >-
+      Please generate a code snippet for connecting to a MySQL database in
+      Typescript.
+resps:
+  - id: chatcmpl-6svJOtZNUvpoxyMV8LCHZUsIeXlZW
+    object: chat.completion
+    created: 1678548038
+    model: gpt-3.5-turbo-0301
+    usage:
+      prompt_tokens: 41
+      completion_tokens: 172
+      total_tokens: 213
+    choices:
+      - message:
+          role: assistant
+          content: >-
+            Certainly! Here's a basic code snippet for connecting to a MySQL
+            database in Typescript using the mysql2 library:
+
+
+            ```typescript
+
+            import mysql from 'mysql2/promise';
+
+
+            async function connectToDatabase() {
+              const connection = await mysql.createConnection({
+                host: 'localhost',
+                user: 'your_username',
+                password: 'your_password',
+                database: 'your_database',
+              });
+
+              console.log('Connected to MySQL database');
+
+              // Do any database operations here
+
+              connection.end();
+            }
+
+
+            connectToDatabase().catch((error) => console.log(error));
+
+            ```
+
+
+            You'll need to replace the placeholders with your actual username,
+            password, and database name. After connecting, you can perform any
+            database operations within the `connectToDatabase` function. Don't
+            forget to close the connection with `connection.end()` when you're
+            done!
+        finish_reason: stop
+        index: 0

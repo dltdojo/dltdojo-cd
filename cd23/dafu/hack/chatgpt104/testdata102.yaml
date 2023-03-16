@@ -1,0 +1,88 @@
+prompts:
+  - role: system
+    content: >-
+      You are a helpful assistant that helps developers with coding and
+      programming tasks.
+  - role: user
+    content: 'as a Ethereum Solidity developer, write a sample ERC20 smart contract'
+resps:
+  - id: chatcmpl-6suhSJrXdRmNta417NwKRdWmVtWLb
+    object: chat.completion
+    created: 1678545686
+    model: gpt-3.5-turbo-0301
+    usage:
+      prompt_tokens: 40
+      completion_tokens: 525
+      total_tokens: 565
+    choices:
+      - message:
+          role: assistant
+          content: >-
+            Sure, here's a sample ERC20 smart contract written in Solidity:
+
+
+            ```
+
+            pragma solidity ^0.8.0;
+
+
+            contract MyToken {
+                string public name;
+                string public symbol;
+                uint8 public decimals;
+                uint256 public totalSupply;
+
+                mapping(address => uint256) public balanceOf;
+                mapping(address => mapping(address => uint256)) public allowance;
+
+                event Transfer(address indexed from, address indexed to, uint256 value);
+                event Approval(address indexed owner, address indexed spender, uint256 value);
+
+                constructor(string memory _name, string memory _symbol, uint8 _decimals, uint256 _totalSupply) {
+                    name = _name;
+                    symbol = _symbol;
+                    decimals = _decimals;
+                    totalSupply = _totalSupply;
+                    balanceOf[msg.sender] = totalSupply;
+                    emit Transfer(address(0), msg.sender, totalSupply);
+                }
+
+                function transfer(address _to, uint256 _value) public returns (bool success) {
+                    require(_to != address(0), "Invalid address");
+                    require(balanceOf[msg.sender] >= _value, "Insufficient balance");
+                    balanceOf[msg.sender] -= _value;
+                    balanceOf[_to] += _value;
+                    emit Transfer(msg.sender, _to, _value);
+                    return true;
+                }
+
+                function approve(address _spender, uint256 _value) public returns (bool success) {
+                    require(_spender != address(0), "Invalid address");
+                    allowance[msg.sender][_spender] = _value;
+                    emit Approval(msg.sender, _spender, _value);
+                    return true;
+                }
+
+                function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
+                    require(_to != address(0), "Invalid address");
+                    require(balanceOf[_from] >= _value, "Insufficient balance");
+                    require(allowance[_from][msg.sender] >= _value, "Insufficient allowance");
+                    balanceOf[_from] -= _value;
+                    balanceOf[_to] += _value;
+                    allowance[_from][msg.sender] -= _value;
+                    emit Transfer(_from, _to, _value);
+                    return true;
+                }
+            }
+
+            ```
+
+
+            This is a simple ERC20 token contract that allows users to transfer
+            tokens to each other, approve others to spend their tokens on their
+            behalf, and transfer tokens on behalf of others if they have been
+            approved to do so. The contract also includes some basic
+            functionality to keep track of the total supply of tokens and each
+            user's balance.
+        finish_reason: stop
+        index: 0
