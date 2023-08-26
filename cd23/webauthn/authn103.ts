@@ -69,7 +69,9 @@ type User = z.infer<typeof Schema.User>;
 
 const kvdb = await Deno.openKv();
 
-const HTML_ROOT = `
+
+
+const HTML_ROOT = String.raw`
 <!DOCTYPE html>
 <html>
 <head>
@@ -84,10 +86,6 @@ const HTML_ROOT = `
   <button onclick="clickRegister()">1. Register</button>
   <button onclick="clickAuthn()">2. Login/Authentication</button>
 </div>
-<script type="module">
-import { base64 } from "https://deno.land/x/b64@1.1.27/src/base64.js";
-globalThis.base64 = base64;
-</script>
 <script>
 function clickRegister() {
     const username = document.getElementById("username").value;
@@ -126,11 +124,11 @@ async function register(username) {
     console.log("navCredCreateResp:", navCredCreateResp);
     makeCredResponse = {
         id: navCredCreateResp.id,
-        rawId: base64.fromArrayBuffer(navCredCreateResp.rawId,true),
+        rawId: fromByteArray(navCredCreateResp.rawId,true),
         transports: navCredCreateResp.response.getTransports ? navCredCreateResp.response.getTransports() : undefined,
         response: {
-            attestationObject: base64.fromArrayBuffer(navCredCreateResp.response.attestationObject,true),
-            clientDataJSON: base64.fromArrayBuffer(navCredCreateResp.response.clientDataJSON,true)
+            attestationObject: fromByteArray(navCredCreateResp.response.attestationObject,true),
+            clientDataJSON: fromByteArray(navCredCreateResp.response.clientDataJSON,true)
         },
         type: navCredCreateResp.type
     };
@@ -150,19 +148,19 @@ async function register(username) {
 // https://github.com/Hexagon/webauthn-skeleton/blob/4606a15ed5db93d16fcb506a05b831881bad020c/public/static/js/utils.js#L39
 //
 function preformatMakeCredReq(makeCredReq){
-	makeCredReq.challenge = base64.toArrayBuffer(makeCredReq.challenge,true);
-	makeCredReq.user.id = base64.toArrayBuffer(makeCredReq.user.id,true);
+	makeCredReq.challenge = toByteArray(makeCredReq.challenge);
+	makeCredReq.user.id = toByteArray(makeCredReq.user.id);
 	// Decode id of each excludeCredentials
 	if (makeCredReq.excludeCredentials) {
-		makeCredReq.excludeCredentials = makeCredReq.excludeCredentials.map((e) => { return { id: base64.toArrayBuffer(e.id, true), type: e.type };});
+		makeCredReq.excludeCredentials = makeCredReq.excludeCredentials.map((e) => { return { id: toByteArray(e.id), type: e.type };});
 	}
 	return makeCredReq;
 };
 function preformatGetAssertReq(getAssert) {
-	getAssert.challenge = base64.toArrayBuffer(getAssert.challenge,true);
+	getAssert.challenge = toByteArray(getAssert.challenge);
 	// Allow any credential, this will be handled later
 	for(let allowCred of getAssert.allowCredentials) {
-		allowCred.id = base64.toArrayBuffer(allowCred.id,true);
+		allowCred.id = toByteArray(allowCred.id);
 	}
 	return getAssert;
 };
@@ -175,7 +173,7 @@ const publicKeyCredentialToJSON = (pubKeyCred) => {
 		return arr;
 	}
 	if(pubKeyCred instanceof ArrayBuffer) {
-		return base64.fromArrayBuffer(pubKeyCred,true);
+		return fromByteArray(pubKeyCred,true);
 	}
 	if(pubKeyCred instanceof Object) {
 		let obj = {};
@@ -215,6 +213,46 @@ async function login(username) {
 	});
 	const respjson2 = await resp2.json();
     console.log(respjson2);
+}
+
+//
+// base64 url encoded/decoded functions in this script are copy from
+// https://github.com/asaikali/webauthn-spring/blob/9c34d3c5f18b24b1cacc25e7565996f4de71248c/webauthn-basics/src/main/resources/static/js/base64/base64.js#L33 
+//
+function toByteArray( base64String ){
+    // console.log(base64String)
+    // Replace non-url compatible chars with base64 standard chars
+    let input = base64String
+        .replace(/-/g, '+')
+        .replace(/_/g, '/');
+
+    // Pad out with standard base64 required padding characters
+    const pad = input.length % 4;
+    if(pad) {
+        if(pad === 1) {
+            throw new Error('InvalidLengthError: Input base64url string is the wrong length to determine padding');
+        }
+        input += new Array(5-pad).join('=');
+    }
+    return  Uint8Array.from(window.atob(input), c=>c.charCodeAt(0))
+}
+
+function fromByteArray( buffer ) {
+    let binaryStr = '';
+    let bytes = new Uint8Array( buffer );
+    let len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+        binaryStr += String.fromCharCode(bytes[i]);
+    }
+    const base64String = window.btoa(binaryStr);
+    // convert from base64 to base64 url encoding
+    // NOTE: the escaping backslash issue without String.raw
+    let result = base64String
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=/g, '');
+
+    return result;
 }
 </script>
 </body>
