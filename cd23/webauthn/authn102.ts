@@ -1,4 +1,4 @@
-//   多重要素驗證 (Multi-factor authentication) : webauthn + OAuth2
+//   TODO 多重要素驗證 (Multi-factor authentication) : webauthn + OAuth2
 // ref:  
 // - denoland/deno_kv_oauth: High-level OAuth 2.0 powered by Deno KV. https://github.com/denoland/deno_kv_oauth
 // - [webauthn-open-source/fido2-lib: A node.js library for performing FIDO 2.0 / WebAuthn server functionality](https://github.com/webauthn-open-source/fido2-lib)
