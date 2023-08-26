@@ -155,13 +155,6 @@ function preformatGetAssertReq(getAssert) {
 	return getAssert;
 };
 const publicKeyCredentialToJSON = (pubKeyCred) => {
-	/* ----- DO NOT MODIFY THIS CODE --export {
-        type Cookie,
-        deleteCookie,
-        getCookies,
-        getSetCookies,
-        setCookie,
-      } from "https://deno.land/std@0.198.0/http/cookie.ts";--- */
 	if(pubKeyCred instanceof Array) {
 		let arr = [];
 		for(let i of pubKeyCred)
