@@ -1,0 +1,16 @@
+services:
+  app101:
+    build: .
+    working_dir: /app
+    volumes:
+      - ./app.sh:/app/app.sh:ro
+    ports:
+      - 8300:3000
+    command:
+      - /bin/bash
+      - -c
+      - |
+        env
+        date
+        # bash /app/app.sh
+        sleep 1000
