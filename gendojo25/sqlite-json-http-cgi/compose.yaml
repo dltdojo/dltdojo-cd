@@ -1,0 +1,33 @@
+services:
+  mytest:
+    build: .
+    working_dir: /app
+    volumes:
+      - ./app.sh:/app/app.sh:ro
+      - ./app.html:/www/app.html:ro
+      - ./app.js:/www/app.js:ro
+      - ./cgi-app.sh:/www/cgi-bin/app.sh
+      - ./cgi-backend.sh:/www/cgi-bin/backend.sh
+    ports:
+      - 8300:3000
+    command:
+      - /bin/bash
+      - -c
+      - |
+        env
+        date
+        bash /app/app.sh
+        chmod +x /www/cgi-bin/app.sh
+        chmod +x /www/cgi-bin/backend.sh
+        busybox httpd -fv -p 3000 -h /www
+        # 
+        # web app page link
+        # http://localhost:8300/app.html
+        #
+        # Exposing a local webserver via a public domain name, with automatic HTTPS
+        #
+        # No installation, no signup
+        # ssh -R 80:localhost:3000 serveo.net
+        # https://xxxxxxxxxxxxxxx.serveo.net/app.html
+        # https://github.com/anderspitman/awesome-tunneling
+        #

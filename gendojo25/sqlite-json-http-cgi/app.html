@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add Function Example</title>
+    <script src="app.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        input[type="number"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .result {
+            margin-top: 10px;
+            font-size: 36px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Example 1: frontend addition</h1>
+    <input type="number" id="num1" value="111">
+    <input type="number" id="num2" value="3">
+    <button id="btn234" onclick="addNumbers()">Add</button>
+    <h3>Result:</h3>
+    <p id="result" class="result"></p>
+    <h1>Example 2: backend app addition</h1>
+    <button id="btn235" onclick="addNumbersFromRemote2()">/cgi-bin/app.sh add two integers</button>
+    <h3>Result:</h3>
+    <p id="result2" class="result"></p>
+    <a href="http://localhost:8300/cgi-bin/app.sh?a=23&b=11" target="_blank">add.sh example link</a>
+
+    <h1>Example 3: backend database addition</h1>
+    <button id="btn236" onclick="addNumbersFromRemote3()">/cgi-bin/backend.sh add two integers</button>
+    <h3>Result:</h3>
+    <p id="result3" class="result"></p>
+    <a href="http://localhost:8300/cgi-bin/backend.sh?a=23&b=11" target="_blank">backend.sh example link</a>
+
+    <script>
+        function addNumbers() {
+            var num1 = parseInt(document.getElementById("num1").value);
+            var num2 = parseInt(document.getElementById("num2").value);
+            var result = add(num1, num2);
+            document.getElementById("result").innerHTML = result;
+            console.log(result);
+        }
+        async function addNumbersFromRemote2() {
+            var num1 = parseInt(document.getElementById("num1").value);
+            var num2 = parseInt(document.getElementById("num2").value);
+            const response = await fetch(`http://localhost:8300/cgi-bin/app.sh?a=${num1}&b=${num2}`);
+            const result = await response.text();
+            console.log(result);
+            document.getElementById("result2").innerHTML = result;
+        }
+        async function addNumbersFromRemote3() {
+            var num1 = parseInt(document.getElementById("num1").value);
+            var num2 = parseInt(document.getElementById("num2").value);
+            const response = await fetch(`http://localhost:8300/cgi-bin/backend.sh?a=${num1}&b=${num2}`);
+            const result = await response.text();
+            console.log(result);
+            document.getElementById("result3").innerHTML = result;
+        }
+    </script>
+</body>
+</html>
