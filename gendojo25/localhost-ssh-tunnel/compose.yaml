@@ -1,0 +1,26 @@
+services:
+  app123:
+    build: .
+    working_dir: /app
+    volumes:
+      - ./index.html:/www/index.html:ro
+    ports:
+      - 8300:3000
+    command:
+      - /bin/bash
+      - -c
+      - |
+        env
+        date
+        busybox httpd -fv -p 3000 -h /www
+        # 
+        # web app page link
+        # http://localhost:8300/index.html
+        #
+        # Exposing a local webserver via a public domain name, with automatic HTTPS
+        #
+        # No installation, no signup
+        # ssh -R 80:localhost:3000 serveo.net
+        # https://xxxxxxxxxxxxxxx.serveo.net/index.html
+        # https://github.com/anderspitman/awesome-tunneling
+        #
