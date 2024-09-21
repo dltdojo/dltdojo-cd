@@ -1,0 +1,18 @@
+#
+# docker compose run --rm box1
+#
+services:
+  box1:
+    image: busybox:1.36.1
+    command:
+      - /bin/sh
+      - -c
+      - |
+        env
+        echo
+        date
+        echo
+        sh app.sh
+    working_dir: /hello
+    volumes:
+      - ./app.sh:/hello/app.sh:ro
