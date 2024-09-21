@@ -1,0 +1,14 @@
+services:
+  bank101:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    #
+    # docker compose run --rm bank101
+    #
+    command: 
+      - /bin/bash
+      - /app/banking.sh
+    working_dir: /app
+    volumes:
+      - ./banking.sh:/app/banking.sh:ro
