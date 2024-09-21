@@ -1,0 +1,32 @@
+# This Docker Compose file defines a Node.js web server.
+#
+# To run the service:
+#   docker-compose up -d
+#
+# To access the service:
+#   http://localhost:8300
+#
+# To access the service via a public domain name with automatic HTTPS (requires serveo.net):
+#   1. Get into the container shell: docker compose exec box1 bash
+#   2. Start SSH tunneling: ssh -R 80:localhost:3000 serveo.net
+#   3. Access the service: https://[your-subdomain].serveo.net
+#
+# To stop the service:
+#   docker compose down
+services:
+  box1:
+    image: node:22.9
+    working_dir: /app
+    command:
+      - /bin/sh
+      - -c
+      - |
+        env
+        echo
+        date
+        echo
+        node app.js
+    ports:
+      - "8300:3000"
+    volumes:
+      - ./app.js:/app/app.js:ro

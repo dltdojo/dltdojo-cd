@@ -1,0 +1,53 @@
+#
+# docker compose up
+# http://localhost:8300
+#
+# While many official images don't include SSH client, some do.  You might need SSH access within a container 
+# without the option of creating a custom Dockerfile (e.g., due to restrictions on building images). If you 
+# need SSH functionality and can't rebuild the image, you need to choose an image that already includes it.
+#
+services:
+  box1:
+    image: python:3-bookworm
+    working_dir: /app
+    command:
+      - /bin/sh
+      - -c
+      - |
+        env
+        echo
+        date
+        echo
+        cat <<\EOOF > app.py
+        from http.server import BaseHTTPRequestHandler, HTTPServer
+        from datetime import datetime
+
+        class MyHandler(BaseHTTPRequestHandler):
+            def do_GET(self):
+                now = datetime.now()
+                date_time_string = now.strftime("%Y-%m-%d %H:%M:%S")
+
+                self.send_response(200)
+                self.send_header("Content-type", "text/plain")
+                self.end_headers()
+                message = f"Hello, World!\nCurrent date and time: {date_time_string}\n"
+                self.wfile.write(message.encode())
+
+        if __name__ == "__main__":
+            server_address = ('', 3000)
+            httpd = HTTPServer(server_address, MyHandler)
+            print('Server running at http://localhost:3000/')
+            httpd.serve_forever()
+        EOOF
+        python app.py
+        # 
+        # docker compose exec box1 bash
+        # 
+        # Exposing a local webserver via a public domain name, with automatic HTTPS
+        # No installation, no signup
+        # ssh -R 80:localhost:3000 serveo.net
+        # https://xxxxxx.serveo.net/
+        # 
+        # https://github.com/anderspitman/awesome-tunneling
+    ports:
+      - "8300:3000"

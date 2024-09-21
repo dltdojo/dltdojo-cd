@@ -1,0 +1,19 @@
+services:
+  app101:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    #
+    # 1. docker compose up -d
+    # 2. docker compose exec app101 bash
+    # 3. bash /app/users.sh
+    # 4. docker compose down
+    #
+    command: 
+      - /bin/bash
+      - -c 
+      - |
+        sleep 9000
+    working_dir: /app
+    volumes:
+      - ./users.sh:/app/users.sh:ro

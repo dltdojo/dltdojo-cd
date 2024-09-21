@@ -1,0 +1,46 @@
+#
+# docker compose up
+# http://localhost:8300
+#
+services:
+  box1:
+    image: busybox:1.36.1
+    command:
+      - /bin/sh
+      - -c
+      - |
+        env
+        echo
+        date
+        echo
+        busybox httpd -f -v -p 3000 -h /www
+    ports:
+      - "8300:3000"
+    working_dir: /www
+    volumes:
+      - ./index.html:/www/index.html:ro
+  box2:
+    image: alpine:3.20.3
+    command:
+      - /bin/sh
+      - -c
+      - |
+        env
+        echo
+        date
+        echo
+        sleep 9000
+        # 
+        # To access the Alpine container and install the OpenSSH client:
+        # 1. Run: docker compose exec box2 sh
+        # 2. Inside the container, install OpenSSH: apk add openssh-client
+        #
+        # To expose the local webserver (running in box1) via a public domain with automatic HTTPS:
+        # 1. Ensure you're inside the box2 container
+        # 2. Run: ssh -R 80:box1:3000 serveo.net
+        # 3. Serveo will provide a URL like https://xxxxxx.serveo.net/
+        #
+        # This setup allows you to share your local web server publicly without port forwarding or static IP.
+        # It's useful for demos, testing, or temporary public access to your local development server.
+        # 
+        # For more tunneling options, visit: https://github.com/anderspitman/awesome-tunneling

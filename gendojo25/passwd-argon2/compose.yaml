@@ -1,0 +1,14 @@
+services:
+  app101:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    #
+    # docker compose run --rm app101
+    #
+    command: 
+      - /bin/bash
+      - /app/users.sh
+    working_dir: /app
+    volumes:
+      - ./users.sh:/app/users.sh:ro

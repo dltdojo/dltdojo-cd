@@ -1,0 +1,34 @@
+#
+# docker compose up
+# http://localhost:8300
+#
+# While many official images don't include SSH client, some do.  You might need SSH access within a container 
+# without the option of creating a custom Dockerfile (e.g., due to restrictions on building images). If you 
+# need SSH functionality and can't rebuild the image, you need to choose an image that already includes it.
+#
+services:
+  box1:
+    image: python:3-bookworm
+    working_dir: /app
+    volumes:
+      - ./app.py:/app/app.py:ro
+    command:
+      - /bin/sh
+      - -c
+      - |
+        env
+        echo
+        date
+        echo
+        python /app/app.py
+        # 
+        # docker compose exec box1 bash
+        # 
+        # Exposing a local webserver via a public domain name, with automatic HTTPS
+        # No installation, no signup
+        # ssh -R 80:localhost:3000 serveo.net
+        # https://xxxxxx.serveo.net/
+        # 
+        # https://github.com/anderspitman/awesome-tunneling
+    ports:
+      - "8300:3000"

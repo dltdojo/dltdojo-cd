@@ -1,0 +1,46 @@
+#
+# docker compose up
+# http://localhost:8300
+#
+services:
+  box1:
+    image: busybox:1.36.1
+    command:
+      - /bin/sh
+      - -c
+      - |
+        env
+        echo
+        date
+        echo
+        mkdir /www
+        cat <<\EOOF > /www/index.html
+        <html>
+          <head><title>busybox httpd 2024</title></head>
+          <body><p>HELLO Busybox Httpd</p></body>
+        </html>
+        EOOF
+        busybox httpd -f -v -p 3000 -h /www
+    ports:
+      - "8300:3000"
+  box2:
+    image: alpine:3.20.3
+    command:
+      - /bin/sh
+      - -c
+      - |
+        env
+        echo
+        date
+        echo
+        sleep 9000
+        # 
+        # docker compose exec box2 sh
+        # 
+        # apk add openssh-client
+        #
+        # Exposing a local webserver via a public domain name, with automatic HTTPS, No installation, no signup
+        # ssh -R 80:box1:3000 serveo.net
+        # https://xxxxxx.serveo.net/
+        # 
+        # https://github.com/anderspitman/awesome-tunneling
