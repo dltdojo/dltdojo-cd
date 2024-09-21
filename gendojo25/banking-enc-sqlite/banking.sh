@@ -6,7 +6,7 @@ DB_FILE="bank.db"
 ENC_DB_FILE="bank.db.age"
 
 create_db_schema() {
-# Check if database exists, create if not
+# Check if the database file exists, create it if not
   if [ ! -f "$DB_FILE" ]; then
     sqlite3 "$DB_FILE" "
       CREATE TABLE accounts (
@@ -32,10 +32,10 @@ create_account() {
 }
 
 enc_dbfile() {
-    # Check if AGE_PUB_KEY exists
+    # Check if AGE_PUB_KEY is set
     if [ -z "$AGE_PUB_KEY" ]; then
         echo "Error: AGE_PUB_KEY is not set. Please set the public key for encryption."
-        echo "Usage: Create Age Key"
+        echo "Usage: Generate an Age Key first."
         return 1
     else
         echo "Using AGE_PUB_KEY: $AGE_PUB_KEY"
@@ -63,7 +63,7 @@ dec_dbfile() {
     if [ ! -f "$AGE_KEY_FILE" ]; then
         echo "Error: AGE_KEY_FILE does not exist or is not accessible."
         echo "Please ensure the key file exists and is readable."
-        echo "Usage: Create Age Key"
+        echo "Usage: Generate an Age Key first."
         return 1
     else
         echo "Using AGE_KEY_FILE: $AGE_KEY_FILE"
@@ -85,7 +85,7 @@ dec_dbfile() {
 # Function to create an age key or prompt for overwrite if one already exists
 create_age_key() {
     AGE_KEY_FILE="/tmp/age-keys.txt"
-    echo "Creating age encryption key, and extracting the public key as AGE_PUB_KEY"
+    echo "Creating an age encryption key and extracting the public key as AGE_PUB_KEY"
     # Generate a new age key
     age-keygen > "$AGE_KEY_FILE"
     # Set appropriate permissions for the key file
@@ -117,26 +117,26 @@ withdraw() {
   echo "Withdrawal successful."
 }
 
-# Function to check balance
+# Function to check the account balance
 check_balance() {
   read -p "Enter account ID: " id
   balance=$(sqlite3 "$DB_FILE" "SELECT balance FROM accounts WHERE id = $id;")
   echo "Account balance: $balance"
 }
 
-# Function to transfer money
+# Function to transfer money between accounts
 transfer() {
   read -p "Enter source account ID: " source_id
   read -p "Enter destination account ID: " dest_id
   read -p "Enter amount to transfer: " amount
 
-  # Check if source account has sufficient funds within the transaction
+  # Check if the source account has sufficient funds within the transaction
   sqlite3 "$DB_FILE" "BEGIN TRANSACTION;
                      SELECT balance FROM accounts WHERE id = $source_id;
                      "
   source_balance=$(sqlite3 "$DB_FILE" "SELECT balance FROM accounts WHERE id = $source_id;")
   if (( $(echo "$source_balance >= $amount" | bc -l) )); then
-    # Deduct from source account
+    # Deduct from the source account and add to the destination account
     sqlite3 "$DB_FILE" "UPDATE accounts SET balance = balance - $amount WHERE id = $source_id;
                      UPDATE accounts SET balance = balance + $amount WHERE id = $dest_id;
                      INSERT INTO transactions (source_id, dest_id, amount) VALUES ($source_id, $dest_id, $amount);
@@ -144,11 +144,11 @@ transfer() {
     echo "Transfer successful."
   else
     sqlite3 "$DB_FILE" "ROLLBACK;"
-    echo "Insufficient funds in source account."
+    echo "Insufficient funds in the source account."
   fi
 }
 
-# Function to print all tables
+# Function to print all tables (for debugging purposes)
 print_tables() {
   echo "Accounts Table:"
   sqlite3 "$DB_FILE" ".headers on" ".mode column" "SELECT * FROM accounts;"
@@ -156,7 +156,7 @@ print_tables() {
   sqlite3 "$DB_FILE" ".headers on" ".mode column" "SELECT * FROM transactions;"
 }
 
-# Function to view transaction history
+# Function to view the transaction history
 view_transaction_history() {
   read -p "Enter account ID (or leave blank for all): " account_id
 

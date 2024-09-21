@@ -1,8 +1,79 @@
-# Age encrypt sqlites datafile
+# Simple Banking System with SQLite and Age Encryption
 
-```sh
-docker compose run --rm bank101
+This script implements a basic banking system using SQLite for data storage and the `age` utility for optional encryption. 
+
+## Features
+
+* **Create Database Schema:** Sets up the necessary tables (accounts and transactions) if they don't exist.
+* **Create Account:** Allows users to create new bank accounts.
+* **Deposit:** Deposits money into an existing account.
+* **Withdraw:** Withdraws money from an existing account.
+* **Check Balance:** Displays the current balance of an account.
+* **Transfer:** Transfers money between two accounts.
+* **Print Tables (Debug):** Outputs the contents of the accounts and transactions tables (for debugging).
+* **View Transaction History:** Displays a list of transactions, either for a specific account or all accounts.
+* **Encrypt Database File:** Encrypts the database file using an Age public key.
+* **Decrypt Database File:** Decrypts the encrypted database file using an Age secret key.
+* **Create Age Key:** Generates a new Age key pair and stores it in a file.
+
+## Usage
+
+1. **Install Dependencies:**
+   - Make sure you have `sqlite3` and `age` installed on your system.
+2. **Run the Script:**
+   ```bash
+   docker compose run --rm bank101
+   # bash banking.sh 
+   ```
+3. **Follow the Menu:** The script presents a menu with the available options. Choose the desired operation by entering the corresponding number.
+
+
+## Encryption/Decryption
+
+**Important:** Before using encryption, you must generate an Age key pair.
+
+1. **Generate Age Key:**
+   - Select option 11 ("Create Age Key") from the menu. 
+   - This will generate a key pair and store the secret key in `/tmp/age-keys.txt` and output the public key. 
+2. **Encrypt Database:**
+   - Set the `AGE_PUB_KEY` environment variable to the public key generated in the previous step. 
+   - Select option 9 ("Encrypt Database File") from the menu.
+   - The original database file will be encrypted and replaced with the encrypted version.
+3. **Decrypt Database:**
+   - Set the `AGE_KEY_FILE` environment variable to the path of the secret key file (`/tmp/age-keys.txt`).
+   - Select option 10 ("Decrypt Database File") from the menu. 
+
+**Note:** 
+- For security, ensure that the secret key file is protected and only accessible to authorized users.
+- Be careful when handling encryption keys, as losing them will make it impossible to decrypt the data.
+
+
+## Database File
+
+The script stores data in a file named `bank.db`. The encrypted version of the database is stored in `bank.db.age`.
+
+## Example
+
 ```
+Banking System Menu:
+
+  1. Create Database Schema
+  2. Create Account
+  ...
+  12. Exit
+
+Enter your choice: 2
+Enter account name: John Doe
+Account created for John Doe.
+
+... (continue using the menu) ...
+```
+
+## Disclaimer
+
+This is a simple demonstration and should not be used for real-world banking applications. It is intended for educational and learning purposes only. 
+
+**Remember to replace placeholders in the README.md with specific details about your implementation if necessary.**
 
 ## Age Help
 
@@ -49,10 +120,6 @@ Example:
     $ age --decrypt -i key.txt -o data.tar.gz data.tar.gz.age
 ```
 
-# Alternative to Full Database Encryption: Encrypting Sensitive Data Before Storage
-
-When the encryption of an entire SQLite database isn't practical or desired, a viable alternative is to encrypt specific pieces of sensitive data before they are inserted into the database. This method allows for the selective protection of data, such as personal identifiers, financial information, or any other data deemed sensitive, without the need to encrypt the entire database file. This strategy involves encrypting individual data elements using cryptographic libraries before inserting them into the SQLite database.
-
 # Banking101 - Simple Banking System
 
 This project implements a basic banking system using Bash scripting and SQLite. It provides a command-line interface for managing bank accounts, performing transactions, and viewing account information.
@@ -79,59 +146,4 @@ This project implements a basic banking system using Bash scripting and SQLite. 
    docker compose run --rm bank101
    ```
 
-   This command will build the Docker image (if not already built) and run the banking application.
-
-## Features
-
-The banking system provides the following features:
-
-1. Create Account: Set up a new bank account with a unique ID.
-2. Deposit: Add funds to an existing account.
-3. Withdraw: Remove funds from an existing account.
-4. Check Balance: View the current balance of an account.
-5. Transfer: Move funds from one account to another.
-6. Print Tables (Debug): Display all accounts and transactions (for debugging purposes).
-7. View Transaction History: See the transaction history for a specific account or all accounts.
-
-## Usage
-
-Once you run the application, you'll be presented with a menu of options. Enter the number corresponding to the action you want to perform and follow the prompts.
-
-Example:
-
-```
-Banking System Menu:
-
-1. Create Account
-2. Deposit
-3. Withdraw
-4. Check Balance
-5. Transfer
-6. Print Tables (Debug)
-7. View Transaction History
-8. Exit
-
-Enter your choice:
-```
-
-## Database
-
-The application uses an SQLite database (`bank.db`) to store account information and transactions. The database is automatically created if it doesn't exist when you first run the application.
-
-## Notes
-
-- The application runs in a Docker container, ensuring consistency across different environments.
-- The `banking.sh` script is mounted as a volume in the Docker container, allowing for easy updates without rebuilding the image.
-- All data is stored in the SQLite database within the container. If you need data persistence between runs, you may want to consider mounting a volume for the database file.
-
-## Security Considerations
-
-This is a simple demonstration project and lacks many security features that would be necessary for a real-world banking application. In a production environment, you would need to implement proper authentication, encryption, input validation, and other security measures.
-
-## Contributing
-
-Feel free to fork this repository and submit pull requests for any improvements or additional features you'd like to add.
-
-## License
-
-This project is open-source and available under the MIT License.
+This command will build the Docker image (if not already built) and run the banking application.

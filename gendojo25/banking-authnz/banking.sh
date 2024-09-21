@@ -16,29 +16,31 @@ check_argon2
 DB_FILE="bank.db"
 
 # Create the database and tables if they don't exist
-sqlite3 "$DB_FILE" "CREATE TABLE IF NOT EXISTS accounts (
+sqlite3 "$DB_FILE" <<EOF
+CREATE TABLE IF NOT EXISTS accounts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     balance REAL DEFAULT 0.0,
     salt TEXT NOT NULL,
     hash TEXT NOT NULL,
     UNIQUE(name)
-);"
+);
 
-sqlite3 "$DB_FILE" "CREATE TABLE IF NOT EXISTS transactions (
+CREATE TABLE IF NOT EXISTS transactions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     source_id INTEGER,
     dest_id INTEGER,
     amount REAL,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-);"
+);
 
-sqlite3 "$DB_FILE" "CREATE TABLE IF NOT EXISTS auth_events (
+CREATE TABLE IF NOT EXISTS auth_events (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL,
     timestamp TEXT NOT NULL,
     success INTEGER NOT NULL
-);"
+);
+EOF
 
 # Function to generate a random salt
 generate_salt() {
@@ -72,6 +74,11 @@ deposit() {
   fi
 
   read -p "Enter account ID: " id
+  # Authorize user to access this account
+  if ! authorize_user "$id"; then
+    echo "You are not authorized to make a deposit."
+    return 1
+  fi
   read -p "Enter amount to deposit: " amount
   sqlite3 "$DB_FILE" "BEGIN TRANSACTION;
                      UPDATE accounts SET balance = balance + $amount WHERE id = $id;
@@ -88,6 +95,11 @@ withdraw() {
   fi
 
   read -p "Enter account ID: " id
+  # Authorize user to access this account
+  if ! authorize_user "$id"; then
+    echo "You are not authorized to make a withdrawal."
+    return 1
+  fi
   read -p "Enter amount to withdraw: " amount
 
   sqlite3 "$DB_FILE" <<EOF
@@ -108,6 +120,11 @@ check_balance() {
   fi
 
   read -p "Enter account ID: " id
+  # Authorize user to access this account
+  if ! authorize_user "$id"; then
+    echo "You are not authorized to check this account's balance."
+    return 1
+  fi
   balance=$(sqlite3 "$DB_FILE" "SELECT balance FROM accounts WHERE id = $id;")
   echo "Account balance: $balance"
 }
@@ -120,6 +137,11 @@ transfer() {
   fi
 
   read -p "Enter source account ID: " source_id
+  # Authorize user to access this account
+  if ! authorize_user "$source_id"; then
+    echo "You are not authorized to make a transfer."
+    return 1
+  fi
   read -p "Enter destination account ID: " dest_id
   read -p "Enter amount to transfer: " amount
 
@@ -147,7 +169,7 @@ print_tables() {
   sqlite3 "$DB_FILE" ".headers on" ".mode column" "SELECT * FROM accounts;"
   echo "\nTransactions Table:"
   sqlite3 "$DB_FILE" ".headers on" ".mode column" "SELECT * FROM transactions;"
-  echo "\nAuth Events Table:"
+  echo "\nAuthentication Events Table:"
   sqlite3 "$DB_FILE" ".headers on" ".mode column" "SELECT * FROM auth_events;"
 }
 
@@ -188,7 +210,13 @@ view_transaction_history() {
     return 1
   fi
 
-  read -p "Enter account ID (or leave blank for all): " account_id
+  read -p "Enter account ID (or leave blank to view all): " account_id
+
+  # Authorize user to access this account
+  if ! authorize_user "$account_id"; then
+    echo "You are not authorized to view transaction history."
+    return 1
+  fi
 
   if [ -z "$account_id" ]; then
     # Show all transactions
@@ -199,6 +227,19 @@ view_transaction_history() {
     echo "Transaction History (Account $account_id):"
     sqlite3 "$DB_FILE" ".headers on" ".mode column" \
       "SELECT * FROM transactions WHERE source_id = $account_id OR dest_id = $account_id;"
+  fi
+}
+
+# Function to authorize a user to access an account
+authorize_user() {
+  local account_id=$1
+  # Get the owner of the account
+  owner=$(sqlite3 "$DB_FILE" "SELECT name FROM accounts WHERE id = $account_id;")
+  # Check if the authenticated user is the owner of the account
+  if [[ "$username" == "$owner" ]]; then
+    return 0 # Authorized
+  else
+    return 1 # Not authorized
   fi
 }
 
@@ -249,13 +290,13 @@ while true; do
   Banking System Menu:
 
   1. Create Account
-  2. Deposit
-  3. Withdraw
+  2. Deposit Funds
+  3. Withdraw Funds
   4. Check Balance
-  5. Transfer
+  5. Transfer Funds
   6. Print Tables (Debug)
   7. View Transaction History
-  8. Authenticate Account
+  8. Authenticate User
   9. Update Password
   10. Exit
   "
@@ -275,4 +316,4 @@ while true; do
     10) exit 0 ;;
     *) echo "Invalid choice. Please try again." ;;
   esac
-done
+done 
